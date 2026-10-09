@@ -1801,18 +1801,17 @@ section[id] {
   gap: 12px;
 }
 
-/* Megosztás gomb a programok kártyáin */
+/* "Üzenet másolása" gomb a programok kártyáin */
 .news-actions {
   display: flex;
   flex-wrap: wrap;
-  align-items: center;
   gap: 8px;
   margin-top: auto;
   padding-top: 12px;
 }
 
 .share-btn,
-.share-option {
+.calendar-btn {
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -1825,15 +1824,22 @@ section[id] {
   font-size: 0.85rem;
   font-weight: 600;
   cursor: pointer;
-  transition: background 0.2s ease;
+  transition: background 0.2s ease, color 0.2s ease;
 }
 
 .share-btn:hover,
-.share-option:hover {
+.calendar-btn:hover {
   background: var(--color-highlight);
 }
 
-.share-btn svg {
+.share-btn.is-copied {
+  border-color: var(--color-primary);
+  background: var(--color-primary);
+  color: #fff;
+}
+
+.share-btn svg,
+.calendar-btn svg {
   width: 15px;
   height: 15px;
   fill: none;
@@ -1843,22 +1849,53 @@ section[id] {
   stroke-linejoin: round;
 }
 
-.share-options {
+/* Dokumentumok oldal */
+.doc-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 24px;
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+.doc-card {
   display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  width: 100%;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 24px;
+  background: var(--color-bg-alt);
+  border: 1px solid var(--color-border);
+  border-top: 4px solid var(--color-accent);
+  border-radius: 12px;
 }
 
-.share-close {
-  padding: 6px 11px;
-  border-color: var(--color-border);
+.doc-card h3 {
+  font-size: 1.2rem;
+}
+
+.doc-card p {
+  margin: 0 0 8px;
+}
+
+.doc-card .doc-meta {
+  margin-bottom: 16px;
+  font-size: 0.85rem;
   color: var(--color-text-muted);
 }
 
-.share-hint {
-  width: 100%;
-  margin: 0;
-  font-size: 0.82rem;
-  color: var(--color-text-muted);
+.doc-card .btn {
+  margin-top: auto;
+}
+
+/* A "Google Naptárba" gomb zöld, hogy kiemelkedjen az "Üzenet másolása" mellől */
+.calendar-btn {
+  border-color: var(--color-primary);
+  background: var(--color-primary);
+  color: #fff;
+}
+
+.calendar-btn:hover {
+  border-color: var(--color-primary-dark);
+  background: var(--color-primary-dark);
+  color: #fff;
 }

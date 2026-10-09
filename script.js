@@ -376,9 +376,12 @@ function initCalendar() {
       copy.hidden = false;
       copy.classList.remove('news-card-past');
       copy.querySelectorAll('.news-past-label').forEach(label => label.remove());
-      // egy esetleg nyitva hagyott megosztás-menüt ne másoljunk át
-      copy.querySelectorAll('.share-options, .share-hint').forEach(menu => menu.remove());
-      copy.querySelectorAll('.share-btn').forEach(btn => { btn.hidden = false; btn.setAttribute('aria-expanded', 'false'); });
+      // a másolás gomb szövegét visszaállítjuk (ha éppen a visszajelzés látszott)
+      copy.querySelectorAll('.share-btn').forEach(btn => {
+        btn.classList.remove('is-copied');
+        const span = btn.querySelector('span');
+        if (span) span.textContent = 'Üzenet másolása';
+      });
       if (event.end < todayKey) {
         copy.querySelector('.news-meta')?.append(element('span', 'news-past-label', 'Elmúlt'));
       }
@@ -599,18 +602,16 @@ document.querySelectorAll('a[href^="mailto:"]').forEach(link => {
 })();
 
 // ==========================================================
-// Megosztás gomb a programoknál
-// Minden id-vel rendelkező .news-card aljára egy "Megosztás" gombot tesz.
-// Kattintásra a gomb helyén megjelennek a lehetőségek: WhatsApp (a teljes
-// üzenet előre beírva), Messenger (az üzenet a vágólapra kerül, és megnyílik
-// a Messenger), üzenet másolása; érintőképernyős készüléken a készülék
-// saját megosztó ablaka is ("Más..."). A küldött üzenet a kártyából áll
-// össze: név, dátum, időpont, helyszín és a program linkje. Képet nem csatol.
-// A kapcsolattartók adatai szándékosan nincsenek az üzenetben.
+// "Üzenet másolása" gomb a programoknál
+// Minden id-vel rendelkező .news-card aljára egy gombot tesz, amely a
+// program rövid üzenetét a vágólapra másolja, hogy be lehessen illeszteni
+// WhatsAppba, Messengerbe vagy bárhova. Az üzenet a kártyából áll össze:
+// név, dátum, időpont, helyszín és a program linkje. A kapcsolattartók
+// adatai szándékosan nincsenek benne.
 // ==========================================================
-const SHARE_ICON =
-  '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/>' +
-  '<circle cx="18" cy="19" r="3"/><path d="M8.6 10.5l6.8-4M8.6 13.5l6.8 4"/></svg>';
+const COPY_ICON =
+  '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/>' +
+  '<path d="M5 15V6a2 2 0 0 1 2-2h9"/></svg>';
 
 function detailValue(card, label) {
   for (const paragraph of card.querySelectorAll('.news-detail')) {
@@ -634,7 +635,67 @@ function buildShareMessage(card, id) {
   if (time) lines.push(`\u{1F551} ${time}`);
   if (place) lines.push(`\u{1F4CD} ${place}`);
   lines.push(`Részletek: ${url}`);
-  return { title, text: lines.join('\n'), url };
+  return lines.join('\n');
+}
+
+const CALENDAR_ICON =
+  '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/>' +
+  '<path d="M3 10h18M8 3v4M16 3v4"/></svg>';
+
+// A Google Naptár "esemény létrehozása" hivatkozása, előre kitöltve (a látogatónak
+// csak a Mentés gombot kell megnyomnia). Ha a kártyán van időpont (pl. "14:00–20:00"
+// vagy "17:45"), időponthoz kötött esemény lesz; ha nincs, egész napos.
+// Egy időpontnál (pl. gyülekező) alapból 1 órás eseményt hoz létre.
+function buildCalendarLink(card) {
+  const startDate = card.dataset.date;
+  if (!startDate) return '';
+  const endDate = card.dataset.endDate || startDate;
+  const digits = value => value.replace(/-/g, '');
+  const pad2 = n => String(n).padStart(2, '0');
+
+  const times = [...detailValue(card, 'időpont').matchAll(/(\d{1,2}):(\d{2})/g)]
+    .map(match => Number(match[1]) * 60 + Number(match[2]));
+
+  let dates;
+  if (times.length === 0) {
+    // egész napos: a befejezés napja nem tartozik bele, ezért a következő nap
+    const [y, m, d] = endDate.split('-').map(Number);
+    const next = new Date(y, m - 1, d + 1);
+    const nextKey = `${next.getFullYear()}${pad2(next.getMonth() + 1)}${pad2(next.getDate())}`;
+    dates = `${digits(startDate)}/${nextKey}`;
+  } else {
+    const stamp = (day, minutes) => `${digits(day)}T${pad2(Math.floor(minutes / 60) % 24)}${pad2(minutes % 60)}00`;
+    const start = times[0];
+    let end = times.length > 1 ? times[1] : start + 60;
+    let endDay = endDate;
+    if (times.length > 1 && endDate === startDate && end < start) {
+      const [y, m, d] = startDate.split('-').map(Number);
+      const next = new Date(y, m - 1, d + 1);
+      endDay = `${next.getFullYear()}-${pad2(next.getMonth() + 1)}-${pad2(next.getDate())}`;
+    }
+    if (end >= 24 * 60) {
+      const [y, m, d] = endDay.split('-').map(Number);
+      const next = new Date(y, m - 1, d + 1);
+      endDay = `${next.getFullYear()}-${pad2(next.getMonth() + 1)}-${pad2(next.getDate())}`;
+      end -= 24 * 60;
+    }
+    dates = `${stamp(startDate, start)}/${stamp(endDay, end)}`;
+  }
+
+  const title = card.querySelector('h3')?.textContent.trim() ?? '';
+  const place = detailValue(card, 'helyszín');
+  const description = card.querySelector(':scope > p:not(.news-detail)')?.textContent.replace(/\s+/g, ' ').trim() ?? '';
+  const url = `${location.origin}${location.pathname}#${card.id}`;
+
+  const params = new URLSearchParams({
+    action: 'TEMPLATE',
+    text: title,
+    dates,
+    ctz: 'Europe/Budapest',
+    details: `${description}\n\nRészletek: ${url}`.trim()
+  });
+  if (place) params.set('location', place);
+  return `https://calendar.google.com/calendar/render?${params}`;
 }
 
 document.querySelectorAll('#newsGrid .news-card[id]').forEach(card => {
@@ -644,87 +705,34 @@ document.querySelectorAll('#newsGrid .news-card[id]').forEach(card => {
   button.type = 'button';
   button.className = 'share-btn';
   button.dataset.shareId = card.id;
-  button.setAttribute('aria-expanded', 'false');
-  button.innerHTML = `${SHARE_ICON}<span>Megosztás</span>`;
+  button.innerHTML = `${COPY_ICON}<span>Üzenet másolása</span>`;
   actions.append(button);
+
+  const calendarLink = buildCalendarLink(card);
+  if (calendarLink) {
+    const calendarButton = document.createElement('a');
+    calendarButton.className = 'calendar-btn';
+    calendarButton.href = calendarLink;
+    calendarButton.target = '_blank';
+    calendarButton.rel = 'noopener noreferrer';
+    calendarButton.innerHTML = `${CALENDAR_ICON}<span>Google Naptárba</span>`;
+    actions.append(calendarButton);
+  }
   card.append(actions);
 });
 
 document.addEventListener('click', async event => {
   const button = event.target.closest('.share-btn');
-  const option = event.target.closest('.share-option');
-
-  // a megosztási lehetőségek egyike
-  if (option) {
-    const { channel, text } = option.dataset;
-    const actions = option.closest('.news-actions');
-    if (channel === 'close') {
-      closeShareOptions(actions);
-    } else if (channel === 'whatsapp' || channel === 'messenger') {
-      // Előbb megnyitjuk az appot (ehhez kell a kattintás), aztán a teljes üzenetet a
-      // vágólapra tesszük. A WhatsApp asztali appja a szövegből néha csak a linket
-      // veszi át; ilyenkor a vágólapról beilleszthető az egész üzenet.
-      const target = channel === 'whatsapp'
-        ? `https://wa.me/?text=${encodeURIComponent(text)}`
-        : 'https://www.messenger.com/';
-      window.open(target, '_blank', 'noopener');
-      const copied = await copyToClipboard(text);
-      showShareHint(actions, copied, channel === 'messenger');
-    } else if (channel === 'copy') {
-      const copied = await copyToClipboard(text);
-      option.textContent = copied ? 'Másolva \u2713' : 'Nem sikerült';
-      setTimeout(() => { option.textContent = 'Üzenet másolása'; }, 2000);
-    }
-    return;
-  }
-
   if (!button) return;
+
   const card = button.closest('.news-card');
-  const { title, text, url } = buildShareMessage(card, button.dataset.shareId);
-
-  // számítógépen: a Megosztás gomb helyén jelennek meg a lehetőségek
-  const actions = button.closest('.news-actions');
-  const options = document.createElement('div');
-  options.className = 'share-options';
-  const channels = [['whatsapp', 'WhatsApp'], ['messenger', 'Messenger'], ['copy', 'Üzenet másolása']];
-  channels.push(['close', '\u2715']);
-  channels.forEach(([channel, label]) => {
-    const item = document.createElement('button');
-    item.type = 'button';
-    item.className = 'share-option' + (channel === 'close' ? ' share-close' : '');
-    item.dataset.channel = channel;
-    item.dataset.text = text;
-    item.dataset.url = url;
-    item.textContent = label;
-    if (channel === 'close') item.setAttribute('aria-label', 'Bezárás');
-    options.append(item);
-  });
-  button.hidden = true;
-  actions.append(options);
+  const copied = await copyToClipboard(buildShareMessage(card, button.dataset.shareId));
+  const label = button.querySelector('span');
+  label.textContent = copied ? 'Másolva \u2713' : 'Nem sikerült másolni';
+  button.classList.toggle('is-copied', copied);
+  clearTimeout(copyTimers.get(button));
+  copyTimers.set(button, setTimeout(() => {
+    label.textContent = 'Üzenet másolása';
+    button.classList.remove('is-copied');
+  }, 2000));
 });
-
-// Kis tájékoztató a megosztás gombok alatt: a teljes üzenet a vágólapon van
-function showShareHint(actions, copied, messengerOnly) {
-  actions.querySelector('.share-hint')?.remove();
-  const key = /Mac|iPhone|iPad/.test(navigator.platform) ? 'Cmd+V' : 'Ctrl+V';
-  const hint = document.createElement('p');
-  hint.className = 'share-hint';
-  hint.textContent = !copied
-    ? 'Az üzenetet nem sikerült a vágólapra tenni.'
-    : messengerOnly
-      ? `Az üzenet a vágólapon van: illeszd be a beszélgetésbe (${key}).`
-      : `A teljes üzenet a vágólapon is ott van: ha a WhatsAppban csak a link látszik, jelöld ki a mezőt és illeszd be (${key}).`;
-  actions.append(hint);
-}
-
-// A megosztási lehetőségek bezárása: a Megosztás gomb visszakerül
-function closeShareOptions(actions) {
-  actions.querySelector('.share-options')?.remove();
-  actions.querySelector('.share-hint')?.remove();
-  const button = actions.querySelector('.share-btn');
-  if (button) {
-    button.hidden = false;
-    button.setAttribute('aria-expanded', 'false');
-    button.focus();
-  }
-}
