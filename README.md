@@ -34,13 +34,12 @@ A `style.css` elején lévő `:root` blokkban vannak (386641, 6a994e, a7c957 az 
 - **Új hír / esemény:** az `aktualis.html`-ben másolj le egy `<article class="news-card">…</article>` blokkot, írd át a szöveget, a látható dátumot (`.news-date`), és állítsd be a `data-date="ÉÉÉÉ-HH-NN"` attribútumot az esemény napjára (többnapos eseménynél add meg a `data-end-date`-et is).
 - **Lejárt események (automatikus):** az esemény napja után az esemény `Elmúlt` címkével, halványítva a lista végére kerül, majd a rács (`#newsGrid`) `data-keep-days` attribútumában megadott nap (alapból 7) után elrejtődik. Ha nincs látható hír, egy üzenet jelenik meg a Facebook/Instagram linkekkel. A `data-date` nélküli hír mindig látszik. Elrejtés csak a böngészőben történik, a HTML-ből néha érdemes kitörölni a régi blokkokat. Teszteléshez a böngésző konzoljában: `updateNews(new Date('2026-10-12T10:00:00'))`.
 - **Támogass minket oldal:** fent a szöveg, alatta az adó 1%-os kép (`ado1.jpg`), majd két kártya egymás mellett (egyesület adatai, banki átutalás); mobilon egymás alá kerülnek.
-- **Rajparancsnokok:** a `csatlakozom.html`-ben osztályonként vannak, a nevek és e-mail címek jelenleg PLACEHOLDEREK (`@example.com`).
+- **Rajparancsnokok:** a `csatlakozom.html`-ben osztályonként (4–8.) szerepel a raj neve, a rajparancsnokok neve és saját e-mail címe.
 - **Facebook- és Instagram-widget:** a főoldalon (802szentkorona) és a csapatotthon oldalon (gdlcserkeszhaz / bezsilla.villa) azonnal betöltődnek, és a legutóbbi bejegyzéseket mutatják. Fontos: a beágyazott tartalom miatt a Facebook és az Instagram sütiket állíthat be a látogatónak. Másik oldal/profil beállításához az iframe `src`-ben cseréld le az oldal nevét, és a "Megnyitás" linkeket is.
 
 ## Még placeholder (cserélendő)
 
 - Csapatotthon szövege (`csapatotthon.html`)
-- Rajparancsnokok nevei és e-mail címei (`csatlakozom.html`)
 - `https://www.YOUR-DOMAIN-HERE.com` az összes HTML fájlban, a `robots.txt`-ben és a `sitemap.xml`-ben
 
 ## Publikálás GitHub Pages-re
