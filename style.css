@@ -1527,6 +1527,22 @@ section[id] {
 /* ==========================================================
    Tábor
    ========================================================== */
+/* Címsáv a bevezető szöveggel együtt */
+.camp-banner {
+  padding: 56px 20px 64px;
+}
+
+.camp-banner p {
+  max-width: 760px;
+  margin-top: 16px;
+  font-size: 1.05rem;
+  line-height: 1.7;
+}
+
+.camp-banner p strong {
+  color: #fff;
+}
+
 .camp-cards {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -1751,4 +1767,19 @@ section[id] {
     bottom: 16px;
     margin-top: 0;
   }
+}
+
+/* Csatlakozom: bevezető szöveg és a belépési nyilatkozatok letöltése */
+.join-lead {
+  max-width: 760px;
+  margin-bottom: 24px;
+  font-size: 1.05rem;
+}
+
+.join-downloads {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 48px;
 }
