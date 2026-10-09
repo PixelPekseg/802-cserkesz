@@ -1928,3 +1928,62 @@ section[id] {
   background: var(--color-primary-dark);
   color: #fff;
 }
+
+/* Rólunk: fotók a szöveg két oldalán.
+   Széles képernyőn szabadon (eltérő méretben és magasságban) a két szélső sávban állnak,
+   keskenyebb képernyőn a szöveg alatt, 2 oszlopos rácsban. Kattintásra nagyban megnyílnak. */
+.side-photos {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  max-width: 800px;
+  margin: 32px auto 0;
+  padding: 0 20px;
+}
+
+.side-photos img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 14px;
+  box-shadow: 0 6px 18px rgba(35, 63, 42, 0.25);
+  cursor: zoom-in;
+}
+
+@media (min-width: 1300px) {
+  .has-side-photos {
+    position: relative;
+  }
+
+  .side-photos {
+    display: block;
+    position: absolute;
+    inset: 0;
+    max-width: none;
+    margin: 0;
+    padding: 0;
+    pointer-events: none;
+  }
+
+  .side-photos img {
+    position: absolute;
+    top: var(--top);
+    width: calc(min(300px, (100vw - 800px) / 2 - 72px) * var(--k, 1));
+    transform: translateX(var(--nudge, 0));
+    pointer-events: auto;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .side-left {
+    right: calc(50% + 400px + 36px);
+  }
+
+  .side-right {
+    left: calc(50% + 400px + 36px);
+  }
+
+  .side-photos img:hover {
+    transform: translateX(var(--nudge, 0)) scale(1.03);
+    box-shadow: 0 10px 26px rgba(35, 63, 42, 0.35);
+  }
+}

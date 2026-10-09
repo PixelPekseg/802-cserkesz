@@ -6,7 +6,7 @@ Statikus (HTML/CSS/JS) többoldalas weboldal, backend nélkül, GitHub Pages-en 
 
 - `index.html` – Főoldal (borítókép + név, Csapatunk (kép + szöveg), Kapcsolat, Facebook- és Instagram-gombok)
 - `rolunk.html` – Rólunk (két pont: Csapatunkról, Cserkészetről; a szöveg a csapat korábbi honlapjáról, a 802szentkorona.hu-ról származik)
-- `tabor.html` – Tábor (kiscserkésztábor és nagytábor kártyák, általános információk váltakozó kép + szöveg blokkokkal; a képek az `images/camp/`, a letölthető PDF-ek a `pdf/` mappában)
+- `tabor.html` – Tábor (kiscserkésztábor és nagytábor kártyák, általános információk váltakozó kép + szöveg blokkokkal; a képek az `images/_webp/tabor/`, a letölthető PDF-ek a `pdf/` mappában)
 - `dokumentumok.html` – Dokumentumok (a `pdf/` mappa letölthető fájljai; a lábléc linkelte, a menüben nincs)
 - `csatlakozom.html` – Csatlakozom (4.–8. osztály, rajparancsnokok)
 - `csapatotthon.html` – Csapatotthonunk (Bezsilla villa, elérhetőség, Google Maps, Facebook- és Instagram-gombok)
@@ -17,17 +17,20 @@ Statikus (HTML/CSS/JS) többoldalas weboldal, backend nélkül, GitHub Pages-en 
 
 A fejléc és a lábléc mind a 7 HTML fájlban külön szerepel – ha módosítod a menüt vagy a láblécet, **mind a 7 fájlban** át kell vezetni.
 
-## Képek (töltsd fel ezekkel a nevekkel)
+## Képek
 
-- `images/hero.webp` – a "Csapatunk" szekció bal oldali képe (a 802-es szám); teljes egészében látszik, levágás nélkül
-- `images/csapatunk.webp` – a főoldal borítóképe (csoportkép) a név mögött; bármilyen arányú lehet, teljes szélességben, levágás nélkül látszik (a magassága az arányából adódik, nagy képernyőn a képernyőnél magasabb is lehet); amíg nincs, zöld színátmenet látszik
-- `images/logo_white.jpg` (fekete jel fehér alapon) – a fejlécben látszik, a fehér háttér átlátszóvá válik; `images/logo_green.jpg` – favicon; `images/logo_black.jpg` – jelenleg nincs használatban
-- `images/bezsilla.webp`, `images/bezsilla_bipi.webp` – a Csapatotthonunk oldal két képe (a villa, illetve a falra festett Baden-Powell-portré); egymás mellett, azonos magassággal, levágás nélkül látszanak, mobilon egymás alatt
-- `images/palack_qrkod.jpg` – a palackvisszaváltáshoz beolvasandó QR-kód (egyedi azonosító) a Támogass minket oldal alján
-- `images/ado1.webp` – az adó 1%-os kép a Támogass minket oldalon, a bevezető szöveg alatt
-- `images/team/cseri-holzman_lili.webp`, `csiki_adam.webp`, `grebel_hanna.webp`, `bedo_gergely.webp`, `peter_anna.webp` – a kapcsolati kártyák fotói (amíg nincs, monogram látszik)
+Minden kép az `images/` mappában van, két fő mappára bontva, azon belül oldalak szerint:
 
-Képformátum: az oldal WebP képeket használ (kisebbek, gyorsabbak). A tábor képekből kettő van: `images/camp/thumb/` (kicsi, ez látszik az oldalon) és `images/camp/` (nagy, ez nyílik meg kattintásra). A régi JPG-k az `images/_jpg-originals/` és `images/camp/originals/` mappákban vannak (a .gitignore kizárja). Új képet is WebP-re alakíts, mielőtt feltöltöd (a borítókép ~1600 px széles, a személyek fotói ~400 px elég), különben lassul az oldal.
+- **`images/_webp/`** – az oldalon használt, tömörített képek (WebP; a QR-kód és a megosztási kép JPG):
+  - `fooldal/` – `csapatunk.webp` (a főoldali borítókép, csoportkép; levágva a csoport körül), `hero.webp` (a 802-es légifotó; asztalon a Csapatunk szekció bal oldala, telefonon a nyitókép)
+  - `rolunk/` – a Rólunk oldal fotói (a szöveg két oldalán)
+  - `tabor/` – a Tábor oldal képei (nagy változat) és `tabor/thumb/` (kis bélyegkép, ez látszik az oldalon; a nagy kattintásra nyílik meg)
+  - `csapatotthon/` – `bezsilla.webp`, `bezsilla_bipi.webp`
+  - `tamogass/` – `ado1.webp` (adó 1%-os kép), `palack_qrkod.jpg` (palackvisszaváltás QR-kód: szándékosan JPG, hogy beolvasható maradjon)
+  - `kozos/` – több oldalon használt képek: `logo_white.webp` / `logo_white.jpg` (fejléc, ill. strukturált adat logója), `logo_green.jpg` (favicon), `logo_black.jpg` (nincs használatban), `share.jpg` (megosztási előnézet, 1200×630), `team/` (a kapcsolati kártyák fotói; amíg nincs fotó, monogram látszik), `pictogram/` (piktogramok, jelenleg nincsenek használatban)
+- **`images/_originals/`** – az eredeti, tömörítetlen fotók ugyanilyen oldalankénti bontásban. Ezt a `.gitignore` kizárja, nem kerül a GitHubra.
+
+Új kép felvétele: tedd az eredetit az `_originals/<oldal>/` mappába, készíts belőle WebP-t (kb. 1000–1600 px széles, minőség ~80) az `_webp/<oldal>/` mappába, és abból hivatkozz. A borítókép ~1600 px széles, a személyek fotói ~400 px elég, különben lassul az oldal.
 
 ## Színek
 

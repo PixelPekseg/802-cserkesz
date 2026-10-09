@@ -1,11 +1,8 @@
 .DS_Store
 Thumbs.db
 
-# a tömörítetlen tábori eredeti fotók (az oldal az images/camp/*.jpg változatokat használja)
-images/camp/originals/
-
-# a WebP-re cserélt régi JPG változatok
-images/_jpg-originals/
-
 # kész, de még nem publikált tervezetek (pl. adatkezelési tájékoztató)
 _drafts/
+
+# eredeti / tömörítetlen képek (az oldal az images/_webp/ mappát használja)
+images/_originals/
