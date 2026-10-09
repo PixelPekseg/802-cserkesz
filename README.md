@@ -25,7 +25,7 @@ Minden kép az `images/` mappában van, két fő mappára bontva, azon belül ol
   - `fooldal/` – `csapatunk.webp` (a főoldali borítókép, csoportkép; levágva a csoport körül), `hero.webp` (a 802-es légifotó; asztalon a Csapatunk szekció bal oldala, telefonon a nyitókép)
   - `rolunk/` – a Rólunk oldal fotói (a szöveg két oldalán)
   - `tabor/` – a Tábor oldal képei (nagy változat) és `tabor/thumb/` (kis bélyegkép, ez látszik az oldalon; a nagy kattintásra nyílik meg)
-  - `csapatotthon/` – `bezsilla.webp`, `bezsilla_bipi.webp`
+  - `csapatotthon/` – `bezsilla1.webp` … `bezsilla6.webp` (a Csapatotthonunk oldalon a szöveg két oldalán, keskenyen a tetején 2 oszlopban; kattintásra nagyítható)
   - `tamogass/` – `ado1.webp` (adó 1%-os kép), `palack_qrkod.jpg` (palackvisszaváltás QR-kód: szándékosan JPG, hogy beolvasható maradjon)
   - `kozos/` – több oldalon használt képek: `logo_white.webp` / `logo_white.jpg` (fejléc, ill. strukturált adat logója), `logo_green.jpg` (favicon), `logo_black.jpg` (nincs használatban), `share.jpg` (megosztási előnézet, 1200×630), `team/` (a kapcsolati kártyák fotói; amíg nincs fotó, monogram látszik), `pictogram/` (piktogramok, jelenleg nincsenek használatban)
 - **`images/originals/`** – az eredeti, tömörítetlen fotók ugyanilyen oldalankénti bontásban. Ezt a `.gitignore` kizárja, nem kerül a GitHubra.
@@ -38,9 +38,7 @@ A `style.css` elején lévő `:root` blokkban vannak (386641, 6a994e, a7c957 az 
 
 ## Karbantartás
 
-- **Új hír / esemény:** az `programok.html`-ben másolj le egy `<article class="news-card">…</article>` blokkot, írd át a szöveget, a látható dátumot (`.news-date`), és állítsd be a `data-date="ÉÉÉÉ-HH-NN"` attribútumot az esemény napjára (többnapos eseménynél add meg a `data-end-date`-et is).
-- **Google Naptárba gomb:** minden programkártyán (az `id`-val és `data-date`-tel rendelkezőn) megjelenik; megnyitja a Google Naptárat az eseménnyel előre kitöltve (a látogatónak a Mentés gombot kell megnyomnia). Az "Időpont" sorból veszi az időt (pl. `14:00–20:00`); egy időpontnál 1 órás esemény lesz, időpont nélkül egész napos. A kapcsolattartók nincsenek benne.
-- **Üzenet másolása gomb:** minden programkártyán (az `id`-val rendelkezőn) automatikusan megjelenik. Kattintásra a program rövid üzenete (név, dátum, időpont, helyszín, link, emojikkal) a vágólapra kerül, onnan beilleszthető WhatsAppba, Messengerbe stb. A kapcsolattartók nincsenek az üzenetben. Működéséhez az `id` kell a kártyán, és élesben a végleges domain.
+- **Új program (automatikus, táblázatból):** a programokat a csapat közös Google Táblázatában kell felvenni (soronként egy program; az oszlopokat a táblázat "Útmutató" lapja írja le). Egy GitHub-feladat (`.github/workflows/sync-programok.yml`) óránként letölti a közzétett CSV-t, és a `tools/sync_programok.py` ezekből újraírja a `programok.html` programkártyáit (a `PROGRAMOK:START` és `PROGRAMOK:END` jelölők közötti rész, ezt kézzel ne szerkeszd). Hibás sort a script kihagy és figyelmeztet; ha a táblázat nem érhető el vagy a fejléce elromlott, az oldal az utolsó jó állapotot mutatja. A feladat kézzel is elindítható: GitHub → Actions → "Programok frissítése" → Run workflow. A táblázat CSV-címe a workflow fájlban van (`PROGRAMOK_CSV_URL`); ha új táblázatot használtok, ott kell átírni. Helyi kipróbálás: `python3 tools/sync_programok.py --file valami.csv`.
 - **Lejárt események (automatikus):** az esemény napja után az esemény `Elmúlt` címkével, halványítva a lista végére kerül, majd a rács (`#newsGrid`) `data-keep-days` attribútumában megadott nap (alapból 7) után elrejtődik. Ha nincs látható hír, egy üzenet jelenik meg a Facebook/Instagram linkekkel. A `data-date` nélküli hír mindig látszik. Elrejtés csak a böngészőben történik, a HTML-ből néha érdemes kitörölni a régi blokkokat. Teszteléshez a böngésző konzoljában: `updateNews(new Date('2026-10-12T10:00:00'))`.
 - **Támogass minket oldal:** fent a szöveg, alatta az adó 1%-os kép (`ado1.jpg`), majd két kártya egymás mellett (egyesület adatai, banki átutalás); mobilon egymás alá kerülnek.
 - **Rajparancsnokok (automatikus léptetés):** a `csatlakozom.html`-ben minden raj kártyáján `data-grade` (osztály) és `data-school-year` (a tanév kezdő éve) van; minden szeptember 1-jén a rajok eggyel feljebb lépnek, a 9. osztályba lépett raj eltűnik (a 4–8. osztály látszik). Új 4. osztályos rajhoz másolj le egy kártyát, írd át a nevet/rajparancsnokokat, és állítsd be `data-grade="4"` + az új tanév kezdő évét (előre is felvehető, addig rejtve marad). Ha az új raj még nincs felvéve, a 4. osztálynál a "Hamarosan frissítjük!" felirat látszik.
@@ -50,7 +48,6 @@ A `style.css` elején lévő `:root` blokkban vannak (386641, 6a994e, a7c957 az 
 
 - Tábor oldal (`tabor.html`): a két tábor időpontja, helyszíne és a főszervezők neve/e-mail címe (jelenleg "Hamarosan frissítjük!" és `@example.com`)
 
-- Csapatotthon szövege (`csapatotthon.html`)
 - `https://www.YOUR-DOMAIN-HERE.com` az összes HTML fájlban, a `robots.txt`-ben és a `sitemap.xml`-ben
 
 ## Publikálás GitHub Pages-re

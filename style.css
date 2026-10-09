@@ -1384,38 +1384,6 @@ section[id] {
   box-shadow: 0 0 0 3px var(--color-highlight);
 }
 
-/* Csapatotthon: két kép egymás mellett, azonos magassággal */
-.home-photos {
-  display: flex;
-  gap: 16px;
-  max-width: 880px;
-  margin: 0 auto 40px;
-}
-
-.home-photos img {
-  flex-basis: 0;
-  min-width: 0;
-  height: auto;
-  object-fit: contain;
-  border-radius: 12px;
-}
-
-@media (max-width: 640px) {
-  .home-photos {
-    flex-direction: column;
-    align-items: center;
-  }
-
-  .home-photos img {
-    flex: none !important;
-    width: 100%;
-    max-width: 420px;
-  }
-}
-
-.section-title {
-  margin-bottom: 36px;
-}
 
 /* Másolás gomb (Támogass minket: adószám, számlaszám): kis ikon az érték mellett */
 .bank-copy {
@@ -1980,4 +1948,110 @@ section[id] {
     transform: translateX(var(--nudge, 0)) scale(1.03);
     box-shadow: 0 10px 26px rgba(35, 63, 42, 0.35);
   }
+}
+
+/* Csapatunk szekció asztali nézeten: a kép lekerekített, árnyékos kártya a zöld háttéren,
+   mellette a szöveg. Telefonon (768 px alatt) nem érvényes, ott marad a korábbi elrendezés. */
+@media (min-width: 769px) {
+  .team-split {
+    align-items: center;
+    column-gap: clamp(32px, 5vw, 72px);
+    padding: 64px max(24px, calc((100% - 1200px) / 2));
+  }
+
+  .team-split-image img {
+    border-radius: 18px;
+    box-shadow: 0 14px 36px rgba(0, 0, 0, 0.35);
+    cursor: zoom-in;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .team-split-image img:hover,
+  .team-split-image img:focus-visible {
+    transform: scale(1.02);
+    box-shadow: 0 18px 44px rgba(0, 0, 0, 0.45);
+  }
+
+  .team-split-text {
+    padding: 0;
+  }
+}
+
+/* Csapatotthon: a szöveg középen (keskenyebb oszlop), a képek két oldalt (lásd Rólunk: .side-photos).
+   Keskenyebb képernyőn a képek 2 oszlopos mozaikban a szekció tetejére kerülnek. */
+.home-center {
+  max-width: 800px;
+}
+
+.side-photos-masonry {
+  display: block;
+  column-count: 2;
+  column-gap: 12px;
+}
+
+.side-photos-masonry img {
+  margin-bottom: 12px;
+  break-inside: avoid;
+}
+
+@media (max-width: 1299px) {
+  .home-section {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .home-section .side-photos {
+    order: -1;
+    width: 100%;
+    max-width: 640px;
+    margin: 0 auto 32px;
+  }
+}
+
+@media (min-width: 1300px) {
+  .side-photos-masonry {
+    column-count: auto;
+  }
+
+  .side-photos-masonry img {
+    margin-bottom: 0;
+  }
+}
+
+/* Csapatotthon: a Bezsilla története és a cserkészek története, hosszabb szöveg */
+.home-story {
+  max-width: none;
+  text-align: left;
+}
+
+.home-story h3 {
+  margin: 32px 0 10px;
+  font-size: 1.35rem;
+}
+
+.home-story h3:first-child {
+  margin-top: 0;
+}
+
+.home-story p {
+  margin: 0 0 14px;
+}
+
+.home-story a {
+  font-weight: 600;
+  border-bottom: 2px solid var(--color-highlight);
+}
+
+.home-story a:hover {
+  color: var(--color-accent);
+}
+
+.home-story .home-source {
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+}
+
+.home-map-address {
+  margin: 0 0 12px;
+  text-align: center;
 }

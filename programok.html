@@ -23,7 +23,7 @@
 
   <link rel="icon" type="image/jpeg" href="images/webp/kozos/logo_green.jpg?v=1">
   <link rel="apple-touch-icon" href="images/webp/kozos/logo_green.jpg?v=1">
-  <link rel="stylesheet" href="style.css?v=54">
+  <link rel="stylesheet" href="style.css?v=63">
 </head>
 <body>
 
@@ -62,30 +62,17 @@
   </section>
 
   <!--
-    Hírdobozok. Új hír hozzáadásához másold le egy <article class="news-card">
-    ... </article> blokkot, és írd át. EGYSÉGES SÉMA (amit nem tudsz, hagyd ki):
-      dátum (.news-date) → cím (h3) → rövid leírás → Helyszín → Időpont →
-      Kérdés esetén keresd → (opcionális link a cikk alján; a Facebook-eseményt érdemes a leírásba tenni)
-    Ha egy hírnél nincs "Kérdés esetén keresd" sor (class="news-detail
-    news-contact"), a script.js automatikusan a programokért felelős
-    csapatparancsnok-helyettest írja oda. Ő a rács data-default-contact-name
-    és data-default-contact-email attribútumában állítható.
-    A dátumot KÉT helyen add meg: a data-date="ÉÉÉÉ-HH-NN" attribútumban (ezt
-    használja a script.js) és a látható dátumban (.news-date). Az id
-    attribútum a főoldali fül linkjéhez kell (pl. id="taborozas").
-    - Többnapos eseménynél add meg a data-end-date="ÉÉÉÉ-HH-NN" attribútumot
-      is: az utolsó napig "közelgő" marad.
-    - Dátum nélküli hír (data-date nélkül) mindig látszik, a sor végén.
-    - A programok maguktól dátum szerinti sorrendbe rendeződnek (a HTML-beli
-      sorrend nem számít). Egyszerre 3 látszik, a nyilakkal lehet léptetni.
-    - A lejárt események az esemény napja után 7 napig "Elmúlt" címkével,
-      halványítva látszanak a sor végén, utána a listából eltűnnek. A 7 a
-      rács data-keep-days attribútumában állítható (0 = az esemény napja
-      után rögtön eltűnik; nagy szám = sokáig látszik "Elmúlt" címkével).
-    - A lap alján lévő NAPTÁR az összes data-date-tel rendelkező kártyát
-      gyűjti, a már lejártakat és a listából eltűntetteket is. Ezért a régi
-      kártyákat nem kell törölni, de ha az oldal túl hosszú lenne, a régi
-      évek kártyái nyugodtan törölhetők.
+    A PROGRAMOK KÁRTYÁIT NEM KÉZZEL KELL SZERKESZTENI. A "PROGRAMOK:START" és "PROGRAMOK:END"
+    közötti részt a tools/sync_programok.py írja újra a csapat Google Táblázatából (óránként,
+    GitHub Actions: .github/workflows/sync-programok.yml). Új program felvétele = új sor a
+    táblázatban; a táblázat útmutatója leírja az oszlopokat.
+
+    - A kártyák dátum szerint maguktól rendeződnek, a lejárt események az esemény napja után
+      a rács data-keep-days attribútumában megadott ideig (alapból 7 nap) "Elmúlt" címkével
+      látszanak, utána eltűnnek a listából, de a naptárban megmaradnak.
+    - Ha egy programnál nincs kapcsolattartó, a script.js az alapértelmezettet írja oda
+      (a rács data-default-contact-name és data-default-contact-email attribútuma).
+    - Időpont nélküli program egész napos eseményként kerül a Google Naptárba.
   -->
   <section class="section">
     <div class="container">
@@ -96,10 +83,11 @@
       <div class="news-grid" id="newsGrid" data-keep-days="7"
            data-default-contact-name="Bedő Gergely" data-default-contact-email="bedo.gergely@cserkesz.hu">
 
-        <article class="news-card" id="toborzo-nap" data-date="2026-10-11">
+        <!-- PROGRAMOK:START (automatikusan generálja a tools/sync_programok.py a Google Táblázatból; ne szerkeszd kézzel) -->
+        <article class="news-card" id="toborzo-nap-20261011" data-date="2026-10-11">
           <div class="news-meta"><span class="news-date">2026. október 11.</span></div>
           <h3>Toborzó nap</h3>
-          <p><strong>Négy fal helyett hív az erdő, téged vár a 802!</strong> Szereted a természetet? Benne lennél egy kalandban? Életre szóló barátságokat kötnél? Gyere el, és ismerd meg a csapatunkat! Részletek a <a class="inline-link" href="https://www.facebook.com/events/1267319125499897" target="_blank" rel="noopener noreferrer">Facebook-eseményen</a>.</p>
+          <p>Négy fal helyett hív az erdő, téged vár a 802! Szereted a természetet? Benne lennél egy kalandban? Életre szóló barátságokat kötnél? Gyere el, és ismerd meg a csapatunkat! Részletek a <a class="inline-link" href="https://www.facebook.com/events/1267319125499897" target="_blank" rel="noopener noreferrer">Facebook-eseményen</a>.</p>
           <p class="news-detail"><strong>Helyszín:</strong> Gödöllő, Cserkész köz 1.</p>
           <p class="news-detail"><strong>Időpont:</strong> 14:00–20:00</p>
           <p class="news-detail news-contact">
@@ -109,12 +97,12 @@
           </p>
         </article>
 
-        <article class="news-card" id="cserkeszmise" data-date="2026-10-11">
+        <article class="news-card" id="cserkeszmise-20261011" data-date="2026-10-11">
           <div class="news-meta"><span class="news-date">2026. október 11.</span></div>
           <h3>Cserkészmise</h3>
           <p>Október 11-én cserkészmise lesz. Szeretettel várunk minden cserkészt egyenruhában!</p>
           <p class="news-detail"><strong>Helyszín:</strong> Gödöllői Szentháromság templom</p>
-          <p class="news-detail"><strong>Időpont:</strong> 17:45 (gyülekező)</p>
+          <p class="news-detail"><strong>Időpont:</strong> 17:45–19:00 (gyülekező)</p>
           <p class="news-detail news-contact">
             <strong>Kérdés esetén keresd:</strong><br>
             Vanyó Ferenc Ágoston<br>
@@ -122,44 +110,46 @@
           </p>
         </article>
 
-        <article class="news-card" id="okt23-megemlekezes" data-date="2026-10-23">
+        <article class="news-card" id="oktober-23-i-megemlekezes-20261023" data-date="2026-10-23">
           <div class="news-meta"><span class="news-date">2026. október 23.</span></div>
           <h3>Október 23-i megemlékezés</h3>
           <p>Az immár több éves szokáshoz híven a gödöllői városi október 23-i ünnepséget a Bezsilla villa kertjében található emlékműnél rendezik. Szeretettel várunk mindenkit!</p>
-          <p class="news-detail"><strong>Helyszín:</strong> Bezsilla villa kertje, Gödöllő, Cserkész köz 1.</p>
+          <p class="news-detail"><strong>Helyszín:</strong> Bezsilla villa kertje</p>
         </article>
 
-        <article class="news-card" id="cserkeszmise-nov8" data-date="2026-11-08">
+        <article class="news-card" id="cserkeszmise-20261108" data-date="2026-11-08">
           <div class="news-meta"><span class="news-date">2026. november 8.</span></div>
           <h3>Cserkészmise</h3>
           <p>November 8-án cserkészmise lesz. Szeretettel várunk minden cserkészt egyenruhában!</p>
           <p class="news-detail"><strong>Helyszín:</strong> Gödöllői Szentháromság templom</p>
-          <p class="news-detail"><strong>Időpont:</strong> 17:45 (gyülekező)</p>
+          <p class="news-detail"><strong>Időpont:</strong> 17:45–19:00 (gyülekező)</p>
           <p class="news-detail news-contact">
             <strong>Kérdés esetén keresd:</strong><br>
             Tanka Ágoston, <a class="inline-link" href="mailto:agoston.sandor.tanka@gmail.com">agoston.sandor.tanka@gmail.com</a>
           </p>
         </article>
 
-        <article class="news-card" id="cserkeszmise-dec13" data-date="2026-12-13">
+        <article class="news-card" id="cserkeszmise-20261213" data-date="2026-12-13">
           <div class="news-meta"><span class="news-date">2026. december 13.</span></div>
           <h3>Cserkészmise</h3>
           <p>December 13-án cserkészmise lesz. Szeretettel várunk minden cserkészt egyenruhában!</p>
           <p class="news-detail"><strong>Helyszín:</strong> Gödöllői Szentháromság templom</p>
-          <p class="news-detail"><strong>Időpont:</strong> 17:45 (gyülekező)</p>
+          <p class="news-detail"><strong>Időpont:</strong> 17:45–19:00 (gyülekező)</p>
         </article>
 
-        <article class="news-card" id="cserkeszmise-jan10" data-date="2027-01-10">
+        <article class="news-card" id="cserkeszmise-20270110" data-date="2027-01-10">
           <div class="news-meta"><span class="news-date">2027. január 10.</span></div>
           <h3>Cserkészmise</h3>
           <p>Január 10-én cserkészmise lesz. Szeretettel várunk minden cserkészt egyenruhában!</p>
           <p class="news-detail"><strong>Helyszín:</strong> Gödöllői Szentháromság templom</p>
-          <p class="news-detail"><strong>Időpont:</strong> 17:45 (gyülekező)</p>
+          <p class="news-detail"><strong>Időpont:</strong> 17:45–19:00 (gyülekező)</p>
           <p class="news-detail news-contact">
             <strong>Kérdés esetén keresd:</strong><br>
             Vanyó Franciska, <a class="inline-link" href="mailto:vanyofranciska@gmail.com">vanyofranciska@gmail.com</a>
           </p>
         </article>
+
+        <!-- PROGRAMOK:END -->
 
       </div>
         <button class="carousel-btn carousel-next" id="newsNext" type="button" aria-label="Következő programok">&#8250;</button>
@@ -200,6 +190,6 @@
     </div>
   </footer>
 
-  <script src="script.js?v=30"></script>
+  <script src="script.js?v=32"></script>
 </body>
 </html>

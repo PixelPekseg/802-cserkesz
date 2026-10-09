@@ -530,7 +530,7 @@ document.querySelectorAll('a[href^="mailto:"]').forEach(link => {
 // léptetés: nyilak a gombokkal vagy a billentyűzeten (bal/jobb nyíl).
 // ==========================================================
 (function initLightbox() {
-  const images = [...document.querySelectorAll('.camp-col img, .side-photos img')];
+  const images = [...document.querySelectorAll('.camp-col img, .side-photos img, .home-gallery img, .team-split-image img')];
   if (images.length === 0) return;
 
   const overlay = document.createElement('div');

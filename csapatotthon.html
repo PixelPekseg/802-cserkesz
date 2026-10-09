@@ -23,7 +23,7 @@
 
   <link rel="icon" type="image/jpeg" href="images/webp/kozos/logo_green.jpg?v=1">
   <link rel="apple-touch-icon" href="images/webp/kozos/logo_green.jpg?v=1">
-  <link rel="stylesheet" href="style.css?v=54">
+  <link rel="stylesheet" href="style.css?v=63">
 </head>
 <body>
 
@@ -62,30 +62,59 @@
   </section>
 
   <!-- Bezsilla villa -->
-  <section class="section">
-    <div class="container">
-      <p class="home-address">Bezsilla villa</p>
-      <p class="section-lead">2100 Gödöllő, Cserkész köz 1.</p>
-
-      <!-- PLACEHOLDER SZÖVEG – cseréld le a csapatotthon valódi bemutatására -->
-      <div class="home-text">
-        <p>
-          Itt tartjuk a foglalkozásainkat, találkozóinkat és közösségi
-          programjainkat. Ide jöhetsz, ha többet szeretnél megtudni a
-          csapatunkról, vagy ha egyszerűen csak körülnéznél nálunk.
-        </p>
-      </div>
-
+  <section class="section has-side-photos home-section">
+    <div class="container home-center">
       <!--
-        Két kép egymás mellett, azonos magassággal, levágás nélkül (a flex-grow
-        a kép oldalarányával egyezik: négyzet = 1, 3:4 álló kép = 0.75).
-        Mobilon egymás alatt jelennek meg.
+        A Bezsilla története röviden a gvkik.hu wiki (Gödöllői Városi Könyvtár és
+        Információs Központ) "Bezsilla villa" szócikke alapján, saját megfogalmazásban.
       -->
-      <div class="home-photos">
-        <img src="images/webp/csapatotthon/bezsilla.webp" width="1638" height="1638" style="flex-grow:1" loading="lazy"
-             alt="A gödöllői Bezsilla villa napsütésben, fák alatt">
-        <img src="images/webp/csapatotthon/bezsilla_bipi.webp" width="1536" height="2048" style="flex-grow:0.75" loading="lazy"
-             alt="Két ember a falra festett Baden-Powell-portré mellett">
+      <div class="home-text home-story">
+        <h3>A Bezsilla villa története</h3>
+        <p>
+          A Bezsilla villa az 1930-as évek elején épült a Rákos-patak partján, Rákos Pál építész
+          tervei szerint. A modernista, Bauhaus-stílusú ház névadója és egykori tulajdonosa dr.
+          Bezsilla István, Pest vármegye tiszteletbeli ügyésze volt. Különlegessége, hogy van egy
+          tükörkép-ikertestvére Budapesten, a XI. kerületben.
+        </p>
+        <p>
+          A második világháború alatt és után a villa lakatlan volt, és pusztult. 1951-től a
+          rendőrség költözött be, később az Agrártudományi Egyetem tanárképző intézete kapta meg.
+          A ház története a magyar történelemhez is kötődik: 1956. október 25-én a rendőrség
+          épülete előtt tüntető tömegre lőttek, és a 17 éves Balázsovich András életét vesztette.
+        </p>
+        <p>
+          Az '56-os áldozatok emlékére 1989-ben fenyőfát ültettek a kertben, 1996-ban emléktáblát,
+          2001-ben pedig kopjafát és emléktáblát állítottak. <strong>Az emlékmű ma is áll a villa
+          kertjében, és a városi '56-os megemlékezéseket rendszeresen itt tartják.</strong>
+        </p>
+        <p class="home-source">
+          Forrás: <a href="https://www.gvkik.hu/wiki/index.php/Bezsilla_villa" target="_blank" rel="noopener noreferrer">Bezsilla villa – Gödöllői Városi Könyvtár és Információs Központ</a>
+        </p>
+
+        <h3>Hogyan lett a cserkészeké?</h3>
+        <p>
+          Csapatunk régóta dolgozott azon, hogy legyen egy hely, ami igazán a miénk. A Bezsilla
+          villát előbb használatba vehettük, később pedig a tulajdonunkba is került.
+        </p>
+        <p>
+          Az épület azonban nagyon megviselt állapotban várt ránk. Évekig üresen állt, felújítás
+          nélkül: több helyen beázott, a parketta felpúposodott és megpenészedett, az egyik
+          szobát pedig alá kellett dúcolni, mert életveszélyessé vált.
+        </p>
+        <p>
+          Az adományoknak, az önkormányzat és az állam támogatásának, valamint a cserkészek
+          önkéntes munkájának köszönhetően a Bezsilla ma már használható állapotban van, és
+          újra élet költözött a falai közé.
+        </p>
+
+        <h3>Most erre gyűjtünk</h3>
+        <p>
+          Sajnos újabb nehézséggel kell szembenéznünk: a ház régi alapja süllyedni kezdett a
+          közeli patak felé. Ezt minél hamarabb meg kell állítanunk, ezért most erre gyűjtünk.
+          A részletekről a
+          <a href="https://www.facebook.com/gdlcserkeszhaz" target="_blank" rel="noopener noreferrer">Gödöllői cserkészház Facebook-oldalán</a>
+          olvashatsz bővebben.
+        </p>
       </div>
 
       <h3 class="home-contact-title">Elérhetőség</h3>
@@ -99,6 +128,8 @@
           <a class="person-email" href="mailto:grebel.hanna@cserkesz.hu">grebel.hanna@cserkesz.hu</a>
         </div>
       </div>
+
+      <p class="home-map-address"><strong>Cím:</strong> 2100 Gödöllő, Cserkész köz 1.</p>
 
       <!-- Google Maps: a cím/hely az iframe src-ben és az útvonaltervező gomb href-jében is szerepel -->
       <div class="map-wrapper">
@@ -137,6 +168,16 @@
         </div>
       </div>
     </div>
+
+    <!-- Képek a Bezsilla villáról: széles képernyőn a szöveg két oldalán, keskenyen a tetején, 2 oszlopos mozaikban -->
+    <div class="side-photos side-photos-masonry">
+      <img class="side-photo side-left" src="images/webp/csapatotthon/bezsilla4.webp" width="1000" height="745" loading="lazy" style="--k:0.94;--top:8.0%;--nudge:-2px" alt="Cserkészek a Bezsilla villa kertjében, padoknál és asztaloknál">
+      <img class="side-photo side-left" src="images/webp/csapatotthon/bezsilla2.webp" width="750" height="1000" loading="lazy" style="--k:0.72;--top:42.1%;--nudge:4px" alt="Két ember a falra festett Baden-Powell-portré mellett">
+      <img class="side-photo side-left" src="images/webp/csapatotthon/bezsilla6.webp" width="1000" height="891" loading="lazy" style="--k:0.97;--top:77.5%;--nudge:-7px" alt="Fiatalok a Bezsilla villa bejárata előtt télen">
+      <img class="side-photo side-right" src="images/webp/csapatotthon/bezsilla1.webp" width="1000" height="1000" loading="lazy" style="--k:0.87;--top:16.7%;--nudge:-2px" alt="A Bezsilla villa napsütésben, fák alatt">
+      <img class="side-photo side-right" src="images/webp/csapatotthon/bezsilla5.webp" width="809" height="1000" loading="lazy" style="--k:0.74;--top:39.2%;--nudge:9px" alt="Két hóember a Bezsilla villa előtt télen">
+      <img class="side-photo side-right" src="images/webp/csapatotthon/bezsilla3.webp" width="1000" height="916" loading="lazy" style="--k:0.9;--top:77.4%;--nudge:-3px" alt="A Bezsilla villa és a kert zászlókkal">
+    </div>
   </section>
 
   <!-- Lábléc -->
@@ -152,6 +193,6 @@
     </div>
   </footer>
 
-  <script src="script.js?v=30"></script>
+  <script src="script.js?v=32"></script>
 </body>
 </html>

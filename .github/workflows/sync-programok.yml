@@ -1,0 +1,48 @@
+# A programok.html programkártyáit a csapat Google Táblázatából (közzétett CSV) frissíti.
+# Óránként fut, és kézzel is elindítható (Actions fül -> "Programok frissítése" -> Run workflow).
+# Ha a táblázat hibás vagy nem érhető el, a feladat hibával leáll, és az oldal az utolsó jó
+# állapotot mutatja. A hónapban egyszer egy apró "életjel" módosítás is készül, mert a GitHub
+# 60 nap tevékenység nélkül leállítja az ütemezett feladatokat.
+name: Programok frissítése
+
+on:
+  schedule:
+    - cron: '23 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sync-programok
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Programok letöltése és az oldal frissítése
+        env:
+          PROGRAMOK_CSV_URL: https://docs.google.com/spreadsheets/d/e/2PACX-1vRxIhMKUiMXX41ujoCjIpmizaXDQwlRyBieMUQZSqZcFUF3ChIpqB1d5Q2Br608v88gWJOSxcu46zPV/pub?gid=659195366&single=true&output=csv
+        run: python tools/sync_programok.py
+
+      - name: Havi életjel
+        run: date +%Y-%m > data/keepalive.txt
+
+      - name: Változások mentése
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add programok.html data/
+          if git diff --cached --quiet; then
+            echo "Nincs változás."
+          else
+            git commit -m "Programok frissítése a táblázatból"
+            git push
+          fi
