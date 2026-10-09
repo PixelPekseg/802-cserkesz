@@ -13,12 +13,12 @@
   <meta property="og:title" content="Aktuális – 802. sz. Szent Korona Cserkészcsapat">
   <meta property="og:description" content="Aktuális híreink és eseményeink.">
   <meta property="og:url" content="https://www.YOUR-DOMAIN-HERE.com/aktualis.html">
-  <meta property="og:image" content="https://www.YOUR-DOMAIN-HERE.com/images/hero.jpg">
+  <meta property="og:image" content="https://www.YOUR-DOMAIN-HERE.com/images/csapatunk.jpg">
   <meta property="og:locale" content="hu_HU">
 
   <link rel="icon" type="image/jpeg" href="images/logo_green.jpeg?v=1">
   <link rel="apple-touch-icon" href="images/logo_green.jpeg?v=1">
-  <link rel="stylesheet" href="style.css?v=2">
+  <link rel="stylesheet" href="style.css?v=11">
 </head>
 <body>
 
@@ -40,9 +40,10 @@
       <nav class="main-nav" id="mainNav">
         <ul>
           <li><a href="index.html">Főoldal</a></li>
+          <li><a href="aktualis.html" aria-current="page">Aktuális</a></li>
           <li><a href="csatlakozom.html">Csatlakozom!</a></li>
           <li><a href="csapatotthon.html">Csapatotthonunk</a></li>
-          <li><a href="aktualis.html" aria-current="page">Aktuális</a></li>
+          <li><a href="rolunk.html">Rólunk</a></li>
           <li><a class="nav-cta" href="tamogass.html">Támogass minket</a></li>
         </ul>
       </nav>
@@ -56,22 +57,39 @@
 
   <!--
     Hírdobozok. Új hír hozzáadásához másold le egy <article class="news-card">
-    ... </article> blokkot, és írd át a dátumot, a címet és a szöveget.
-    Dátum szerint növekvő sorrendben vannak (a legközelebbi esemény elöl).
+    ... </article> blokkot, és írd át a címet, a szöveget, valamint a dátumot
+    KÉT helyen: a data-date="ÉÉÉÉ-HH-NN" attribútumban (ezt használja a
+    script.js) és a látható dátumban (.news-date).
+    - Többnapos eseménynél add meg a data-end-date="ÉÉÉÉ-HH-NN" attribútumot
+      is: az utolsó napig "közelgő" marad.
+    - Dátum nélküli hír (data-date nélkül) mindig látszik.
+    - A lejárt események az esemény napja után 7 napig "Elmúlt" címkével,
+      halványítva látszanak a lista végén, utána maguktól eltűnnek. A 7 a
+      rács data-keep-days attribútumában állítható (0 = az esemény napja
+      után rögtön eltűnik; nagy szám = sokáig látszik "Elmúlt" címkével).
+    Dátum szerint növekvő sorrendben érdemes felvenni őket.
   -->
   <section class="section">
     <div class="container">
-      <div class="news-grid">
+      <div class="news-grid" id="newsGrid" data-keep-days="7">
 
-        <article class="news-card">
-          <span class="news-date">2026. október 11.</span>
+        <article class="news-card" data-date="2026-10-11">
+          <div class="news-meta"><span class="news-date">2026. október 11.</span></div>
           <h3>Toborzó nap</h3>
           <p><strong>Négy fal helyett hív az erdő, téged vár a 802.</strong></p>
+          <p>Szereted a természetet? Benne lennél egy kalandban? Életre szóló barátságokat kötnél? Gyere el, és ismerd meg a csapatunkat!</p>
+          <p><strong>Időpont:</strong> 14:00–20:00</p>
+          <p><strong>Helyszín:</strong> Gödöllő, Cserkész köz 1.</p>
+          <p>
+            Kérdés esetén keresd:<br>
+            Pálinkás Péter, <a class="inline-link" href="mailto:palinkaspeter11@gmail.com">palinkaspeter11@gmail.com</a><br>
+            Korzenszky Gergely, <a class="inline-link" href="mailto:korzenszky.gergely@gmail.com">korzenszky.gergely@gmail.com</a>
+          </p>
           <a class="news-link" href="https://www.facebook.com/events/1267319125499897" target="_blank" rel="noopener noreferrer">Facebook-esemény megnyitása</a>
         </article>
 
-        <article class="news-card">
-          <span class="news-date">2026. október 11.</span>
+        <article class="news-card" data-date="2026-10-11">
+          <div class="news-meta"><span class="news-date">2026. október 11.</span></div>
           <h3>Cserkészmise</h3>
           <p>Október 11-én a Gödöllői Szentháromság templomban cserkészmise lesz. Szeretettel várunk minden cserkészt egyenruhában!</p>
           <p><strong>Gyülekező:</strong> 17:45, Szentháromság templom</p>
@@ -81,14 +99,22 @@
           </p>
         </article>
 
-        <article class="news-card">
-          <span class="news-date">2026. október 23.</span>
+        <article class="news-card" data-date="2026-10-23">
+          <div class="news-meta"><span class="news-date">2026. október 23.</span></div>
           <h3>Október 23-i megemlékezés</h3>
           <p>Az immár több éves szokáshoz híven a gödöllői városi október 23-i ünnepséget a Bezsilla villa kertjében található emlékműnél rendezik.</p>
           <p>Szeretettel várunk mindenkit!</p>
         </article>
 
       </div>
+
+      <p class="news-empty" id="newsEmpty" hidden>
+        Jelenleg nincs közelgő eseményünk. Kövess minket a
+        <a class="inline-link" href="https://www.facebook.com/802szentkorona" target="_blank" rel="noopener noreferrer">Facebookon</a>
+        vagy az
+        <a class="inline-link" href="https://www.instagram.com/802szentkorona/" target="_blank" rel="noopener noreferrer">Instagramon</a>,
+        hogy ne maradj le az újdonságokról!
+      </p>
     </div>
   </section>
 
@@ -104,6 +130,6 @@
     </div>
   </footer>
 
-  <script src="script.js?v=2"></script>
+  <script src="script.js?v=3"></script>
 </body>
 </html>

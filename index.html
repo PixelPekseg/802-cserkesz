@@ -7,7 +7,7 @@
   <meta name="description" content="A 802. sz. Szent Korona Cserkészcsapat Gödöllőn működő cserkészcsapat. Csatlakozz hozzánk 4. osztálytól: közösség, kaland, természet.">
 
   <!--
-    FONTOS: amint megvan a saját domain, mind az 5 HTML fájlban, a
+    FONTOS: amint megvan a saját domain, mind a 6 HTML fájlban, a
     robots.txt-ben és a sitemap.xml-ben cseréld le a
     "https://www.YOUR-DOMAIN-HERE.com" placeholdert a valódi domainre
     (canonical, Open Graph és strukturált adat linkek).
@@ -18,13 +18,13 @@
   <meta property="og:title" content="802. sz. Szent Korona Cserkészcsapat – Gödöllő">
   <meta property="og:description" content="Csatlakozz hozzánk 4. osztálytól: közösség, kaland, természet.">
   <meta property="og:url" content="https://www.YOUR-DOMAIN-HERE.com/">
-  <meta property="og:image" content="https://www.YOUR-DOMAIN-HERE.com/images/hero.jpg">
+  <meta property="og:image" content="https://www.YOUR-DOMAIN-HERE.com/images/csapatunk.jpg">
   <meta property="og:locale" content="hu_HU">
 
   <!-- Logók: a fejlécben az images/logo_white.jpg (fekete jel fehér alapon) látszik, faviconként az images/logo_green.jpeg -->
   <link rel="icon" type="image/jpeg" href="images/logo_green.jpeg?v=1">
   <link rel="apple-touch-icon" href="images/logo_green.jpeg?v=1">
-  <link rel="stylesheet" href="style.css?v=2">
+  <link rel="stylesheet" href="style.css?v=11">
 
   <!-- Strukturált adat: segít a Google-nek megérteni, hogy ez egy szervezet -->
   <script type="application/ld+json">
@@ -60,9 +60,10 @@
       <nav class="main-nav" id="mainNav">
         <ul>
           <li><a href="index.html" aria-current="page">Főoldal</a></li>
+          <li><a href="aktualis.html">Aktuális</a></li>
           <li><a href="csatlakozom.html">Csatlakozom!</a></li>
           <li><a href="csapatotthon.html">Csapatotthonunk</a></li>
-          <li><a href="aktualis.html">Aktuális</a></li>
+          <li><a href="rolunk.html">Rólunk</a></li>
           <li><a class="nav-cta" href="tamogass.html">Támogass minket</a></li>
         </ul>
       </nav>
@@ -70,27 +71,41 @@
   </header>
 
   <!--
-    Borítókép + név. A kép teljes egészében látszik (nincs levágva), bármilyen
-    arányú képet töltesz is fel: ha a kép nem tölti ki a teljes szélességet,
-    a mögötte lévő sávokat ugyanennek a képnek az elmosott változata tölti ki
-    (lásd style.css, .hero::before).
+    Borítókép + név (images/csapatunk.jpg). A kép teljes egészében látszik,
+    levágás nélkül, a saját arányában, teljes szélességben.
   -->
   <section class="hero">
-    <img class="hero-img" src="images/hero.jpg" alt="Cserkészek madártávlatból, a réten kirakott 802-es szám" data-optional>
+    <img class="hero-img" src="images/csapatunk.jpg" alt="A csapat tagjai közös csoportképen az erdő előtt" data-optional>
     <h1>802. sz. Szent Korona Cserkészcsapat</h1>
   </section>
 
-  <!-- Csapatunk (a háttérkép: images/csapatunk.jpg) -->
-  <section id="csapatunk" class="section team-intro">
-    <div class="container">
-      <h2>Csapatunk</h2>
-      <!-- PLACEHOLDER SZÖVEG – cseréld le a csapat saját bemutatkozására -->
-      <p>
-        Csapatunk gödöllői és környékbeli gyerekeknek, fiataloknak kínál
-        közösséget, kalandot és tartalmas időtöltést a természetben. A
-        cserkészet értékei – hűség, segítőkészség, természetszeretet –
-        szerint nevelünk.
-      </p>
+  <!--
+    Csapatunk: bal oldalon a kép (images/hero.jpg, teljes egészében látszik,
+    levágás nélkül), jobb oldalon a szöveg sima zöld háttéren.
+    Mobilon a kép fölül, a szöveg alatta jelenik meg.
+  -->
+  <section id="csapatunk" class="team-split">
+    <div class="team-split-image">
+      <img src="images/hero.jpg" alt="Cserkészek madártávlatból, a réten kirakott 802-es szám" data-optional>
+    </div>
+    <div class="team-split-text">
+      <div>
+        <h2>Csapatunk</h2>
+        <!--
+          A szöveg a csapat korábbi honlapja alapján készült (Rólunk és
+          "Csapatunk múltja" oldalak: az 1920-as évek eleji indulás, az 1948-as
+          betiltás, az 1989-es újraindulás, a heti őrsgyűlések és a nyári tábor).
+        -->
+        <p>
+          Csapatunk gyökerei az 1920-as évek gödöllői cserkészetéig nyúlnak
+          vissza. A cserkészet 1948-as betiltása után 1989-ben indultunk újra,
+          és ma több mint 400 gödöllői és környékbeli gyerek és fiatal tartozik
+          közénk. Hetente őrsgyűlésen találkozunk, félévente kirándulásokat és
+          portyákat szervezünk, nyáron pedig tíznapos táborban kovácsolódunk
+          össze.
+        </p>
+        <a class="btn btn-light" href="rolunk.html">Tovább a Rólunk oldalra</a>
+      </div>
     </div>
   </section>
 
@@ -164,7 +179,7 @@
             <h4>Facebook</h4>
             <iframe
               class="social-frame social-frame-fb"
-              src="https://www.facebook.com/plugins/page.php?href=https%3A%2F%2Fwww.facebook.com%2F802szentkorona&amp;tabs=timeline&amp;width=500&amp;height=640&amp;small_header=false&amp;adapt_container_width=true&amp;hide_cover=false&amp;show_facepile=true"
+              src="https://www.facebook.com/plugins/page.php?href=https%3A%2F%2Fwww.facebook.com%2F802szentkorona&amp;tabs=timeline&amp;width=500&amp;height=520&amp;small_header=false&amp;adapt_container_width=true&amp;hide_cover=false&amp;show_facepile=true"
               title="A 802. sz. Szent Korona Cserkészcsapat Facebook-oldala"
               scrolling="no"
               loading="lazy"
@@ -201,6 +216,6 @@
     </div>
   </footer>
 
-  <script src="script.js?v=2"></script>
+  <script src="script.js?v=3"></script>
 </body>
 </html>
