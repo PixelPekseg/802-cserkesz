@@ -1,0 +1,786 @@
+/* ==========================================================
+   Alapbeállítások
+   ========================================================== */
+:root {
+  /* ----------------------------------------------------------
+     A weboldal SZÍNSÉMÁJA — a megadott 3 zöld az alap:
+       - 386641 (sötétzöld)
+       - 6a994e (közepes zöld)
+       - a7c957 (világos, lime zöld)
+     Egyik megadott szín sem elég világos háttérnek, ezért a háttér-
+     és szegélyszínek az a7c957-ből lettek levezetve (fehérrel
+     kikeverve), a szövegszín pedig a 386641 sötétebb árnyalata.
+     Elég ezeket a változókat átírni, az egész oldal színe változik.
+     ---------------------------------------------------------- */
+  --color-primary: #386641;        /* sötétzöld – gombok, linkek, címsorok, lábléc */
+  --color-primary-dark: #2a4d31;   /* sötétzöld sötétebb árnyalata – hover állapot */
+  --color-accent: #6a994e;         /* közepes zöld – díszítő vonalak, ikonok */
+  --color-highlight: #a7c957;      /* világos zöld – dátum-címkék, kiemelések */
+  --color-text: #233f2a;           /* levezetett sötétzöld – törzsszöveg */
+  --color-text-muted: rgba(35, 63, 42, 0.72);
+  --color-bg: #f4f9eb;             /* levezetett – fő háttérszín */
+  --color-bg-alt: #e8f1d2;         /* levezetett – váltakozó szekció-háttér */
+  --color-border: #d3e4ab;         /* levezetett – szegélyek */
+
+  --font-heading: 'Georgia', 'Times New Roman', serif;
+  --font-body: 'Segoe UI', Arial, sans-serif;
+  --max-width: 1100px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  color: var(--color-text);
+  background: var(--color-bg);
+  line-height: 1.6;
+}
+
+h1, h2, h3 {
+  font-family: var(--font-heading);
+  color: var(--color-primary);
+  line-height: 1.25;
+  margin-top: 0;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+.container {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.section {
+  padding: 72px 0;
+}
+
+.section h2 {
+  font-size: 2rem;
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+.section-lead {
+  text-align: center;
+  max-width: 640px;
+  margin: 0 auto 40px;
+  color: var(--color-text-muted);
+}
+
+.btn {
+  display: inline-block;
+  padding: 12px 28px;
+  border: none;
+  border-radius: 30px;
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+}
+
+.btn-primary {
+  background: var(--color-primary);
+  color: #fff;
+}
+
+.btn-primary:hover {
+  background: var(--color-primary-dark);
+}
+
+/* ==========================================================
+   Fejléc / navigáció
+   ========================================================== */
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(244, 249, 235, 0.95);
+  border-bottom: 1px solid var(--color-border);
+  backdrop-filter: blur(4px);
+}
+
+.header-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 70px;
+  gap: 16px;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-heading);
+  font-size: 1.05rem;
+  font-weight: bold;
+  color: var(--color-primary);
+  line-height: 1.2;
+}
+
+/* A logó fehér hátterű JPG: a multiply keverés a fehéret átlátszóvá teszi
+   a fejléc halvány háttere előtt, a fekete rész fekete marad */
+.logo-img {
+  width: 64px;
+  height: 64px;
+  object-fit: contain;
+  mix-blend-mode: multiply;
+}
+
+.main-nav ul {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.main-nav a {
+  font-size: 0.95rem;
+  font-weight: 600;
+  padding: 6px 0;
+  border-bottom: 2px solid transparent;
+  transition: color 0.2s ease, border-color 0.2s ease;
+}
+
+.main-nav a:hover {
+  color: var(--color-accent);
+}
+
+.main-nav a[aria-current="page"] {
+  color: var(--color-primary);
+  border-bottom-color: var(--color-highlight);
+}
+
+/* A "Támogass minket" menüpont gombként jelenik meg */
+.main-nav a.nav-cta {
+  padding: 8px 18px;
+  border-bottom: none;
+  border-radius: 30px;
+  background: var(--color-primary);
+  color: #fff;
+}
+
+.main-nav a.nav-cta:hover {
+  background: var(--color-primary-dark);
+  color: #fff;
+}
+
+.main-nav a.nav-cta[aria-current="page"] {
+  background: var(--color-primary-dark);
+  color: #fff;
+}
+
+.nav-toggle {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  width: 32px;
+  height: 32px;
+  background: none;
+  border: none;
+  padding: 4px;
+  cursor: pointer;
+}
+
+.nav-toggle span {
+  display: block;
+  height: 2px;
+  background: var(--color-primary);
+  border-radius: 2px;
+}
+
+/* ==========================================================
+   Hero (főoldal)
+   A borítókép TELJES EGÉSZÉBEN látszik, levágás nélkül, bármilyen arányú
+   képet töltesz is fel: a kép a saját arányát megtartva tölti ki a
+   szélességet, de legfeljebb a képernyő magasságáig nő. Ha emiatt a kép
+   mellett üres sáv maradna, azt ugyanennek a képnek az elmosott
+   változata tölti ki (.hero::before). A hiányzó hero.jpg esetén
+   (a script.js eltávolítja a nem betöltődő képet) zöld színátmenet látszik.
+   ========================================================== */
+.hero {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  min-height: 260px;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
+}
+
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: -30px;
+  z-index: -1;
+  background: url('images/hero.jpg') center / cover no-repeat;
+  filter: blur(24px) brightness(0.85);
+}
+
+/* Enyhe sötétítés, hogy a fehér cím olvasható maradjon a képen */
+.hero::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(rgba(35, 63, 42, 0.2), rgba(35, 63, 42, 0.4));
+}
+
+.hero-img {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: calc(100vh - 70px);
+  object-fit: contain;
+}
+
+.hero h1 {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  padding: 20px;
+  text-align: center;
+  color: #fff;
+  font-size: 3rem;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.45);
+}
+
+/* Aloldalak címsávja */
+.page-banner {
+  padding: 56px 20px;
+  text-align: center;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
+}
+
+.page-banner h1 {
+  margin: 0;
+  color: #fff;
+  font-size: 2.4rem;
+}
+
+.page-banner p {
+  margin: 10px auto 0;
+  max-width: 640px;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+/* ==========================================================
+   Csapatunk szekció (szöveg háttérképpel)
+   ========================================================== */
+.team-intro {
+  padding: 96px 0;
+  text-align: center;
+  color: #fff;
+  background:
+    linear-gradient(rgba(35, 63, 42, 0.7), rgba(35, 63, 42, 0.7)),
+    url('images/csapatunk.jpg') center / cover no-repeat,
+    linear-gradient(135deg, var(--color-primary), var(--color-accent));
+}
+
+.team-intro h2 {
+  color: #fff;
+}
+
+.team-intro p {
+  max-width: 720px;
+  margin: 0 auto;
+  font-size: 1.1rem;
+}
+
+/* ==========================================================
+   Kapcsolat – személyek kártyái
+   ========================================================== */
+.contact {
+  background: var(--color-bg-alt);
+}
+
+.people-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 24px;
+}
+
+.person-card {
+  flex: 0 1 190px;
+  padding: 24px 16px;
+  text-align: center;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.person-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px rgba(35, 63, 42, 0.12);
+}
+
+/* A fotó mögött monogram látszik, ha a kép még nincs feltöltve
+   (a script.js eltávolítja a nem betöltődő képet) */
+.person-photo {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  margin: 0 auto 14px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: var(--color-highlight);
+  border: 3px solid var(--color-accent);
+}
+
+.person-photo::before {
+  content: attr(data-initials);
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-heading);
+  font-size: 2rem;
+  font-weight: bold;
+  color: var(--color-primary);
+}
+
+.person-photo img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.person-card h3 {
+  font-size: 1.1rem;
+  margin-bottom: 2px;
+}
+
+.person-role {
+  margin: 0 0 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--color-accent);
+}
+
+.person-email {
+  font-size: 0.9rem;
+  overflow-wrap: anywhere;
+  border-bottom: 1px solid var(--color-highlight);
+}
+
+.person-email:hover {
+  color: var(--color-accent);
+}
+
+/* ==========================================================
+   Facebook- és Instagram-widget (egymás mellett, mobilon egymás alatt)
+   ========================================================== */
+.social-section {
+  margin-top: 56px;
+  text-align: center;
+}
+
+.social-section > h3 {
+  font-size: 1.5rem;
+  margin-bottom: 28px;
+}
+
+.social-widgets {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 32px;
+}
+
+.social-widget {
+  flex: 1 1 320px;
+  max-width: 500px;
+}
+
+.social-widget h4 {
+  margin: 0 0 12px;
+  font-family: var(--font-heading);
+  font-size: 1.15rem;
+  color: var(--color-primary);
+}
+
+.social-frame {
+  display: block;
+  width: 100%;
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  background: #fff;
+}
+
+.social-frame-fb {
+  height: 640px;
+}
+
+.social-frame-ig {
+  height: 540px;
+}
+
+.social-link {
+  display: inline-block;
+  margin-top: 14px;
+  font-weight: 600;
+  border-bottom: 2px solid var(--color-highlight);
+}
+
+.social-link:hover {
+  color: var(--color-accent);
+}
+
+/* ==========================================================
+   Csatlakozom! – osztályok és rajparancsnokok
+   ========================================================== */
+.grades-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 24px;
+}
+
+.grade-card {
+  padding: 24px;
+  background: var(--color-bg-alt);
+  border: 1px solid var(--color-border);
+  border-top: 4px solid var(--color-accent);
+  border-radius: 12px;
+}
+
+.grade-card h3 {
+  font-size: 1.25rem;
+  margin-bottom: 12px;
+}
+
+.grade-card ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.grade-card li {
+  padding: 8px 0;
+  border-top: 1px solid var(--color-border);
+}
+
+.grade-card li:first-child {
+  border-top: none;
+}
+
+.leader-name {
+  display: block;
+  font-weight: 600;
+}
+
+.leader-email {
+  font-size: 0.9rem;
+  overflow-wrap: anywhere;
+  border-bottom: 1px solid var(--color-highlight);
+}
+
+.leader-email:hover {
+  color: var(--color-accent);
+}
+
+/* ==========================================================
+   Csapatotthonunk
+   ========================================================== */
+.home-text {
+  max-width: 720px;
+  margin: 0 auto 40px;
+  text-align: center;
+}
+
+.home-address {
+  margin: 0 auto 8px;
+  font-family: var(--font-heading);
+  font-size: 1.3rem;
+  font-weight: bold;
+  color: var(--color-primary);
+}
+
+.home-contact-title {
+  margin-bottom: 20px;
+  text-align: center;
+  font-size: 1.3rem;
+}
+
+.home-contact {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 48px;
+}
+
+/* Szövegen belüli link (pl. telefonszám) */
+.inline-link {
+  font-weight: 600;
+  border-bottom: 2px solid var(--color-highlight);
+}
+
+.inline-link:hover {
+  color: var(--color-accent);
+}
+
+.map-wrapper {
+  max-width: 900px;
+  margin: 0 auto;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  box-shadow: 0 10px 30px rgba(35, 63, 42, 0.1);
+}
+
+.map-wrapper iframe {
+  display: block;
+  width: 100%;
+  height: 380px;
+  border: 0;
+}
+
+.map-cta {
+  margin-top: 24px;
+  text-align: center;
+}
+
+/* ==========================================================
+   Aktuális – hírdobozok
+   ========================================================== */
+.news-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 24px;
+}
+
+.news-card {
+  display: flex;
+  flex-direction: column;
+  padding: 28px 24px;
+  background: var(--color-bg-alt);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.news-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px rgba(35, 63, 42, 0.12);
+}
+
+.news-date {
+  align-self: flex-start;
+  margin-bottom: 12px;
+  padding: 4px 12px;
+  border-radius: 20px;
+  background: var(--color-highlight);
+  font-size: 0.85rem;
+  font-weight: bold;
+  color: var(--color-text);
+}
+
+.news-card h3 {
+  font-size: 1.25rem;
+}
+
+.news-card p {
+  margin: 0 0 12px;
+}
+
+.news-card .news-link {
+  margin-top: auto;
+  align-self: flex-start;
+  font-weight: 600;
+  border-bottom: 2px solid var(--color-highlight);
+}
+
+.news-card .news-link:hover {
+  color: var(--color-accent);
+}
+
+/* ==========================================================
+   Támogass minket
+   ========================================================== */
+.support-text {
+  max-width: 720px;
+  margin: 0 auto 40px;
+  text-align: center;
+}
+
+.bank-card {
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 28px 24px;
+  text-align: center;
+  background: var(--color-bg-alt);
+  border: 1px solid var(--color-border);
+  border-top: 4px solid var(--color-accent);
+  border-radius: 12px;
+}
+
+.bank-card h3 {
+  font-size: 1.2rem;
+}
+
+.bank-label {
+  margin: 14px 0 2px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-accent);
+}
+
+.bank-value {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+/* Egy kattintással kijelölhető számlaszám */
+.bank-number {
+  font-family: 'Courier New', monospace;
+  font-size: 1.3rem;
+  user-select: all;
+}
+
+/* ==========================================================
+   Lábléc
+   ========================================================== */
+.site-footer {
+  padding: 36px 0 28px;
+  background: var(--color-primary);
+  color: var(--color-bg);
+  text-align: center;
+  font-size: 0.9rem;
+}
+
+.footer-links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px 24px;
+  margin-bottom: 16px;
+}
+
+.footer-links a {
+  font-weight: 600;
+  border-bottom: 2px solid var(--color-highlight);
+}
+
+.footer-links a:hover {
+  color: var(--color-highlight);
+}
+
+.site-footer p {
+  margin: 4px 0;
+}
+
+/* ==========================================================
+   Reszponzivitás
+   ========================================================== */
+/* A hosszú csapatnév + 5 menüpont 1100px alatt már nem fér el egy sorban,
+   ezért itt vált a menü hamburgerre */
+@media (max-width: 1100px) {
+  .nav-toggle {
+    display: flex;
+  }
+
+  .main-nav {
+    position: absolute;
+    top: 70px;
+    left: 0;
+    right: 0;
+    max-height: 0;
+    overflow: hidden;
+    background: var(--color-bg);
+    border-bottom: 1px solid var(--color-border);
+    transition: max-height 0.3s ease;
+  }
+
+  .main-nav.open {
+    max-height: calc(100vh - 70px);
+    overflow-y: auto;
+  }
+
+  .main-nav ul {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+  }
+
+  .main-nav li {
+    border-top: 1px solid var(--color-border);
+  }
+
+  .main-nav a {
+    display: block;
+    padding: 14px 20px;
+    border-bottom: none;
+  }
+
+  .main-nav a[aria-current="page"] {
+    background: var(--color-bg-alt);
+  }
+
+  .main-nav a.nav-cta {
+    margin: 12px 20px;
+    text-align: center;
+  }
+}
+
+@media (max-width: 768px) {
+  .hero h1 {
+    font-size: 2.2rem;
+  }
+
+  .page-banner h1 {
+    font-size: 1.9rem;
+  }
+
+  .section {
+    padding: 56px 0;
+  }
+
+  .map-wrapper iframe {
+    height: 300px;
+  }
+}
+
+@media (max-width: 480px) {
+  .logo-text {
+    font-size: 0.9rem;
+  }
+
+  .hero h1 {
+    font-size: 1.6rem;
+  }
+}

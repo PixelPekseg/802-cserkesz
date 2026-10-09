@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>802. sz. Szent Korona Cserkészcsapat – Gödöllő</title>
+  <meta name="description" content="A 802. sz. Szent Korona Cserkészcsapat Gödöllőn működő cserkészcsapat. Csatlakozz hozzánk 4. osztálytól: közösség, kaland, természet.">
+
+  <!--
+    FONTOS: amint megvan a saját domain, mind az 5 HTML fájlban, a
+    robots.txt-ben és a sitemap.xml-ben cseréld le a
+    "https://www.YOUR-DOMAIN-HERE.com" placeholdert a valódi domainre
+    (canonical, Open Graph és strukturált adat linkek).
+  -->
+  <link rel="canonical" href="https://www.YOUR-DOMAIN-HERE.com/">
+
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="802. sz. Szent Korona Cserkészcsapat – Gödöllő">
+  <meta property="og:description" content="Csatlakozz hozzánk 4. osztálytól: közösség, kaland, természet.">
+  <meta property="og:url" content="https://www.YOUR-DOMAIN-HERE.com/">
+  <meta property="og:image" content="https://www.YOUR-DOMAIN-HERE.com/images/hero.jpg">
+  <meta property="og:locale" content="hu_HU">
+
+  <!-- Logók: a fejlécben az images/logo_white.jpg (fekete jel fehér alapon) látszik, faviconként az images/logo_green.jpeg -->
+  <link rel="icon" type="image/jpeg" href="images/logo_green.jpeg?v=1">
+  <link rel="apple-touch-icon" href="images/logo_green.jpeg?v=1">
+  <link rel="stylesheet" href="style.css?v=2">
+
+  <!-- Strukturált adat: segít a Google-nek megérteni, hogy ez egy szervezet -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "802. sz. Szent Korona Cserkészcsapat",
+    "url": "https://www.YOUR-DOMAIN-HERE.com/",
+    "logo": "https://www.YOUR-DOMAIN-HERE.com/images/logo_white.jpg",
+    "email": "802@cserkesz.hu",
+    "areaServed": "Gödöllő",
+    "sameAs": ["https://www.facebook.com/802szentkorona"]
+  }
+  </script>
+</head>
+<body>
+
+  <!-- Fejléc / navigáció -->
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="index.html" class="logo">
+        <img class="logo-img" src="images/logo_white.jpg" alt="" data-optional>
+        <span class="logo-text">802. sz. Szent Korona Cserkészcsapat</span>
+      </a>
+
+      <!-- Hamburger gomb mobil nézethez -->
+      <button class="nav-toggle" id="navToggle" type="button" aria-label="Menü megnyitása" aria-expanded="false" aria-controls="mainNav">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+
+      <nav class="main-nav" id="mainNav">
+        <ul>
+          <li><a href="index.html" aria-current="page">Főoldal</a></li>
+          <li><a href="csatlakozom.html">Csatlakozom!</a></li>
+          <li><a href="csapatotthon.html">Csapatotthonunk</a></li>
+          <li><a href="aktualis.html">Aktuális</a></li>
+          <li><a class="nav-cta" href="tamogass.html">Támogass minket</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <!--
+    Borítókép + név. A kép teljes egészében látszik (nincs levágva), bármilyen
+    arányú képet töltesz is fel: ha a kép nem tölti ki a teljes szélességet,
+    a mögötte lévő sávokat ugyanennek a képnek az elmosott változata tölti ki
+    (lásd style.css, .hero::before).
+  -->
+  <section class="hero">
+    <img class="hero-img" src="images/hero.jpg" alt="Cserkészek madártávlatból, a réten kirakott 802-es szám" data-optional>
+    <h1>802. sz. Szent Korona Cserkészcsapat</h1>
+  </section>
+
+  <!-- Csapatunk (a háttérkép: images/csapatunk.jpg) -->
+  <section id="csapatunk" class="section team-intro">
+    <div class="container">
+      <h2>Csapatunk</h2>
+      <!-- PLACEHOLDER SZÖVEG – cseréld le a csapat saját bemutatkozására -->
+      <p>
+        Csapatunk gödöllői és környékbeli gyerekeknek, fiataloknak kínál
+        közösséget, kalandot és tartalmas időtöltést a természetben. A
+        cserkészet értékei – hűség, segítőkészség, természetszeretet –
+        szerint nevelünk.
+      </p>
+    </div>
+  </section>
+
+  <!-- Kapcsolat -->
+  <!--
+    A fotók a images/team/ mappába kerülnek, a megadott fájlnevekkel.
+    Amíg egy fotó nincs feltöltve, a kártyán a monogram látszik.
+  -->
+  <section id="kapcsolat" class="section contact">
+    <div class="container">
+      <h2>Kapcsolat</h2>
+
+      <div class="people-grid">
+        <div class="person-card">
+          <div class="person-photo" data-initials="CL">
+            <img src="images/team/cseri-holzman_lili.jpg" alt="Cseri-Holzman Lili" data-optional>
+          </div>
+          <h3>Cseri-Holzman Lili</h3>
+          <p class="person-role">Csapatparancsnok</p>
+          <a class="person-email" href="mailto:802@cserkesz.hu">802@cserkesz.hu</a>
+        </div>
+
+        <div class="person-card">
+          <div class="person-photo" data-initials="CÁ">
+            <img src="images/team/csiki_adam.jpg" alt="Csiki Ádám" data-optional>
+          </div>
+          <h3>Csiki Ádám</h3>
+          <p class="person-role">Pénzügyek</p>
+          <a class="person-email" href="mailto:cs.adam.b@gmail.com">cs.adam.b@gmail.com</a>
+        </div>
+
+        <div class="person-card">
+          <div class="person-photo" data-initials="GH">
+            <img src="images/team/grebel_hanna.jpg" alt="Grébel Hanna" data-optional>
+          </div>
+          <h3>Grébel Hanna</h3>
+          <p class="person-role">Bezsilla Villa</p>
+          <a class="person-email" href="mailto:grebel.hanna@cserkesz.hu">grebel.hanna@cserkesz.hu</a>
+        </div>
+
+        <div class="person-card">
+          <div class="person-photo" data-initials="BG">
+            <img src="images/team/bedo_gergely.jpg" alt="Bedő Gergely" data-optional>
+          </div>
+          <h3>Bedő Gergely</h3>
+          <p class="person-role">Tábor és programok</p>
+          <a class="person-email" href="mailto:bedo.gergely@cserkesz.hu">bedo.gergely@cserkesz.hu</a>
+        </div>
+
+        <div class="person-card">
+          <div class="person-photo" data-initials="PA">
+            <img src="images/team/peter_anna.jpg" alt="Péter Anna" data-optional>
+          </div>
+          <h3>Péter Anna</h3>
+          <p class="person-role">Nevelés és gyermekvédelem</p>
+          <a class="person-email" href="mailto:peter.anna@cserkesz.hu">peter.anna@cserkesz.hu</a>
+        </div>
+      </div>
+
+      <!--
+        Facebook- és Instagram-widget (a Facebook hivatalos Page Plugin-ja,
+        illetve az Instagram profil-beágyazása). Azonnal betöltődnek, és a
+        csapat oldalának/profiljának legutóbbi bejegyzéseit mutatják.
+        Más oldalhoz/profilhoz: cseréld le az iframe src-ben az oldal nevét
+        (802szentkorona), és a "Megnyitás" linkeket is.
+      -->
+      <div class="social-section">
+        <h3>Kövess minket</h3>
+        <div class="social-widgets">
+          <div class="social-widget">
+            <h4>Facebook</h4>
+            <iframe
+              class="social-frame social-frame-fb"
+              src="https://www.facebook.com/plugins/page.php?href=https%3A%2F%2Fwww.facebook.com%2F802szentkorona&amp;tabs=timeline&amp;width=500&amp;height=640&amp;small_header=false&amp;adapt_container_width=true&amp;hide_cover=false&amp;show_facepile=true"
+              title="A 802. sz. Szent Korona Cserkészcsapat Facebook-oldala"
+              scrolling="no"
+              loading="lazy"
+              allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share">
+            </iframe>
+            <a class="social-link" href="https://www.facebook.com/802szentkorona" target="_blank" rel="noopener noreferrer">Megnyitás Facebookon</a>
+          </div>
+
+          <div class="social-widget">
+            <h4>Instagram</h4>
+            <iframe
+              class="social-frame social-frame-ig"
+              src="https://www.instagram.com/802szentkorona/embed"
+              title="A 802. sz. Szent Korona Cserkészcsapat Instagram-profilja"
+              scrolling="no"
+              loading="lazy">
+            </iframe>
+            <a class="social-link" href="https://www.instagram.com/802szentkorona/" target="_blank" rel="noopener noreferrer">Megnyitás Instagramon</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Lábléc -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-links">
+        <a href="mailto:802@cserkesz.hu">802@cserkesz.hu</a>
+        <a href="https://www.facebook.com/802szentkorona" target="_blank" rel="noopener noreferrer">Facebook</a>
+        <a href="https://www.instagram.com/802szentkorona/" target="_blank" rel="noopener noreferrer">Instagram</a>
+      </div>
+      <p>&copy; <span id="year"></span> 802. sz. Szent Korona Cserkészcsapat. Minden jog fenntartva.</p>
+    </div>
+  </footer>
+
+  <script src="script.js?v=2"></script>
+</body>
+</html>
