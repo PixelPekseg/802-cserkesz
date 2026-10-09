@@ -1642,14 +1642,14 @@ section[id] {
 }
 
 .camp-col:first-child {
-  flex: 0 0 58%;
+  flex: 0 0 var(--col1, 58%);
 }
 
 .camp-col:nth-child(2) {
   position: relative;
   z-index: 1;
-  flex: 0 0 50%;
-  margin-left: -8%;
+  flex: 0 0 var(--col2, 50%);
+  margin-left: var(--overlap, -8%);
   margin-top: 12%;
 }
 
