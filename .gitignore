@@ -2,7 +2,7 @@
 Thumbs.db
 
 # kész, de még nem publikált tervezetek (pl. adatkezelési tájékoztató)
-_drafts/
+drafts/
 
-# eredeti / tömörítetlen képek (az oldal az images/_webp/ mappát használja)
-images/_originals/
+# eredeti / tömörítetlen képek (az oldal az images/webp/ mappát használja)
+images/originals/
