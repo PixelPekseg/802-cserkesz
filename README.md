@@ -6,7 +6,7 @@ Statikus (HTML/CSS/JS) többoldalas weboldal, backend nélkül, GitHub Pages-en 
 
 - `index.html` – Főoldal (borítókép + név, Csapatunk (kép + szöveg), Kapcsolat, Facebook- és Instagram-gombok)
 - `rolunk.html` – Rólunk (két pont: Csapatunkról, Cserkészetről; a szöveg a csapat korábbi honlapjáról, a 802szentkorona.hu-ról származik)
-- `csatlakozom.html` – Csatlakozom! (4.–12. osztály, rajparancsnokok)
+- `csatlakozom.html` – Csatlakozom (4.–8. osztály, rajparancsnokok)
 - `csapatotthon.html` – Csapatotthonunk (Bezsilla villa, elérhetőség, Google Maps, Facebook- és Instagram-gombok)
 - `programok.html` – Programok (hírdobozok léptethető sorban + naptár)
 - `tamogass.html` – Támogass minket (adó 1%-os kép, egyesület adatai, számlaszám)
@@ -21,6 +21,7 @@ A fejléc és a lábléc mind a 6 HTML fájlban külön szerepel – ha módosí
 - `images/csapatunk.jpg` – a főoldal borítóképe (csoportkép) a név mögött; bármilyen arányú lehet, teljes szélességben, levágás nélkül látszik (a magassága az arányából adódik, nagy képernyőn a képernyőnél magasabb is lehet); amíg nincs, zöld színátmenet látszik
 - `images/logo_white.jpg` (fekete jel fehér alapon) – a fejlécben látszik, a fehér háttér átlátszóvá válik; `images/logo_green.jpg` – favicon; `images/logo_black.jpg` – jelenleg nincs használatban
 - `images/bezsilla.jpg`, `images/bezsilla_bipi.jpg` – a Csapatotthonunk oldal két képe (a villa, illetve a falra festett Baden-Powell-portré); egymás mellett, azonos magassággal, levágás nélkül látszanak, mobilon egymás alatt
+- `images/palack_qrkod.jpg` – a palackvisszaváltáshoz beolvasandó QR-kód (egyedi azonosító) a Támogass minket oldal alján
 - `images/ado1.jpg` – az adó 1%-os kép a Támogass minket oldalon, a bevezető szöveg alatt
 - `images/team/cseri-holzman_lili.jpg`, `csiki_adam.jpg`, `grebel_hanna.jpg`, `bedo_gergely.jpg`, `peter_anna.jpg` – a kapcsolati kártyák fotói (amíg nincs, monogram látszik)
 

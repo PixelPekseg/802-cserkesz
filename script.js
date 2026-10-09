@@ -443,3 +443,77 @@ function initCalendar() {
 }
 
 initCalendar();
+
+// ==========================================================
+// Másolás gombok (data-copy attribútum): a megadott szöveget a vágólapra
+// teszi, és két másodpercre pipára cseréli az ikont. Ha a böngésző nem
+// engedi a vágólap használatát, az ikon a hibát jelzi a címkében, az érték
+// pedig kézzel kijelölhető marad. Egy közös (delegált) eseménykezelő
+// dolgozik, így a később létrehozott gombokkal (pl. a naptár részletei) is működik.
+// ==========================================================
+const copyTimers = new WeakMap();
+
+async function copyToClipboard(value) {
+  try {
+    await navigator.clipboard.writeText(value);
+    return true;
+  } catch (e) {
+    // régebbi böngésző / nem biztonságos környezet: ideiglenes beviteli mező
+    const field = document.createElement('textarea');
+    field.value = value;
+    field.setAttribute('readonly', '');
+    field.style.position = 'fixed';
+    field.style.opacity = '0';
+    document.body.append(field);
+    field.select();
+    let copied = false;
+    try { copied = document.execCommand('copy'); } catch (err) { copied = false; }
+    field.remove();
+    return copied;
+  }
+}
+
+document.addEventListener('click', async event => {
+  const button = event.target.closest('.copy-btn[data-copy]');
+  if (!button) return;
+
+  const copied = await copyToClipboard(button.dataset.copy);
+  if (!button.dataset.originalLabel) button.dataset.originalLabel = button.getAttribute('aria-label') || '';
+  const label = button.dataset.copyLabel || 'Szöveg';
+
+  clearTimeout(copyTimers.get(button));
+  button.classList.toggle('is-copied', copied);
+  button.setAttribute('aria-label', copied ? `${label} másolva` : 'Nem sikerült, jelöld ki kézzel');
+  button.title = copied ? 'Másolva!' : 'Nem sikerült, jelöld ki kézzel';
+  copyTimers.set(button, setTimeout(() => {
+    button.classList.remove('is-copied');
+    button.setAttribute('aria-label', button.dataset.originalLabel);
+    button.title = 'Másolás';
+  }, 2000));
+});
+
+// ==========================================================
+// Minden e-mail cím (mailto link) mellé másolás gombot tesz (a láblécben és a programok kártyáin nem).
+// Az oldal végén fut, hogy a korábban létrehozott elemeket is elérje.
+// ==========================================================
+document.querySelectorAll('a[href^="mailto:"]').forEach(link => {
+  const address = link.getAttribute('href').slice('mailto:'.length).split('?')[0];
+  if (!address || link.closest('.email-copy, .site-footer, .news-card')) return;
+
+  const wrapper = document.createElement('span');
+  wrapper.className = 'email-copy';
+  link.replaceWith(wrapper);
+  wrapper.append(link);
+
+  const button = document.createElement('button');
+  button.type = 'button';
+  button.className = 'copy-btn';
+  button.dataset.copy = address;
+  button.dataset.copyLabel = 'E-mail cím';
+  button.setAttribute('aria-label', `${address} másolása`);
+  button.title = 'Másolás';
+  button.innerHTML =
+    '<svg class="icon-copy" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/></svg>' +
+    '<svg class="icon-check" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 13l4 4L19 7"/></svg>';
+  wrapper.append(button);
+});

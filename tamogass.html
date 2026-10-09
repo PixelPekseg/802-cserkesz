@@ -13,12 +13,17 @@
   <meta property="og:title" content="Támogass minket – 802. sz. Szent Korona Cserkészcsapat">
   <meta property="og:description" content="Támogassa a csapatunk munkáját. Minden felajánlást köszönünk!">
   <meta property="og:url" content="https://www.YOUR-DOMAIN-HERE.com/tamogass.html">
-  <meta property="og:image" content="https://www.YOUR-DOMAIN-HERE.com/images/csapatunk.jpg">
+  <meta property="og:image" content="https://www.YOUR-DOMAIN-HERE.com/images/share.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="A 802. sz. Szent Korona Cserkészcsapat tagjai közös csoportképen">
+  <meta property="og:site_name" content="802. sz. Szent Korona Cserkészcsapat">
+  <meta name="twitter:card" content="summary_large_image">
   <meta property="og:locale" content="hu_HU">
 
   <link rel="icon" type="image/jpeg" href="images/logo_green.jpg?v=1">
   <link rel="apple-touch-icon" href="images/logo_green.jpg?v=1">
-  <link rel="stylesheet" href="style.css?v=23">
+  <link rel="stylesheet" href="style.css?v=33">
 </head>
 <body>
 
@@ -41,9 +46,9 @@
         <ul>
           <li><a href="index.html">Főoldal</a></li>
           <li><a href="programok.html">Programok</a></li>
-          <li><a href="csatlakozom.html">Csatlakozom!</a></li>
           <li><a href="csapatotthon.html">Csapatotthonunk</a></li>
           <li><a href="rolunk.html">Rólunk</a></li>
+          <li><a class="nav-cta nav-cta-join" href="csatlakozom.html">Csatlakozom</a></li>
           <li><a class="nav-cta" href="tamogass.html" aria-current="page">Támogass minket</a></li>
         </ul>
       </nav>
@@ -79,6 +84,11 @@
       <div class="support-cards">
         <div class="bank-card">
           <h3>Gödöllői Cserkészetért Egyesület</h3>
+          <p class="bank-label">Adószám</p>
+          <div class="bank-copy">
+            <p class="bank-value bank-number">18949584-1-13</p>
+            <button class="copy-btn" type="button" data-copy="18949584-1-13" data-copy-label="Adószám" aria-label="Adószám másolása" title="Másolás"><svg class="icon-copy" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/></svg><svg class="icon-check" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 13l4 4L19 7"/></svg></button>
+          </div>
           <p class="bank-label">A szervezet e-mail címe</p>
           <p class="bank-value"><a class="inline-link" href="mailto:kristof.vass@gmail.com">kristof.vass@gmail.com</a></p>
           <p class="bank-label">A szervezet címe</p>
@@ -88,13 +98,46 @@
         <div class="bank-card">
           <h3>Banki átutalás</h3>
           <p class="bank-label">Számlatulajdonos</p>
-          <p class="bank-value">Gödöllői Cserkészetért Egyesület</p>
+          <div class="bank-copy">
+            <p class="bank-value">Gödöllői Cserkészetért Egyesület</p>
+            <button class="copy-btn" type="button" data-copy="Gödöllői Cserkészetért Egyesület" data-copy-label="Számlatulajdonos" aria-label="Számlatulajdonos másolása" title="Másolás"><svg class="icon-copy" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/></svg><svg class="icon-check" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 13l4 4L19 7"/></svg></button>
+          </div>
           <p class="bank-label">Számlaszám</p>
-          <p class="bank-value bank-number">1620 0223 1007 7922 0000 0000</p>
+          <div class="bank-copy">
+            <p class="bank-value bank-number">1620 0223 1007 7922 0000 0000</p>
+            <!-- szóközök nélkül másolódik, a bankok így is elfogadják -->
+            <button class="copy-btn" type="button" data-copy="162002231007792200000000" data-copy-label="Számlaszám" aria-label="Számlaszám másolása" title="Másolás"><svg class="icon-copy" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/></svg><svg class="icon-check" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 13l4 4L19 7"/></svg></button>
+          </div>
           <p class="bank-label">Másodlagos banki azonosító</p>
-          <p class="bank-value bank-number">+36204924970</p>
+          <div class="bank-copy">
+            <p class="bank-value bank-number">+36204924970</p>
+            <button class="copy-btn" type="button" data-copy="+36204924970" data-copy-label="Másodlagos azonosító" aria-label="Másodlagos banki azonosító másolása" title="Másolás"><svg class="icon-copy" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/></svg><svg class="icon-check" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 13l4 4L19 7"/></svg></button>
+          </div>
           <p class="bank-note">Kérjük, az utalás közlemény rovatában tüntesse fel: <strong>Adomány</strong></p>
         </div>
+      </div>
+
+      <!--
+        Palackvisszaváltás: az images/palack_qrkod.jpg a visszaváltáskor
+        beolvasandó egyedi azonosító, amivel a betétdíj az egyesület számlájára megy.
+      -->
+      <div class="support-bottle">
+        <div class="support-bottle-text">
+          <h3>Váltsd vissza a palackot nekünk!</h3>
+          <p>
+            Betétdíjas, 50 Ft-os palackot váltasz vissza? A visszaváltáskor olvasd be az
+            alábbi QR-kódot egyedi azonosítóként: a visszaváltási díj így közvetlenül az
+            egyesület bankszámlájára érkezik.
+          </p>
+          <p>Mobilra mentve a kód mindig kéznél van, ha legközelebb palackot váltasz vissza.</p>
+          <a class="btn btn-primary" href="images/palack_qrkod.jpg" download="gödöllői-cserkészetért-egyesület-qr.jpg">QR-kód letöltése</a>
+        </div>
+        <img
+          src="images/palack_qrkod.jpg"
+          width="509"
+          height="755"
+          loading="lazy"
+          alt="QR-kód a Gödöllői Cserkészetért Egyesület egyedi azonosítójával a palackvisszaváltáshoz">
       </div>
     </div>
   </section>
@@ -111,6 +154,6 @@
     </div>
   </footer>
 
-  <script src="script.js?v=12"></script>
+  <script src="script.js?v=17"></script>
 </body>
 </html>
