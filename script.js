@@ -98,3 +98,78 @@ function updateNews(now = new Date()) {
 }
 
 updateNews();
+
+// ==========================================================
+// Főoldal – a következő 7 nap programjainak füle
+// A programokat az aktualis.html hírdobozaiból olvassa ki (data-date /
+// data-end-date), így nincs külön adatot karbantartani. Ha nincs közelgő
+// program, vagy az aktualis.html nem olvasható (pl. fájlból megnyitva),
+// a fül nem jelenik meg. A bezárást a munkamenet erejéig megjegyzi.
+// ==========================================================
+async function initUpcomingTab(now = new Date()) {
+  const tab = document.getElementById('upcomingTab');
+  const list = document.getElementById('upcomingList');
+  const closeButton = document.getElementById('upcomingClose');
+  if (!tab || !list || !closeButton) return;
+
+  try {
+    if (sessionStorage.getItem('upcomingTabClosed') === '1') return;
+  } catch (e) { /* a tárolás nem elérhető – a fül megjelenhet */ }
+
+  const windowDays = 7;
+  const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const windowEnd = new Date(startOfToday.getTime() + (windowDays + 1) * 24 * 60 * 60 * 1000);
+
+  let doc;
+  try {
+    const response = await fetch('aktualis.html');
+    if (!response.ok) return;
+    doc = new DOMParser().parseFromString(await response.text(), 'text/html');
+  } catch (e) {
+    return;
+  }
+
+  const events = [...doc.querySelectorAll('.news-card[data-date]')]
+    .map(card => {
+      const start = new Date(`${card.dataset.date}T00:00:00`);
+      const end = new Date(`${card.dataset.endDate || card.dataset.date}T23:59:59`);
+      return {
+        start, end,
+        id: card.id,
+        name: card.querySelector('h3')?.textContent.trim() ?? '',
+        date: card.querySelector('.news-date')?.textContent.trim() ?? ''
+      };
+    })
+    // még nem ért véget, és a következő 7 napon belül kezdődik (vagy már tart)
+    .filter(event => !Number.isNaN(event.start.getTime()) && event.name &&
+                     event.end >= now && event.start < windowEnd)
+    .sort((a, b) => a.start - b.start);
+
+  if (events.length === 0) return;
+
+  events.forEach(event => {
+    const item = document.createElement('li');
+    const link = document.createElement('a');
+    link.href = event.id ? `aktualis.html#${event.id}` : 'aktualis.html';
+    const name = document.createElement('span');
+    name.className = 'upcoming-name';
+    name.textContent = event.name;
+    const date = document.createElement('span');
+    date.className = 'upcoming-date';
+    date.textContent = event.date;
+    link.append(name, date);
+    item.append(link);
+    list.append(item);
+  });
+
+  closeButton.addEventListener('click', () => {
+    tab.classList.remove('is-visible');
+    try { sessionStorage.setItem('upcomingTabClosed', '1'); } catch (e) { /* nem baj */ }
+  });
+
+  tab.hidden = false;
+  // rövid késleltetés, hogy a becsúszás látszódjon
+  setTimeout(() => tab.classList.add('is-visible'), 300);
+}
+
+initUpcomingTab();

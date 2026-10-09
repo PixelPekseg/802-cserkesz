@@ -24,7 +24,7 @@
   <!-- Logók: a fejlécben az images/logo_white.jpg (fekete jel fehér alapon) látszik, faviconként az images/logo_green.jpeg -->
   <link rel="icon" type="image/jpeg" href="images/logo_green.jpeg?v=1">
   <link rel="apple-touch-icon" href="images/logo_green.jpeg?v=1">
-  <link rel="stylesheet" href="style.css?v=11">
+  <link rel="stylesheet" href="style.css?v=13">
 
   <!-- Strukturált adat: segít a Google-nek megérteni, hogy ez egy szervezet -->
   <script type="application/ld+json">
@@ -216,6 +216,18 @@
     </div>
   </footer>
 
-  <script src="script.js?v=3"></script>
+  <!--
+    Közelgő program füle: ha az aktualis.html-ben a következő 7 napban van
+    program (data-date), jobbról becsúszik ez a fül a program nevével és
+    dátumával. A kattintás az Aktuális oldal megfelelő hírére visz.
+    Az adatot a script.js az aktualis.html-ből olvassa, itt nincs mit szerkeszteni.
+  -->
+  <aside class="upcoming-tab" id="upcomingTab" aria-label="Közelgő programok" hidden>
+    <button class="upcoming-close" id="upcomingClose" type="button" aria-label="Bezárás">&times;</button>
+    <p class="upcoming-title">Közelgő program</p>
+    <ul class="upcoming-list" id="upcomingList"></ul>
+  </aside>
+
+  <script src="script.js?v=5"></script>
 </body>
 </html>

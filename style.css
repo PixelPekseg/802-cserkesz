@@ -983,3 +983,105 @@ section[id] {
     font-size: 1.6rem;
   }
 }
+
+/* ==========================================================
+   Közelgő program füle (főoldal, jobbról csúszik be)
+   ========================================================== */
+.upcoming-tab {
+  position: fixed;
+  right: 0;
+  top: 90px;
+  z-index: 90;
+  width: min(290px, calc(100vw - 24px));
+  padding: 16px 40px 16px 18px;
+  background: var(--color-primary);
+  color: #fff;
+  border-radius: 12px 0 0 12px;
+  box-shadow: 0 8px 24px rgba(35, 63, 42, 0.3);
+  transform: translateX(110%);
+  transition: transform 0.5s ease;
+}
+
+.upcoming-tab.is-visible {
+  transform: translateX(0);
+}
+
+.upcoming-title {
+  margin: 0 0 8px;
+  font-size: 0.8rem;
+  font-weight: bold;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-highlight);
+}
+
+.upcoming-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.upcoming-list li + li {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.25);
+}
+
+.upcoming-list a {
+  display: block;
+  color: #fff;
+}
+
+.upcoming-list a:hover .upcoming-name {
+  text-decoration: underline;
+}
+
+.upcoming-name {
+  display: block;
+  font-family: Georgia, serif;
+  font-size: 1.05rem;
+  font-weight: bold;
+  line-height: 1.25;
+}
+
+.upcoming-date {
+  display: block;
+  margin-top: 2px;
+  font-size: 0.88rem;
+  opacity: 0.9;
+}
+
+.upcoming-close {
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  width: 30px;
+  height: 30px;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: #fff;
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.upcoming-close:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .upcoming-tab {
+    transition: none;
+  }
+}
+
+/* Az Aktuális oldalon a fülről érkező hír kiemelése */
+.news-card {
+  scroll-margin-top: 90px;
+}
+
+.news-card:target {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px var(--color-highlight);
+}
