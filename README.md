@@ -6,6 +6,7 @@ Statikus (HTML/CSS/JS) többoldalas weboldal, backend nélkül, GitHub Pages-en 
 
 - `index.html` – Főoldal (borítókép + név, Csapatunk (kép + szöveg), Kapcsolat, Facebook- és Instagram-gombok)
 - `rolunk.html` – Rólunk (két pont: Csapatunkról, Cserkészetről; a szöveg a csapat korábbi honlapjáról, a 802szentkorona.hu-ról származik)
+- `tabor.html` – Tábor (kiscserkésztábor és nagytábor kártyák, általános információk váltakozó kép + szöveg blokkokkal; a képek az `images/camp/`, a letölthető PDF-ek a `pdf/` mappában)
 - `csatlakozom.html` – Csatlakozom (4.–8. osztály, rajparancsnokok)
 - `csapatotthon.html` – Csapatotthonunk (Bezsilla villa, elérhetőség, Google Maps, Facebook- és Instagram-gombok)
 - `programok.html` – Programok (hírdobozok léptethető sorban + naptár)
@@ -13,7 +14,7 @@ Statikus (HTML/CSS/JS) többoldalas weboldal, backend nélkül, GitHub Pages-en 
 - `style.css`, `script.js` – közös kinézet és működés (mobil menü, hiányzó képek kezelése)
 - `robots.txt`, `sitemap.xml` – Google-kereshetőséghez
 
-A fejléc és a lábléc mind a 6 HTML fájlban külön szerepel – ha módosítod a menüt vagy a láblécet, **mind a 6 fájlban** át kell vezetni.
+A fejléc és a lábléc mind a 7 HTML fájlban külön szerepel – ha módosítod a menüt vagy a láblécet, **mind a 7 fájlban** át kell vezetni.
 
 ## Képek (töltsd fel ezekkel a nevekkel)
 
@@ -40,6 +41,8 @@ A `style.css` elején lévő `:root` blokkban vannak (386641, 6a994e, a7c957 az 
 - **Facebook / Instagram:** a főoldalon (802szentkorona) és a csapatotthon oldalon (gdlcserkeszhaz / bezsilla.villa) csak linkgombok vannak, a tartalmukat az oldal nem tölti be (így nincs külső süti/adatátadás kattintás előtt). Másik oldalhoz/profilhoz cseréld le a gombok `href`-jét.
 
 ## Még placeholder (cserélendő)
+
+- Tábor oldal (`tabor.html`): a két tábor időpontja, helyszíne és a főszervezők neve/e-mail címe (jelenleg "Hamarosan frissítjük!" és `@example.com`)
 
 - Csapatotthon szövege (`csapatotthon.html`)
 - `https://www.YOUR-DOMAIN-HERE.com` az összes HTML fájlban, a `robots.txt`-ben és a `sitemap.xml`-ben

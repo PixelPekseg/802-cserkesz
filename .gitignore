@@ -1,2 +1,5 @@
 .DS_Store
 Thumbs.db
+
+# a tömörítetlen tábori eredeti fotók (az oldal az images/camp/*.jpg változatokat használja)
+images/camp/originals/

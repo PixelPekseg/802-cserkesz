@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tábor – 802. sz. Szent Korona Cserkészcsapat</title>
+  <meta name="description" content="Nyári táboraink: kiscserkésztábor (5 nap) és nagytábor (6–10 nap). Nomádtábor, sokszínű programok, keretmese. Időpontok, helyszín, felszerelési lista.">
+
+  <!-- FONTOS: a "https://www.YOUR-DOMAIN-HERE.com" placeholdert cseréld le a valódi domainre (lásd index.html) -->
+  <link rel="canonical" href="https://www.YOUR-DOMAIN-HERE.com/tabor.html">
+
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Tábor – 802. sz. Szent Korona Cserkészcsapat">
+  <meta property="og:description" content="Kiscserkésztábor és nagytábor: nomádtábor, sokszínű programok, keretmese.">
+  <meta property="og:url" content="https://www.YOUR-DOMAIN-HERE.com/tabor.html">
+  <meta property="og:image" content="https://www.YOUR-DOMAIN-HERE.com/images/share.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="A 802. sz. Szent Korona Cserkészcsapat tagjai közös csoportképen">
+  <meta property="og:site_name" content="802. sz. Szent Korona Cserkészcsapat">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta property="og:locale" content="hu_HU">
+
+  <link rel="icon" type="image/jpeg" href="images/logo_green.jpg?v=1">
+  <link rel="apple-touch-icon" href="images/logo_green.jpg?v=1">
+  <link rel="stylesheet" href="style.css?v=38">
+</head>
+<body>
+
+  <!-- Fejléc / navigáció -->
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="index.html" class="logo">
+        <img class="logo-img" src="images/logo_white.jpg" alt="" data-optional>
+        <span class="logo-text">802. sz. Szent Korona Cserkészcsapat</span>
+      </a>
+
+      <!-- Hamburger gomb mobil nézethez -->
+      <button class="nav-toggle" id="navToggle" type="button" aria-label="Menü megnyitása" aria-expanded="false" aria-controls="mainNav">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+
+      <nav class="main-nav" id="mainNav">
+        <ul>
+          <li><a href="index.html">Főoldal</a></li>
+          <li><a href="programok.html">Programok</a></li>
+          <li><a href="tabor.html" aria-current="page">Tábor</a></li>
+          <li><a href="csapatotthon.html">Csapatotthonunk</a></li>
+          <li><a href="rolunk.html">Rólunk</a></li>
+          <li><a class="nav-cta nav-cta-join" href="csatlakozom.html">Csatlakozom</a></li>
+          <li><a class="nav-cta" href="tamogass.html">Támogass minket</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Címsáv -->
+  <section class="page-banner">
+    <h1>Tábor</h1>
+    <p>Minden évben két tábort szervezünk: a kiscserkésztábort és a nagytábort.</p>
+  </section>
+
+  <!--
+    A tábor adatai évente változnak: a két kártyán az Időpont, a Helyszín és a
+    Főszervezők sort kell frissíteni (a főszervezők nevei és e-mail címei
+    jelenleg PLACEHOLDEREK). Az "Általános információk" állandó szöveg.
+    A képek az images/camp/ mappában vannak (az eredeti, nagy fotók az
+    images/camp/originals/ mappában, amit a .gitignore kizár). A letölthető
+    PDF-ek a pdf/ mappában vannak.
+  -->
+  <section class="section">
+    <div class="container">
+      <div class="support-text">
+        <p>
+          Évente két tábort szervezünk. A <strong>kiscserkésztábor</strong> azoknak szól, akik most
+          fejezték be a 4. osztályt, és 5 napos. A <strong>nagytábor</strong> mindenki másnak van:
+          akik most fejezték be az 5. osztályt, 6 napra érkeznek, mindenki más 10 napig marad.
+        </p>
+        <p>
+          A vezetők és az OP segítők a tábor előtt 5 napos előtáborban építik fel a gyerekeknek
+          szükséges infrastruktúrát, a tábor után pedig egy napos utótáborban gondoskodnak róla,
+          hogy az erdőt úgy hagyjuk ott, ahogyan találtuk.
+        </p>
+      </div>
+
+      <div class="camp-cards">
+        <div class="camp-card">
+          <h3>Kiscserkésztábor</h3>
+          <p class="camp-card-lead">5 napos tábor azoknak, akik most fejezték be a 4. osztályt.</p>
+          <p class="bank-label">Időpont</p>
+          <p class="camp-card-value">Hamarosan frissítjük!</p>
+          <p class="bank-label">Helyszín</p>
+          <p class="camp-card-value">Hamarosan frissítjük!</p>
+          <p class="bank-label">Főszervezők</p>
+          <!-- PLACEHOLDER: cseréld le a valódi főszervezők nevére és e-mail címére -->
+          <p class="camp-card-value">Főszervező Neve, <a class="inline-link" href="mailto:foszervezo-kiscserkesz1@example.com">foszervezo-kiscserkesz1@example.com</a></p>
+          <p class="camp-card-value">Főszervező Neve, <a class="inline-link" href="mailto:foszervezo-kiscserkesz2@example.com">foszervezo-kiscserkesz2@example.com</a></p>
+        </div>
+
+        <div class="camp-card">
+          <h3>Nagytábor</h3>
+          <p class="camp-card-lead">Mindenki másnak. Az 5. osztályt most végzők 6 napra érkeznek, mindenki más a teljes, 10 napos táborban vesz részt.</p>
+          <p class="bank-label">Időpont</p>
+          <p class="camp-card-value">Hamarosan frissítjük!</p>
+          <p class="bank-label">Helyszín</p>
+          <p class="camp-card-value">Hamarosan frissítjük!</p>
+          <p class="bank-label">Főszervezők</p>
+          <!-- PLACEHOLDER: cseréld le a valódi főszervezők nevére és e-mail címére -->
+          <p class="camp-card-value">Főszervező Neve, <a class="inline-link" href="mailto:foszervezo-nagytabor1@example.com">foszervezo-nagytabor1@example.com</a></p>
+          <p class="camp-card-value">Főszervező Neve, <a class="inline-link" href="mailto:foszervezo-nagytabor2@example.com">foszervezo-nagytabor2@example.com</a></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section camp-info">
+    <div class="container">
+      <h2 class="section-title">Általános információk</h2>
+      <div class="camp-block">
+        <div class="camp-media">
+          <div class="camp-col">
+            <img src="images/camp/epitkezes1.jpg" width="1600" height="1067" loading="lazy" alt="Gyerekek és vezetők építkeznek a tábor helyszínén, egy fa tövében">
+          </div>
+          <div class="camp-col">
+            <img src="images/camp/epitkezes2.jpg" width="1600" height="1067" loading="lazy" alt="Egy fiú ásóval dolgozik a tábor építésekor">
+          </div>
+        </div>
+        <div class="camp-text">
+          <h3>Nomádtábor</h3>
+          <p>Táboraink nomádtáborok: sátorban alszunk, latrinát használunk, és egész nap a természetben vagyunk. Bár ez elsőre szokatlan lehet a gyerekeknek, több éves tapasztalatunk, hogy jót tesz nekik: kimozdulnak a komfortzónájukból, és közel kerülnek a természethez.</p>
+          <p>A tábor során a gyerekek nem csak a sátrukat állítják fel az őrsükkel. Az előtáborban a szükséges infrastruktúra nagy részét a vezetők építik meg számukra, a tábor első két napját viszont arra szánjuk, hogy a gyerekek maguk alakíthassák ki a környezetüket. Építenek többek között asztalt, tűzrakót és csajkatartót, ponyvát kötnek fel, sátorárkot ásnak, és még sok apróságot készítenek, amelyek megkönnyítik a tábori hétköznapokat.</p>
+        </div>
+      </div>
+
+      <div class="camp-block camp-block-reverse">
+        <div class="camp-media">
+          <div class="camp-col">
+            <img src="images/camp/felszereles1.jpg" width="1067" height="1600" loading="lazy" alt="Hátizsákos gyerekek gyülekeznek a tábor kezdetén">
+          </div>
+          <div class="camp-col">
+            <img src="images/camp/felszereles2.jpg" width="1067" height="1600" loading="lazy" alt="Egy vezető áll a tábori gyülekezőn, körülötte gyerekek">
+          </div>
+        </div>
+        <div class="camp-text">
+          <h3>Felszerelés</h3>
+          <p>A nomád körülmények miatt a megszokott táborokétól eltérő felszerelésre is szükség van.</p>
+          <ul class="camp-list">
+            <li>Kérjük, hogy a gyerekek ne gurulós bőröndbe, hanem hátizsákba pakoljanak, mert azzal kell majd besétálniuk a tábor helyszínére.</li>
+            <li>Kérjük, hogy ne hozzanak magukkal mobiltelefont. A tábor fontos nevelési célja a természet közelségének és a közösségben létnek a megélése, és véleményünk szerint a mobiltelefon-használat ezt akadályozza. Bármilyen felmerülő probléma esetén a főszervezőket lehet keresni.</li>
+            <li>Fontos tudnunk, ha gyermekének van betegsége, allergiája vagy érzékenysége, amelyre figyelnünk kell. Kérjük ezért, hogy az egészségügyi nyilatkozatot kitöltve hozzák magukkal.</li>
+            <li>Kérjük, hogy a gyerekkel együtt pakoljanak be a táskába, hogy a tábor során biztosan mindent megtaláljon.</li>
+          </ul>
+          <div class="camp-downloads">
+            <a class="btn btn-primary" href="pdf/felszereles_lista.pdf" download>Felszerelési lista (PDF)</a>
+            <a class="btn btn-primary" href="pdf/eu_nyilatkozat.pdf" download>Egészségügyi nyilatkozat (PDF)</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="camp-block">
+        <div class="camp-media">
+          <div class="camp-col">
+            <img src="images/camp/programok1.jpg" width="1067" height="1600" loading="lazy" alt="Zászlófelvonás a tábori zászlórúdnál">
+          </div>
+          <div class="camp-col">
+            <img src="images/camp/programok2.jpg" width="1600" height="1067" loading="lazy" alt="Gyerekek és vezetők csoportja gyalogol az erdőben">
+            <img src="images/camp/programok3.jpg" width="1600" height="1067" loading="lazy" alt="Íjászat a táborban">
+          </div>
+        </div>
+        <div class="camp-text">
+          <h3>Programok</h3>
+          <p>A táborban a gyerekek rendkívül sokszínű programokon vehetnek részt. Minden reggel és este közös zászlófel- és levonással indítjuk, illetve zárjuk a napot. A tábor során többször maguknak főznek, közösen részt veszünk szentmisén vagy istentiszteleten, túrázunk, hagyományőrző programokon veszünk részt, esténként pedig tábortűz mellett nézzük meg a vezetők szórakoztató előadását, közösen énekelünk és játszunk.</p>
+        </div>
+      </div>
+
+      <div class="camp-block camp-block-reverse">
+        <div class="camp-media">
+          <div class="camp-col">
+            <img src="images/camp/km1.jpg" width="1067" height="1600" loading="lazy" alt="Vörös köpenyes vezető játssza el a keretmese egyik jelenetét">
+          </div>
+          <div class="camp-col">
+            <img src="images/camp/km2.jpg" width="1600" height="1067" loading="lazy" alt="Star Wars-jelmezes vezetők fénykardokkal a keretmese egyik jelenetében">
+          </div>
+        </div>
+        <div class="camp-text">
+          <h3>Keretmese</h3>
+          <p>A gyerekek minden táborban egy új történetbe csöppennek bele. Minden táborunk egy általánosan ismert történetet dolgoz fel, például a Macskafogót, az Aladdint vagy a Star Warst. A tábor során a vezetők színházszerű jelenetekben vezetik végig a gyerekeket a történéseken, és a világra jellemző nyelvezetet használjuk.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Lábléc -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-links">
+        <a href="mailto:802@cserkesz.hu">802@cserkesz.hu</a>
+        <a href="https://www.facebook.com/802szentkorona" target="_blank" rel="noopener noreferrer">Facebook</a>
+        <a href="https://www.instagram.com/802szentkorona/" target="_blank" rel="noopener noreferrer">Instagram</a>
+      </div>
+      <p>&copy; <span id="year"></span> 802. sz. Szent Korona Cserkészcsapat. Minden jog fenntartva.</p>
+    </div>
+  </footer>
+
+  <script src="script.js?v=18"></script>
+</body>
+</html>

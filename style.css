@@ -1163,9 +1163,9 @@ section[id] {
 /* ==========================================================
    Reszponzivitás
    ========================================================== */
-/* A hosszú csapatnév + 6 menüpont 1200px alatt már nem fér el egy sorban,
+/* A hosszú csapatnév + 6 menüpont 1260px alatt már nem fér el egy sorban,
    ezért itt vált a menü hamburgerre */
-@media (max-width: 1200px) {
+@media (max-width: 1260px) {
   .nav-toggle {
     display: flex;
   }
@@ -1522,4 +1522,233 @@ section[id] {
 .site-header .container {
   max-width: none;
   padding: 0 clamp(20px, 3vw, 48px);
+}
+
+/* ==========================================================
+   Tábor
+   ========================================================== */
+.camp-cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+.camp-card {
+  padding: 28px 24px;
+  background: var(--color-bg-alt);
+  border: 1px solid var(--color-border);
+  border-top: 4px solid var(--color-accent);
+  border-radius: 12px;
+}
+
+.camp-card h3 {
+  font-size: 1.4rem;
+}
+
+.camp-card-lead {
+  margin: 0 0 8px;
+}
+
+.camp-card-value {
+  margin: 0 0 2px;
+  font-weight: 600;
+}
+
+/* Általános információk: váltakozva bal/jobb oldali kép + szöveg */
+.camp-info {
+  border-top: 1px solid var(--color-border);
+}
+
+.camp-block {
+  display: grid;
+  grid-template-columns: 1.15fr 1fr;
+  align-items: center;
+  gap: 48px;
+  margin-bottom: 72px;
+}
+
+.camp-block:last-child {
+  margin-bottom: 0;
+}
+
+.camp-block-reverse {
+  grid-template-columns: 1fr 1.15fr;
+}
+
+.camp-block-reverse .camp-media {
+  order: 2;
+}
+
+/* Összeállított képcsokor: két, eltérő szélességű oszlop, kissé egymásba
+   csúsztatva és lejjebb tolva. A képek a saját arányukban látszanak
+   (nincs levágás), lekerekített sarokkal; kattintásra nagyban megnyílnak. */
+.camp-media {
+  display: flex;
+  align-items: flex-start;
+}
+
+.camp-col {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+}
+
+.camp-col:first-child {
+  flex: 0 0 58%;
+}
+
+.camp-col:nth-child(2) {
+  position: relative;
+  z-index: 1;
+  flex: 0 0 50%;
+  margin-left: -8%;
+  margin-top: 12%;
+}
+
+.camp-col img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 14px;
+  box-shadow: 0 6px 18px rgba(35, 63, 42, 0.25);
+  cursor: zoom-in;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.camp-col img:hover,
+.camp-col img:focus-visible {
+  transform: scale(1.03);
+  box-shadow: 0 10px 26px rgba(35, 63, 42, 0.35);
+}
+
+.camp-text h3 {
+  font-size: 1.6rem;
+}
+
+.camp-text p {
+  margin: 0 0 14px;
+}
+
+.camp-list {
+  margin: 0 0 20px;
+  padding-left: 20px;
+}
+
+.camp-list li {
+  margin-bottom: 10px;
+}
+
+.camp-downloads {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+@media (max-width: 860px) {
+  .camp-cards {
+    grid-template-columns: 1fr;
+  }
+
+  .camp-block {
+    grid-template-columns: 1fr;
+    gap: 24px;
+    margin-bottom: 56px;
+  }
+
+  /* mobilon mindig a kép van elöl, a szöveg alatta */
+  .camp-block-reverse .camp-media {
+    order: 0;
+  }
+}
+
+/* Nagyítás (lightbox): kattintásra a kép teljes méretben jelenik meg */
+.lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(10, 20, 12, 0.9);
+}
+
+.lightbox[hidden] {
+  display: none;
+}
+
+.lightbox-figure {
+  margin: 0;
+  text-align: center;
+}
+
+.lightbox-img {
+  display: block;
+  max-width: min(92vw, 1400px);
+  max-height: 82vh;
+  width: auto;
+  height: auto;
+  margin: 0 auto;
+  border-radius: 10px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+}
+
+.lightbox-caption {
+  margin-top: 12px;
+  color: #fff;
+  font-size: 0.95rem;
+}
+
+.lightbox-btn {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  height: 46px;
+  padding: 0 0 4px;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.18);
+  color: #fff;
+  font-size: 1.9rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.lightbox-btn:hover {
+  background: rgba(255, 255, 255, 0.34);
+}
+
+.lightbox-close {
+  top: 16px;
+  right: 16px;
+}
+
+.lightbox-prev {
+  left: 16px;
+  top: 50%;
+  margin-top: -23px;
+}
+
+.lightbox-next {
+  right: 16px;
+  top: 50%;
+  margin-top: -23px;
+}
+
+@media (max-width: 640px) {
+  .lightbox {
+    padding: 12px;
+  }
+
+  .lightbox-prev,
+  .lightbox-next {
+    top: auto;
+    bottom: 16px;
+    margin-top: 0;
+  }
 }

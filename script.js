@@ -517,3 +517,79 @@ document.querySelectorAll('a[href^="mailto:"]').forEach(link => {
     '<svg class="icon-check" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 13l4 4L19 7"/></svg>';
   wrapper.append(button);
 });
+
+// ==========================================================
+// Nagyítás (lightbox): a .camp-col képekre kattintva a kép teljes méretben,
+// sötét háttéren jelenik meg. Bezárás: × gomb, háttérre kattintás vagy Esc;
+// léptetés: nyilak a gombokkal vagy a billentyűzeten (bal/jobb nyíl).
+// ==========================================================
+(function initLightbox() {
+  const images = [...document.querySelectorAll('.camp-col img')];
+  if (images.length === 0) return;
+
+  const overlay = document.createElement('div');
+  overlay.className = 'lightbox';
+  overlay.hidden = true;
+  overlay.setAttribute('role', 'dialog');
+  overlay.setAttribute('aria-modal', 'true');
+  overlay.setAttribute('aria-label', 'Képnagyítás');
+  overlay.innerHTML =
+    '<button class="lightbox-btn lightbox-close" type="button" aria-label="Bezárás">&times;</button>' +
+    '<button class="lightbox-btn lightbox-prev" type="button" aria-label="Előző kép">&#8249;</button>' +
+    '<figure class="lightbox-figure"><img class="lightbox-img" alt=""><figcaption class="lightbox-caption"></figcaption></figure>' +
+    '<button class="lightbox-btn lightbox-next" type="button" aria-label="Következő kép">&#8250;</button>';
+  document.body.append(overlay);
+
+  const view = overlay.querySelector('.lightbox-img');
+  const caption = overlay.querySelector('.lightbox-caption');
+  const closeButton = overlay.querySelector('.lightbox-close');
+  let index = 0;
+  let opener = null;
+
+  function show(i) {
+    index = (i + images.length) % images.length;
+    view.src = images[index].currentSrc || images[index].src;
+    view.alt = images[index].alt;
+    caption.textContent = images[index].alt;
+  }
+
+  function open(i, trigger) {
+    opener = trigger;
+    show(i);
+    overlay.hidden = false;
+    document.body.style.overflow = 'hidden';
+    closeButton.focus();
+  }
+
+  function close() {
+    overlay.hidden = true;
+    document.body.style.overflow = '';
+    opener?.focus();
+  }
+
+  images.forEach((image, i) => {
+    image.tabIndex = 0;
+    image.setAttribute('role', 'button');
+    image.setAttribute('aria-label', `${image.alt} (nagyítás)`);
+    image.addEventListener('click', () => open(i, image));
+    image.addEventListener('keydown', event => {
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        open(i, image);
+      }
+    });
+  });
+
+  closeButton.addEventListener('click', close);
+  overlay.querySelector('.lightbox-prev').addEventListener('click', () => show(index - 1));
+  overlay.querySelector('.lightbox-next').addEventListener('click', () => show(index + 1));
+  overlay.addEventListener('click', event => {
+    if (event.target === overlay) close();
+  });
+  document.addEventListener('keydown', event => {
+    if (overlay.hidden) return;
+    if (event.key === 'Escape') close();
+    else if (event.key === 'ArrowLeft') show(index - 1);
+    else if (event.key === 'ArrowRight') show(index + 1);
+  });
+})();
