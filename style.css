@@ -267,6 +267,11 @@ img {
   height: auto;
 }
 
+/* A telefonos, 802-es képváltozat asztali nézeten rejtve van */
+.hero-img-mobile {
+  display: none;
+}
+
 .hero h1 {
   position: absolute;
   /* alul 16% szabadon marad, így a cím a kép magasságának kb. 42%-ánál van
@@ -1226,8 +1231,32 @@ section[id] {
     padding: 40px 20px;
   }
 
+  /* Telefonon a csoportkép eltűnik, a 802-es légifotó a hero: a cím a kép alján, sötét
+     átmenettel (hogy a számok látszanak maradjanak). A Csapatunk szekcióból a kép kimarad,
+     mert már fent van. */
+  .hero {
+    min-height: 0;
+  }
+
+  .hero-img {
+    display: none;
+  }
+
+  .hero-img-mobile {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
   .hero h1 {
-    font-size: 2.2rem;
+    inset: auto 0 0 0;
+    padding: 56px 20px 20px;
+    background: linear-gradient(to top, rgba(10, 20, 12, 0.78), rgba(10, 20, 12, 0));
+    font-size: 2rem;
+  }
+
+  .team-split-image {
+    display: none;
   }
 
   .page-banner h1 {
