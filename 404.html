@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+  <meta charset="UTF-8">
+  <!--
+    A GitHub Pages ezt az oldalt bármilyen nem létező címen megjeleníti (akár
+    mélyebb útvonalon is), ezért a relatív hivatkozások alapját az oldal gyökerére
+    állítjuk: saját domainen "/", github.io alatt "/repo-neve/".
+  -->
+  <script>
+    (function () {
+      var parts = location.pathname.split('/').filter(Boolean);
+      var root = location.hostname.endsWith('github.io') && parts.length ? '/' + parts[0] + '/' : '/';
+      var base = document.createElement('base');
+      base.href = root;
+      document.head.prepend(base);
+    })();
+  </script>
+  <meta name="robots" content="noindex">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Az oldal nem található – 802. sz. Szent Korona Cserkészcsapat</title>
+  <meta name="description" content="Az oldal nem található.">
+
+  <!-- FONTOS: a "https://www.YOUR-DOMAIN-HERE.com" placeholdert cseréld le a valódi domainre (lásd index.html) -->
+
+
+  <link rel="icon" type="image/jpeg" href="images/logo_green.jpg?v=1">
+  <link rel="apple-touch-icon" href="images/logo_green.jpg?v=1">
+  <link rel="stylesheet" href="style.css?v=45">
+</head>
+<body>
+
+  <!-- Fejléc / navigáció -->
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="index.html" class="logo">
+        <img class="logo-img" src="images/logo_white.webp" alt="" data-optional>
+        <span class="logo-text">802. sz. Szent Korona Cserkészcsapat</span>
+      </a>
+
+      <!-- Hamburger gomb mobil nézethez -->
+      <button class="nav-toggle" id="navToggle" type="button" aria-label="Menü megnyitása" aria-expanded="false" aria-controls="mainNav">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+
+      <nav class="main-nav" id="mainNav">
+        <ul>
+          <li><a href="index.html">Főoldal</a></li>
+          <li><a href="programok.html">Programok</a></li>
+          <li><a href="tabor.html">Tábor</a></li>
+          <li><a href="csapatotthon.html">Csapatotthonunk</a></li>
+          <li><a href="rolunk.html">Rólunk</a></li>
+          <li><a class="nav-cta nav-cta-join" href="csatlakozom.html">Csatlakozom</a></li>
+          <li><a class="nav-cta" href="tamogass.html">Támogass minket</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Címsáv -->
+  <section class="page-banner">
+    <h1>404 – Az oldal nem található</h1>
+    <p>Sajnos a keresett oldal nem létezik, vagy időközben áthelyeztük. Innen tovább tudsz lépni:</p>
+  </section>
+
+  <section class="section">
+    <div class="container error-links">
+      <a class="btn btn-primary" href="index.html">Főoldal</a>
+      <a class="btn btn-primary" href="programok.html">Programok</a>
+      <a class="btn btn-primary" href="tabor.html">Tábor</a>
+      <a class="btn btn-primary" href="csatlakozom.html">Csatlakozom</a>
+    </div>
+  </section>
+
+  <!-- Lábléc -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-links">
+        <a href="mailto:802@cserkesz.hu">802@cserkesz.hu</a>
+        <a href="https://www.facebook.com/802szentkorona" target="_blank" rel="noopener noreferrer">Facebook</a>
+        <a href="https://www.instagram.com/802szentkorona/" target="_blank" rel="noopener noreferrer">Instagram</a>
+      </div>
+      <p>&copy; <span id="year"></span> 802. sz. Szent Korona Cserkészcsapat. Minden jog fenntartva.</p>
+    </div>
+  </footer>
+
+  <script src="script.js?v=26"></script>
+</body>
+</html>

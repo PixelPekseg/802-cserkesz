@@ -1783,3 +1783,82 @@ section[id] {
   gap: 12px;
   margin-bottom: 48px;
 }
+
+/* Lábléc: adatkezelési tájékoztató linkje */
+.footer-privacy {
+  text-decoration: underline;
+}
+
+.footer-privacy:hover {
+  color: var(--color-highlight);
+}
+
+/* 404: gombsor */
+.error-links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+}
+
+/* Megosztás gomb a programok kártyáin */
+.news-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: auto;
+  padding-top: 12px;
+}
+
+.share-btn,
+.share-option {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border: 1px solid var(--color-accent);
+  border-radius: 20px;
+  background: #fff;
+  color: var(--color-primary);
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.share-btn:hover,
+.share-option:hover {
+  background: var(--color-highlight);
+}
+
+.share-btn svg {
+  width: 15px;
+  height: 15px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.share-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  width: 100%;
+}
+
+.share-close {
+  padding: 6px 11px;
+  border-color: var(--color-border);
+  color: var(--color-text-muted);
+}
+
+.share-hint {
+  width: 100%;
+  margin: 0;
+  font-size: 0.82rem;
+  color: var(--color-text-muted);
+}

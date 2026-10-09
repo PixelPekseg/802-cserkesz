@@ -376,6 +376,9 @@ function initCalendar() {
       copy.hidden = false;
       copy.classList.remove('news-card-past');
       copy.querySelectorAll('.news-past-label').forEach(label => label.remove());
+      // egy esetleg nyitva hagyott megosztás-menüt ne másoljunk át
+      copy.querySelectorAll('.share-options, .share-hint').forEach(menu => menu.remove());
+      copy.querySelectorAll('.share-btn').forEach(btn => { btn.hidden = false; btn.setAttribute('aria-expanded', 'false'); });
       if (event.end < todayKey) {
         copy.querySelector('.news-meta')?.append(element('span', 'news-past-label', 'Elmúlt'));
       }
@@ -548,7 +551,8 @@ document.querySelectorAll('a[href^="mailto:"]').forEach(link => {
 
   function show(i) {
     index = (i + images.length) % images.length;
-    view.src = images[index].currentSrc || images[index].src;
+    // a kis bélyegkép helyett a nagy változatot töltjük be (data-full)
+    view.src = images[index].dataset.full || images[index].currentSrc || images[index].src;
     view.alt = images[index].alt;
     caption.textContent = images[index].alt;
   }
@@ -593,3 +597,134 @@ document.querySelectorAll('a[href^="mailto:"]').forEach(link => {
     else if (event.key === 'ArrowRight') show(index + 1);
   });
 })();
+
+// ==========================================================
+// Megosztás gomb a programoknál
+// Minden id-vel rendelkező .news-card aljára egy "Megosztás" gombot tesz.
+// Kattintásra a gomb helyén megjelennek a lehetőségek: WhatsApp (a teljes
+// üzenet előre beírva), Messenger (az üzenet a vágólapra kerül, és megnyílik
+// a Messenger), üzenet másolása; érintőképernyős készüléken a készülék
+// saját megosztó ablaka is ("Más..."). A küldött üzenet a kártyából áll
+// össze: név, dátum, időpont, helyszín és a program linkje. Képet nem csatol.
+// A kapcsolattartók adatai szándékosan nincsenek az üzenetben.
+// ==========================================================
+const SHARE_ICON =
+  '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/>' +
+  '<circle cx="18" cy="19" r="3"/><path d="M8.6 10.5l6.8-4M8.6 13.5l6.8 4"/></svg>';
+
+function detailValue(card, label) {
+  for (const paragraph of card.querySelectorAll('.news-detail')) {
+    const strong = paragraph.querySelector('strong');
+    if (strong && strong.textContent.trim().toLowerCase().startsWith(label)) {
+      return paragraph.textContent.replace(strong.textContent, '').replace(/\s+/g, ' ').trim();
+    }
+  }
+  return '';
+}
+
+function buildShareMessage(card, id) {
+  const title = card.querySelector('h3')?.textContent.trim() ?? '';
+  const date = card.querySelector('.news-date')?.textContent.trim() ?? '';
+  const time = detailValue(card, 'időpont');
+  const place = detailValue(card, 'helyszín');
+  const url = `${location.origin}${location.pathname}#${id}`;
+
+  const lines = [title];
+  if (date) lines.push(`\u{1F4C5} ${date}`);
+  if (time) lines.push(`\u{1F551} ${time}`);
+  if (place) lines.push(`\u{1F4CD} ${place}`);
+  lines.push(`Részletek: ${url}`);
+  return { title, text: lines.join('\n'), url };
+}
+
+document.querySelectorAll('#newsGrid .news-card[id]').forEach(card => {
+  const actions = document.createElement('div');
+  actions.className = 'news-actions';
+  const button = document.createElement('button');
+  button.type = 'button';
+  button.className = 'share-btn';
+  button.dataset.shareId = card.id;
+  button.setAttribute('aria-expanded', 'false');
+  button.innerHTML = `${SHARE_ICON}<span>Megosztás</span>`;
+  actions.append(button);
+  card.append(actions);
+});
+
+document.addEventListener('click', async event => {
+  const button = event.target.closest('.share-btn');
+  const option = event.target.closest('.share-option');
+
+  // a megosztási lehetőségek egyike
+  if (option) {
+    const { channel, text } = option.dataset;
+    const actions = option.closest('.news-actions');
+    if (channel === 'close') {
+      closeShareOptions(actions);
+    } else if (channel === 'whatsapp' || channel === 'messenger') {
+      // Előbb megnyitjuk az appot (ehhez kell a kattintás), aztán a teljes üzenetet a
+      // vágólapra tesszük. A WhatsApp asztali appja a szövegből néha csak a linket
+      // veszi át; ilyenkor a vágólapról beilleszthető az egész üzenet.
+      const target = channel === 'whatsapp'
+        ? `https://wa.me/?text=${encodeURIComponent(text)}`
+        : 'https://www.messenger.com/';
+      window.open(target, '_blank', 'noopener');
+      const copied = await copyToClipboard(text);
+      showShareHint(actions, copied, channel === 'messenger');
+    } else if (channel === 'copy') {
+      const copied = await copyToClipboard(text);
+      option.textContent = copied ? 'Másolva \u2713' : 'Nem sikerült';
+      setTimeout(() => { option.textContent = 'Üzenet másolása'; }, 2000);
+    }
+    return;
+  }
+
+  if (!button) return;
+  const card = button.closest('.news-card');
+  const { title, text, url } = buildShareMessage(card, button.dataset.shareId);
+
+  // számítógépen: a Megosztás gomb helyén jelennek meg a lehetőségek
+  const actions = button.closest('.news-actions');
+  const options = document.createElement('div');
+  options.className = 'share-options';
+  const channels = [['whatsapp', 'WhatsApp'], ['messenger', 'Messenger'], ['copy', 'Üzenet másolása']];
+  channels.push(['close', '\u2715']);
+  channels.forEach(([channel, label]) => {
+    const item = document.createElement('button');
+    item.type = 'button';
+    item.className = 'share-option' + (channel === 'close' ? ' share-close' : '');
+    item.dataset.channel = channel;
+    item.dataset.text = text;
+    item.dataset.url = url;
+    item.textContent = label;
+    if (channel === 'close') item.setAttribute('aria-label', 'Bezárás');
+    options.append(item);
+  });
+  button.hidden = true;
+  actions.append(options);
+});
+
+// Kis tájékoztató a megosztás gombok alatt: a teljes üzenet a vágólapon van
+function showShareHint(actions, copied, messengerOnly) {
+  actions.querySelector('.share-hint')?.remove();
+  const key = /Mac|iPhone|iPad/.test(navigator.platform) ? 'Cmd+V' : 'Ctrl+V';
+  const hint = document.createElement('p');
+  hint.className = 'share-hint';
+  hint.textContent = !copied
+    ? 'Az üzenetet nem sikerült a vágólapra tenni.'
+    : messengerOnly
+      ? `Az üzenet a vágólapon van: illeszd be a beszélgetésbe (${key}).`
+      : `A teljes üzenet a vágólapon is ott van: ha a WhatsAppban csak a link látszik, jelöld ki a mezőt és illeszd be (${key}).`;
+  actions.append(hint);
+}
+
+// A megosztási lehetőségek bezárása: a Megosztás gomb visszakerül
+function closeShareOptions(actions) {
+  actions.querySelector('.share-options')?.remove();
+  actions.querySelector('.share-hint')?.remove();
+  const button = actions.querySelector('.share-btn');
+  if (button) {
+    button.hidden = false;
+    button.setAttribute('aria-expanded', 'false');
+    button.focus();
+  }
+}
