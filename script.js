@@ -526,7 +526,7 @@ document.querySelectorAll('a[href^="mailto:"]').forEach(link => {
 
 // ==========================================================
 // Nagyítás (lightbox): a .camp-col képekre kattintva a kép teljes méretben,
-// sötét háttéren jelenik meg. Bezárás: × gomb, háttérre kattintás vagy Esc;
+// sötét háttéren jelenik meg (felirat nélkül). Bezárás: × gomb, háttérre kattintás vagy Esc;
 // léptetés: nyilak a gombokkal vagy a billentyűzeten (bal/jobb nyíl).
 // ==========================================================
 (function initLightbox() {
@@ -542,12 +542,11 @@ document.querySelectorAll('a[href^="mailto:"]').forEach(link => {
   overlay.innerHTML =
     '<button class="lightbox-btn lightbox-close" type="button" aria-label="Bezárás">&times;</button>' +
     '<button class="lightbox-btn lightbox-prev" type="button" aria-label="Előző kép">&#8249;</button>' +
-    '<figure class="lightbox-figure"><img class="lightbox-img" alt=""><figcaption class="lightbox-caption"></figcaption></figure>' +
+    '<figure class="lightbox-figure"><img class="lightbox-img" alt=""></figure>' +
     '<button class="lightbox-btn lightbox-next" type="button" aria-label="Következő kép">&#8250;</button>';
   document.body.append(overlay);
 
   const view = overlay.querySelector('.lightbox-img');
-  const caption = overlay.querySelector('.lightbox-caption');
   const closeButton = overlay.querySelector('.lightbox-close');
   let index = 0;
   let opener = null;
@@ -557,7 +556,6 @@ document.querySelectorAll('a[href^="mailto:"]').forEach(link => {
     // a kis bélyegkép helyett a nagy változatot töltjük be (data-full)
     view.src = images[index].dataset.full || images[index].currentSrc || images[index].src;
     view.alt = images[index].alt;
-    caption.textContent = images[index].alt;
   }
 
   function open(i, trigger) {
