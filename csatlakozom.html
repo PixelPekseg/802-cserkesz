@@ -16,9 +16,9 @@
   <meta property="og:image" content="https://www.YOUR-DOMAIN-HERE.com/images/csapatunk.jpg">
   <meta property="og:locale" content="hu_HU">
 
-  <link rel="icon" type="image/jpeg" href="images/logo_green.jpeg?v=1">
-  <link rel="apple-touch-icon" href="images/logo_green.jpeg?v=1">
-  <link rel="stylesheet" href="style.css?v=14">
+  <link rel="icon" type="image/jpeg" href="images/logo_green.jpg?v=1">
+  <link rel="apple-touch-icon" href="images/logo_green.jpg?v=1">
+  <link rel="stylesheet" href="style.css?v=17">
 </head>
 <body>
 
@@ -59,16 +59,27 @@
   <!-- Osztályok és rajparancsnokok -->
   <!--
     Osztályonként a raj neve és a rajparancsnokok (név + saját e-mail cím).
-    Új rajparancsnok felvételéhez másolj le egy <li>...</li> blokkot az adott
-    osztály listájában. A 4–8. osztály jelenik meg, efölött nincs kiírva.
+
+    AUTOMATIKUS LÉPTETÉS: minden raj kártyáján két attribútum van:
+      data-grade="4"          az az osztály, amelyben a raj a megadott tanévben van
+      data-school-year="2026" a tanév kezdő éve (a 2026/27-es tanév = 2026)
+    Minden év szeptember 1-jén a script.js eggyel feljebb lépteti a rajokat
+    (a kártyán látszó osztály = data-grade + eltelt tanévek). A 4–8. osztály
+    látszik, a 9. osztályba lépett raj eltűnik, a kártya a HTML-ben marad.
+
+    ÚJ 4. OSZTÁLYOS RAJ: másolj le egy kártyát, írd át a raj nevét, a
+    rajparancsnokokat, és állítsd be a data-grade="4" és a data-school-year
+    értékét az új tanév kezdő évére (pl. 2027). Előre is felvehető: a kártya
+    addig rejtve marad, amíg el nem érkezik a szeptember 1. Ha az új raj
+    még nincs felvéve, a 4. osztálynál a "Hamarosan frissítjük!" felirat látszik.
   -->
   <section class="section">
     <div class="container">
       <h2>Rajparancsnokaink</h2>
       <p class="section-lead">Keresd bátran az osztályodnak megfelelő rajparancsnokot!</p>
 
-      <div class="grades-grid">
-        <div class="grade-card">
+      <div class="grades-grid" id="gradesGrid">
+        <div class="grade-card" data-grade="4" data-school-year="2026">
           <h3>4. osztály</h3>
           <p class="grade-squad">Mexikói Badargomba raj</p>
           <ul>
@@ -83,7 +94,7 @@
           </ul>
         </div>
 
-        <div class="grade-card">
+        <div class="grade-card" data-grade="5" data-school-year="2026">
           <h3>5. osztály</h3>
           <p class="grade-squad">Azúrkék Galambgomba raj</p>
           <ul>
@@ -98,7 +109,7 @@
           </ul>
         </div>
 
-        <div class="grade-card">
+        <div class="grade-card" data-grade="6" data-school-year="2026">
           <h3>6. osztály</h3>
           <p class="grade-squad">Császárgomba raj</p>
           <ul>
@@ -113,7 +124,7 @@
           </ul>
         </div>
 
-        <div class="grade-card">
+        <div class="grade-card" data-grade="7" data-school-year="2026">
           <h3>7. osztály</h3>
           <p class="grade-squad">Mozdonyfüstszagú Pókhálósgomba raj</p>
           <ul>
@@ -128,7 +139,7 @@
           </ul>
         </div>
 
-        <div class="grade-card">
+        <div class="grade-card" data-grade="8" data-school-year="2026">
           <h3>8. osztály</h3>
           <p class="grade-squad">Rókagomba raj</p>
           <ul>
@@ -141,6 +152,13 @@
               <a class="leader-email" href="mailto:hidvegizsombor@gmail.com">hidvegizsombor@gmail.com</a>
             </li>
           </ul>
+        </div>
+
+        <!-- Idősebbeknek, vezetőknek: a rajok léptetése nem érinti, mindig a lista végén marad -->
+        <div class="grade-card grade-card-extra">
+          <h3>Idősebbként vagy vezetőként</h3>
+          <p class="grade-note">Ha idősebbként, esetleg vezetőként csatlakoznál hozzánk, keresd csapatparancsnokunkat.</p>
+          <a class="leader-email" href="mailto:802@cserkesz.hu">802@cserkesz.hu</a>
         </div>
       </div>
     </div>
@@ -158,6 +176,6 @@
     </div>
   </footer>
 
-  <script src="script.js?v=5"></script>
+  <script src="script.js?v=10"></script>
 </body>
 </html>

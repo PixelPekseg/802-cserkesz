@@ -19,8 +19,9 @@ A fejléc és a lábléc mind a 6 HTML fájlban külön szerepel – ha módosí
 
 - `images/hero.jpg` – a "Csapatunk" szekció bal oldali képe (a 802-es szám); teljes egészében látszik, levágás nélkül
 - `images/csapatunk.jpg` – a főoldal borítóképe (csoportkép) a név mögött; bármilyen arányú lehet, teljes szélességben, levágás nélkül látszik (a magassága az arányából adódik, nagy képernyőn a képernyőnél magasabb is lehet); amíg nincs, zöld színátmenet látszik
-- `images/logo_white.jpg` (fekete jel fehér alapon) – a fejlécben látszik, a fehér háttér átlátszóvá válik; `images/logo_green.jpeg` – favicon; `images/logo_black.jpeg` – jelenleg nincs használatban
-- `images/ado1.jpg` – az adó 1%-os kép a Támogass minket oldalon, a bevezető szöveg alatt (az `ado1.png` tömörítetlen eredeti, nem kerül a repóba – a `.gitignore` kizárja)
+- `images/logo_white.jpg` (fekete jel fehér alapon) – a fejlécben látszik, a fehér háttér átlátszóvá válik; `images/logo_green.jpg` – favicon; `images/logo_black.jpg` – jelenleg nincs használatban
+- `images/bezsilla.jpg`, `images/bezsilla_bipi.jpg` – a Csapatotthonunk oldal két képe (a villa, illetve a falra festett Baden-Powell-portré); egymás mellett, azonos magassággal, levágás nélkül látszanak, mobilon egymás alatt
+- `images/ado1.jpg` – az adó 1%-os kép a Támogass minket oldalon, a bevezető szöveg alatt
 - `images/team/cseri-holzman_lili.jpg`, `csiki_adam.jpg`, `grebel_hanna.jpg`, `bedo_gergely.jpg`, `peter_anna.jpg` – a kapcsolati kártyák fotói (amíg nincs, monogram látszik)
 
 Tömörítsd a képeket feltöltés előtt (a hero ~1920px széles, a személyek fotói ~400×400 px elég), különben lassul az oldal.
@@ -34,7 +35,7 @@ A `style.css` elején lévő `:root` blokkban vannak (386641, 6a994e, a7c957 az 
 - **Új hír / esemény:** az `aktualis.html`-ben másolj le egy `<article class="news-card">…</article>` blokkot, írd át a szöveget, a látható dátumot (`.news-date`), és állítsd be a `data-date="ÉÉÉÉ-HH-NN"` attribútumot az esemény napjára (többnapos eseménynél add meg a `data-end-date`-et is).
 - **Lejárt események (automatikus):** az esemény napja után az esemény `Elmúlt` címkével, halványítva a lista végére kerül, majd a rács (`#newsGrid`) `data-keep-days` attribútumában megadott nap (alapból 7) után elrejtődik. Ha nincs látható hír, egy üzenet jelenik meg a Facebook/Instagram linkekkel. A `data-date` nélküli hír mindig látszik. Elrejtés csak a böngészőben történik, a HTML-ből néha érdemes kitörölni a régi blokkokat. Teszteléshez a böngésző konzoljában: `updateNews(new Date('2026-10-12T10:00:00'))`.
 - **Támogass minket oldal:** fent a szöveg, alatta az adó 1%-os kép (`ado1.jpg`), majd két kártya egymás mellett (egyesület adatai, banki átutalás); mobilon egymás alá kerülnek.
-- **Rajparancsnokok:** a `csatlakozom.html`-ben osztályonként (4–8.) szerepel a raj neve, a rajparancsnokok neve és saját e-mail címe.
+- **Rajparancsnokok (automatikus léptetés):** a `csatlakozom.html`-ben minden raj kártyáján `data-grade` (osztály) és `data-school-year` (a tanév kezdő éve) van; minden szeptember 1-jén a rajok eggyel feljebb lépnek, a 9. osztályba lépett raj eltűnik (a 4–8. osztály látszik). Új 4. osztályos rajhoz másolj le egy kártyát, írd át a nevet/rajparancsnokokat, és állítsd be `data-grade="4"` + az új tanév kezdő évét (előre is felvehető, addig rejtve marad). Ha az új raj még nincs felvéve, a 4. osztálynál a "Hamarosan frissítjük!" felirat látszik.
 - **Facebook- és Instagram-widget:** a főoldalon (802szentkorona) és a csapatotthon oldalon (gdlcserkeszhaz / bezsilla.villa) azonnal betöltődnek, és a legutóbbi bejegyzéseket mutatják. Fontos: a beágyazott tartalom miatt a Facebook és az Instagram sütiket állíthat be a látogatónak. Másik oldal/profil beállításához az iframe `src`-ben cseréld le az oldal nevét, és a "Megnyitás" linkeket is.
 
 ## Még placeholder (cserélendő)

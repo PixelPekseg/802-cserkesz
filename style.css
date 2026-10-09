@@ -584,6 +584,10 @@ section[id] {
   margin-bottom: 4px;
 }
 
+.grade-note {
+  margin: 0 0 12px;
+}
+
 .grade-squad {
   margin: 0 0 12px;
   font-weight: 600;
@@ -753,6 +757,10 @@ section[id] {
 
 .news-card p {
   margin: 0 0 12px;
+}
+
+.news-card .news-detail {
+  margin: 0 0 8px;
 }
 
 .news-card .news-link {
@@ -1090,4 +1098,33 @@ section[id] {
 .news-card:target {
   border-color: var(--color-accent);
   box-shadow: 0 0 0 3px var(--color-highlight);
+}
+
+/* Csapatotthon: két kép egymás mellett, azonos magassággal */
+.home-photos {
+  display: flex;
+  gap: 16px;
+  max-width: 880px;
+  margin: 0 auto 40px;
+}
+
+.home-photos img {
+  flex-basis: 0;
+  min-width: 0;
+  height: auto;
+  object-fit: contain;
+  border-radius: 12px;
+}
+
+@media (max-width: 640px) {
+  .home-photos {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .home-photos img {
+    flex: none !important;
+    width: 100%;
+    max-width: 420px;
+  }
 }

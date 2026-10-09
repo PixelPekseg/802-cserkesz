@@ -16,9 +16,9 @@
   <meta property="og:image" content="https://www.YOUR-DOMAIN-HERE.com/images/csapatunk.jpg">
   <meta property="og:locale" content="hu_HU">
 
-  <link rel="icon" type="image/jpeg" href="images/logo_green.jpeg?v=1">
-  <link rel="apple-touch-icon" href="images/logo_green.jpeg?v=1">
-  <link rel="stylesheet" href="style.css?v=14">
+  <link rel="icon" type="image/jpeg" href="images/logo_green.jpg?v=1">
+  <link rel="apple-touch-icon" href="images/logo_green.jpg?v=1">
+  <link rel="stylesheet" href="style.css?v=17">
 </head>
 <body>
 
@@ -57,9 +57,16 @@
 
   <!--
     Hírdobozok. Új hír hozzáadásához másold le egy <article class="news-card">
-    ... </article> blokkot, és írd át a címet, a szöveget, valamint a dátumot
-    KÉT helyen: a data-date="ÉÉÉÉ-HH-NN" attribútumban (ezt használja a
-    script.js) és a látható dátumban (.news-date).
+    ... </article> blokkot, és írd át. EGYSÉGES SÉMA (amit nem tudsz, hagyd ki):
+      dátum (.news-date) → cím (h3) → rövid leírás → Helyszín → Időpont →
+      Kérdés esetén keresd → (opcionális link a cikk alján; a Facebook-eseményt érdemes a leírásba tenni)
+    Ha egy hírnél nincs "Kérdés esetén keresd" sor (class="news-detail
+    news-contact"), a script.js automatikusan a programokért felelős
+    csapatparancsnok-helyettest írja oda. Ő a rács data-default-contact-name
+    és data-default-contact-email attribútumában állítható.
+    A dátumot KÉT helyen add meg: a data-date="ÉÉÉÉ-HH-NN" attribútumban (ezt
+    használja a script.js) és a látható dátumban (.news-date). Az id
+    attribútum a főoldali fül linkjéhez kell (pl. id="taborozas").
     - Többnapos eseménynél add meg a data-end-date="ÉÉÉÉ-HH-NN" attribútumot
       is: az utolsó napig "közelgő" marad.
     - Dátum nélküli hír (data-date nélkül) mindig látszik.
@@ -71,30 +78,31 @@
   -->
   <section class="section">
     <div class="container">
-      <div class="news-grid" id="newsGrid" data-keep-days="7">
+      <div class="news-grid" id="newsGrid" data-keep-days="7"
+           data-default-contact-name="Bedő Gergely" data-default-contact-email="bedo.gergely@cserkesz.hu">
 
         <article class="news-card" id="toborzo-nap" data-date="2026-10-11">
           <div class="news-meta"><span class="news-date">2026. október 11.</span></div>
           <h3>Toborzó nap</h3>
-          <p><strong>Négy fal helyett hív az erdő, téged vár a 802.</strong></p>
-          <p>Szereted a természetet? Benne lennél egy kalandban? Életre szóló barátságokat kötnél? Gyere el, és ismerd meg a csapatunkat!</p>
-          <p><strong>Időpont:</strong> 14:00–20:00</p>
-          <p><strong>Helyszín:</strong> Gödöllő, Cserkész köz 1.</p>
-          <p>
-            Kérdés esetén keresd:<br>
+          <p><strong>Négy fal helyett hív az erdő, téged vár a 802!</strong> Szereted a természetet? Benne lennél egy kalandban? Életre szóló barátságokat kötnél? Gyere el, és ismerd meg a csapatunkat! Részletek a <a class="inline-link" href="https://www.facebook.com/events/1267319125499897" target="_blank" rel="noopener noreferrer">Facebook-eseményen</a>.</p>
+          <p class="news-detail"><strong>Helyszín:</strong> Gödöllő, Cserkész köz 1.</p>
+          <p class="news-detail"><strong>Időpont:</strong> 14:00–20:00</p>
+          <p class="news-detail news-contact">
+            <strong>Kérdés esetén keresd:</strong><br>
             Pálinkás Péter, <a class="inline-link" href="mailto:palinkaspeter11@gmail.com">palinkaspeter11@gmail.com</a><br>
             Korzenszky Gergely, <a class="inline-link" href="mailto:korzenszky.gergely@gmail.com">korzenszky.gergely@gmail.com</a>
           </p>
-          <a class="news-link" href="https://www.facebook.com/events/1267319125499897" target="_blank" rel="noopener noreferrer">Facebook-esemény megnyitása</a>
         </article>
 
         <article class="news-card" id="cserkeszmise" data-date="2026-10-11">
           <div class="news-meta"><span class="news-date">2026. október 11.</span></div>
           <h3>Cserkészmise</h3>
-          <p>Október 11-én a Gödöllői Szentháromság templomban cserkészmise lesz. Szeretettel várunk minden cserkészt egyenruhában!</p>
-          <p><strong>Gyülekező:</strong> 17:45, Szentháromság templom</p>
-          <p>
-            Kérdés esetén keressék: Vanyó Ferenc Ágoston,
+          <p>Október 11-én cserkészmise lesz. Szeretettel várunk minden cserkészt egyenruhában!</p>
+          <p class="news-detail"><strong>Helyszín:</strong> Gödöllői Szentháromság templom</p>
+          <p class="news-detail"><strong>Időpont:</strong> 17:45 (gyülekező)</p>
+          <p class="news-detail news-contact">
+            <strong>Kérdés esetén keresd:</strong><br>
+            Vanyó Ferenc Ágoston<br>
             <a class="inline-link" href="tel:+36707582659">+36 70 758 2659</a>
           </p>
         </article>
@@ -102,8 +110,8 @@
         <article class="news-card" id="okt23-megemlekezes" data-date="2026-10-23">
           <div class="news-meta"><span class="news-date">2026. október 23.</span></div>
           <h3>Október 23-i megemlékezés</h3>
-          <p>Az immár több éves szokáshoz híven a gödöllői városi október 23-i ünnepséget a Bezsilla villa kertjében található emlékműnél rendezik.</p>
-          <p>Szeretettel várunk mindenkit!</p>
+          <p>Az immár több éves szokáshoz híven a gödöllői városi október 23-i ünnepséget a Bezsilla villa kertjében található emlékműnél rendezik. Szeretettel várunk mindenkit!</p>
+          <p class="news-detail"><strong>Helyszín:</strong> Bezsilla villa kertje, Gödöllő, Cserkész köz 1.</p>
         </article>
 
       </div>
@@ -130,6 +138,6 @@
     </div>
   </footer>
 
-  <script src="script.js?v=5"></script>
+  <script src="script.js?v=10"></script>
 </body>
 </html>
