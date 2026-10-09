@@ -3,22 +3,22 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Aktuális – 802. sz. Szent Korona Cserkészcsapat</title>
-  <meta name="description" content="A 802. sz. Szent Korona Cserkészcsapat aktuális hírei és eseményei: toborzó nap, cserkészmise, október 23-i megemlékezés.">
+  <title>Programok – 802. sz. Szent Korona Cserkészcsapat</title>
+  <meta name="description" content="A 802. sz. Szent Korona Cserkészcsapat programjai és eseményei, naptárral: toborzó nap, cserkészmise, október 23-i megemlékezés.">
 
   <!-- FONTOS: a "https://www.YOUR-DOMAIN-HERE.com" placeholdert cseréld le a valódi domainre (lásd index.html) -->
-  <link rel="canonical" href="https://www.YOUR-DOMAIN-HERE.com/aktualis.html">
+  <link rel="canonical" href="https://www.YOUR-DOMAIN-HERE.com/programok.html">
 
   <meta property="og:type" content="website">
-  <meta property="og:title" content="Aktuális – 802. sz. Szent Korona Cserkészcsapat">
-  <meta property="og:description" content="Aktuális híreink és eseményeink.">
-  <meta property="og:url" content="https://www.YOUR-DOMAIN-HERE.com/aktualis.html">
+  <meta property="og:title" content="Programok – 802. sz. Szent Korona Cserkészcsapat">
+  <meta property="og:description" content="Programjaink és eseményeink.">
+  <meta property="og:url" content="https://www.YOUR-DOMAIN-HERE.com/programok.html">
   <meta property="og:image" content="https://www.YOUR-DOMAIN-HERE.com/images/csapatunk.jpg">
   <meta property="og:locale" content="hu_HU">
 
   <link rel="icon" type="image/jpeg" href="images/logo_green.jpg?v=1">
   <link rel="apple-touch-icon" href="images/logo_green.jpg?v=1">
-  <link rel="stylesheet" href="style.css?v=17">
+  <link rel="stylesheet" href="style.css?v=23">
 </head>
 <body>
 
@@ -40,7 +40,7 @@
       <nav class="main-nav" id="mainNav">
         <ul>
           <li><a href="index.html">Főoldal</a></li>
-          <li><a href="aktualis.html" aria-current="page">Aktuális</a></li>
+          <li><a href="programok.html" aria-current="page">Programok</a></li>
           <li><a href="csatlakozom.html">Csatlakozom!</a></li>
           <li><a href="csapatotthon.html">Csapatotthonunk</a></li>
           <li><a href="rolunk.html">Rólunk</a></li>
@@ -52,7 +52,7 @@
 
   <!-- Címsáv -->
   <section class="page-banner">
-    <h1>Aktuális</h1>
+    <h1>Programok</h1>
   </section>
 
   <!--
@@ -69,15 +69,24 @@
     attribútum a főoldali fül linkjéhez kell (pl. id="taborozas").
     - Többnapos eseménynél add meg a data-end-date="ÉÉÉÉ-HH-NN" attribútumot
       is: az utolsó napig "közelgő" marad.
-    - Dátum nélküli hír (data-date nélkül) mindig látszik.
+    - Dátum nélküli hír (data-date nélkül) mindig látszik, a sor végén.
+    - A programok maguktól dátum szerinti sorrendbe rendeződnek (a HTML-beli
+      sorrend nem számít). Egyszerre 3 látszik, a nyilakkal lehet léptetni.
     - A lejárt események az esemény napja után 7 napig "Elmúlt" címkével,
-      halványítva látszanak a lista végén, utána maguktól eltűnnek. A 7 a
+      halványítva látszanak a sor végén, utána a listából eltűnnek. A 7 a
       rács data-keep-days attribútumában állítható (0 = az esemény napja
       után rögtön eltűnik; nagy szám = sokáig látszik "Elmúlt" címkével).
-    Dátum szerint növekvő sorrendben érdemes felvenni őket.
+    - A lap alján lévő NAPTÁR az összes data-date-tel rendelkező kártyát
+      gyűjti, a már lejártakat és a listából eltűntetteket is. Ezért a régi
+      kártyákat nem kell törölni, de ha az oldal túl hosszú lenne, a régi
+      évek kártyái nyugodtan törölhetők.
   -->
   <section class="section">
     <div class="container">
+      <h2 class="section-title">Közelgő programok</h2>
+
+      <div class="news-carousel" id="newsCarousel">
+        <button class="carousel-btn carousel-prev" id="newsPrev" type="button" aria-label="Előző programok">&#8249;</button>
       <div class="news-grid" id="newsGrid" data-keep-days="7"
            data-default-contact-name="Bedő Gergely" data-default-contact-email="bedo.gergely@cserkesz.hu">
 
@@ -115,6 +124,8 @@
         </article>
 
       </div>
+        <button class="carousel-btn carousel-next" id="newsNext" type="button" aria-label="Következő programok">&#8250;</button>
+      </div>
 
       <p class="news-empty" id="newsEmpty" hidden>
         Jelenleg nincs közelgő eseményünk. Kövess minket a
@@ -123,6 +134,18 @@
         <a class="inline-link" href="https://www.instagram.com/802szentkorona/" target="_blank" rel="noopener noreferrer">Instagramon</a>,
         hogy ne maradj le az újdonságokról!
       </p>
+    </div>
+  </section>
+
+  <!--
+    Naptár: a script.js tölti ki a fenti kártyák (data-date / data-end-date)
+    alapján. Nincs itt mit szerkeszteni.
+  -->
+  <section class="section calendar-section" id="naptar">
+    <div class="container">
+      <h2 class="section-title">Naptár</h2>
+      <div class="calendar" id="calendar"></div>
+      <div class="calendar-detail" id="calendarDetail" aria-live="polite"></div>
     </div>
   </section>
 
@@ -138,6 +161,6 @@
     </div>
   </footer>
 
-  <script src="script.js?v=10"></script>
+  <script src="script.js?v=12"></script>
 </body>
 </html>

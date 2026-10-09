@@ -4,11 +4,11 @@ Statikus (HTML/CSS/JS) többoldalas weboldal, backend nélkül, GitHub Pages-en 
 
 ## Fájlstruktúra
 
-- `index.html` – Főoldal (borítókép + név, Csapatunk (kép + szöveg), Kapcsolat, Facebook- és Instagram-widget)
+- `index.html` – Főoldal (borítókép + név, Csapatunk (kép + szöveg), Kapcsolat, Facebook- és Instagram-gombok)
 - `rolunk.html` – Rólunk (két pont: Csapatunkról, Cserkészetről; a szöveg a csapat korábbi honlapjáról, a 802szentkorona.hu-ról származik)
 - `csatlakozom.html` – Csatlakozom! (4.–12. osztály, rajparancsnokok)
-- `csapatotthon.html` – Csapatotthonunk (Bezsilla villa, elérhetőség, Google Maps, Facebook- és Instagram-widget)
-- `aktualis.html` – Aktuális (hírdobozok)
+- `csapatotthon.html` – Csapatotthonunk (Bezsilla villa, elérhetőség, Google Maps, Facebook- és Instagram-gombok)
+- `programok.html` – Programok (hírdobozok léptethető sorban + naptár)
 - `tamogass.html` – Támogass minket (adó 1%-os kép, egyesület adatai, számlaszám)
 - `style.css`, `script.js` – közös kinézet és működés (mobil menü, hiányzó képek kezelése)
 - `robots.txt`, `sitemap.xml` – Google-kereshetőséghez
@@ -32,11 +32,11 @@ A `style.css` elején lévő `:root` blokkban vannak (386641, 6a994e, a7c957 az 
 
 ## Karbantartás
 
-- **Új hír / esemény:** az `aktualis.html`-ben másolj le egy `<article class="news-card">…</article>` blokkot, írd át a szöveget, a látható dátumot (`.news-date`), és állítsd be a `data-date="ÉÉÉÉ-HH-NN"` attribútumot az esemény napjára (többnapos eseménynél add meg a `data-end-date`-et is).
+- **Új hír / esemény:** az `programok.html`-ben másolj le egy `<article class="news-card">…</article>` blokkot, írd át a szöveget, a látható dátumot (`.news-date`), és állítsd be a `data-date="ÉÉÉÉ-HH-NN"` attribútumot az esemény napjára (többnapos eseménynél add meg a `data-end-date`-et is).
 - **Lejárt események (automatikus):** az esemény napja után az esemény `Elmúlt` címkével, halványítva a lista végére kerül, majd a rács (`#newsGrid`) `data-keep-days` attribútumában megadott nap (alapból 7) után elrejtődik. Ha nincs látható hír, egy üzenet jelenik meg a Facebook/Instagram linkekkel. A `data-date` nélküli hír mindig látszik. Elrejtés csak a böngészőben történik, a HTML-ből néha érdemes kitörölni a régi blokkokat. Teszteléshez a böngésző konzoljában: `updateNews(new Date('2026-10-12T10:00:00'))`.
 - **Támogass minket oldal:** fent a szöveg, alatta az adó 1%-os kép (`ado1.jpg`), majd két kártya egymás mellett (egyesület adatai, banki átutalás); mobilon egymás alá kerülnek.
 - **Rajparancsnokok (automatikus léptetés):** a `csatlakozom.html`-ben minden raj kártyáján `data-grade` (osztály) és `data-school-year` (a tanév kezdő éve) van; minden szeptember 1-jén a rajok eggyel feljebb lépnek, a 9. osztályba lépett raj eltűnik (a 4–8. osztály látszik). Új 4. osztályos rajhoz másolj le egy kártyát, írd át a nevet/rajparancsnokokat, és állítsd be `data-grade="4"` + az új tanév kezdő évét (előre is felvehető, addig rejtve marad). Ha az új raj még nincs felvéve, a 4. osztálynál a "Hamarosan frissítjük!" felirat látszik.
-- **Facebook- és Instagram-widget:** a főoldalon (802szentkorona) és a csapatotthon oldalon (gdlcserkeszhaz / bezsilla.villa) azonnal betöltődnek, és a legutóbbi bejegyzéseket mutatják. Fontos: a beágyazott tartalom miatt a Facebook és az Instagram sütiket állíthat be a látogatónak. Másik oldal/profil beállításához az iframe `src`-ben cseréld le az oldal nevét, és a "Megnyitás" linkeket is.
+- **Facebook / Instagram:** a főoldalon (802szentkorona) és a csapatotthon oldalon (gdlcserkeszhaz / bezsilla.villa) csak linkgombok vannak, a tartalmukat az oldal nem tölti be (így nincs külső süti/adatátadás kattintás előtt). Másik oldalhoz/profilhoz cseréld le a gombok `href`-jét.
 
 ## Még placeholder (cserélendő)
 

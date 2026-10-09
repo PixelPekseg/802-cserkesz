@@ -24,7 +24,7 @@
   <!-- Logók: a fejlécben az images/logo_white.jpg (fekete jel fehér alapon) látszik, faviconként az images/logo_green.jpg -->
   <link rel="icon" type="image/jpeg" href="images/logo_green.jpg?v=1">
   <link rel="apple-touch-icon" href="images/logo_green.jpg?v=1">
-  <link rel="stylesheet" href="style.css?v=17">
+  <link rel="stylesheet" href="style.css?v=23">
 
   <!-- Strukturált adat: segít a Google-nek megérteni, hogy ez egy szervezet -->
   <script type="application/ld+json">
@@ -60,7 +60,7 @@
       <nav class="main-nav" id="mainNav">
         <ul>
           <li><a href="index.html" aria-current="page">Főoldal</a></li>
-          <li><a href="aktualis.html">Aktuális</a></li>
+          <li><a href="programok.html">Programok</a></li>
           <li><a href="csatlakozom.html">Csatlakozom!</a></li>
           <li><a href="csapatotthon.html">Csapatotthonunk</a></li>
           <li><a href="rolunk.html">Rólunk</a></li>
@@ -166,39 +166,15 @@
       </div>
 
       <!--
-        Facebook- és Instagram-widget (a Facebook hivatalos Page Plugin-ja,
-        illetve az Instagram profil-beágyazása). Azonnal betöltődnek, és a
-        csapat oldalának/profiljának legutóbbi bejegyzéseit mutatják.
-        Más oldalhoz/profilhoz: cseréld le az iframe src-ben az oldal nevét
-        (802szentkorona), és a "Megnyitás" linkeket is.
+        Közösségi oldalak: szándékosan csak linkek, a Facebook/Instagram
+        tartalmát nem töltjük be az oldalra (így a látogató adatait nem
+        küldjük el a Metának, amíg ő maga nem kattint).
       -->
       <div class="social-section">
         <h3>Kövess minket</h3>
-        <div class="social-widgets">
-          <div class="social-widget">
-            <h4>Facebook</h4>
-            <iframe
-              class="social-frame social-frame-fb"
-              src="https://www.facebook.com/plugins/page.php?href=https%3A%2F%2Fwww.facebook.com%2F802szentkorona&amp;tabs=timeline&amp;width=500&amp;height=520&amp;small_header=false&amp;adapt_container_width=true&amp;hide_cover=false&amp;show_facepile=true"
-              title="A 802. sz. Szent Korona Cserkészcsapat Facebook-oldala"
-              scrolling="no"
-              loading="lazy"
-              allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share">
-            </iframe>
-            <a class="social-link" href="https://www.facebook.com/802szentkorona" target="_blank" rel="noopener noreferrer">Megnyitás Facebookon</a>
-          </div>
-
-          <div class="social-widget">
-            <h4>Instagram</h4>
-            <iframe
-              class="social-frame social-frame-ig"
-              src="https://www.instagram.com/802szentkorona/embed"
-              title="A 802. sz. Szent Korona Cserkészcsapat Instagram-profilja"
-              scrolling="no"
-              loading="lazy">
-            </iframe>
-            <a class="social-link" href="https://www.instagram.com/802szentkorona/" target="_blank" rel="noopener noreferrer">Megnyitás Instagramon</a>
-          </div>
+        <div class="social-buttons">
+          <a class="btn btn-primary" href="https://www.facebook.com/802szentkorona" target="_blank" rel="noopener noreferrer">Facebook</a>
+          <a class="btn btn-primary" href="https://www.instagram.com/802szentkorona/" target="_blank" rel="noopener noreferrer">Instagram</a>
         </div>
       </div>
     </div>
@@ -217,10 +193,10 @@
   </footer>
 
   <!--
-    Közelgő program füle: ha az aktualis.html-ben a következő 7 napban van
+    Közelgő program füle: ha az programok.html-ben a következő 7 napban van
     program (data-date), jobbról becsúszik ez a fül a program nevével és
-    dátumával. A kattintás az Aktuális oldal megfelelő hírére visz.
-    Az adatot a script.js az aktualis.html-ből olvassa, itt nincs mit szerkeszteni.
+    dátumával. A kattintás a Programok oldal megfelelő hírére visz.
+    Az adatot a script.js az programok.html-ből olvassa, itt nincs mit szerkeszteni.
   -->
   <aside class="upcoming-tab" id="upcomingTab" aria-label="Közelgő programok" hidden>
     <button class="upcoming-close" id="upcomingClose" type="button" aria-label="Bezárás">&times;</button>
@@ -228,6 +204,6 @@
     <ul class="upcoming-list" id="upcomingList"></ul>
   </aside>
 
-  <script src="script.js?v=10"></script>
+  <script src="script.js?v=12"></script>
 </body>
 </html>
