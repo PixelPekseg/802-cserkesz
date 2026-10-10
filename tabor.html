@@ -23,7 +23,7 @@
 
   <link rel="icon" type="image/jpeg" href="images/webp/kozos/logo_green.jpg?v=1">
   <link rel="apple-touch-icon" href="images/webp/kozos/logo_green.jpg?v=1">
-  <link rel="stylesheet" href="style.css?v=63">
+  <link rel="stylesheet" href="style.css?v=64">
 </head>
 <body>
 
@@ -72,18 +72,18 @@
   </section>
 
   <!--
-    A tábor adatai évente változnak: a két kártyán az Időpont, a Helyszín és a
-    Főszervezők sort kell frissíteni (a főszervezők nevei és e-mail címei
-    jelenleg PLACEHOLDEREK). Az "Általános információk" állandó szöveg.
-    A képek az images/webp/tabor/ mappában vannak (a kicsi bélyegképek a thumb/
-    almappában; az eredeti, nagy fotók az images/originals/tabor/ mappában, amit
-    a .gitignore kizár). A letölthető
-    PDF-ek a pdf/ mappában vannak.
+    A két tábor kártyája (Időpont, Helyszín, Főszervezők) NEM kézzel szerkesztendő: a
+    "TABOROK:START" és "TABOROK:END" közötti részt a tools/sync_taborok.py írja újra a csapat
+    Google Táblázatának "Táborok" lapjából (óránként, GitHub Actions). Új kártya = új sor a
+    táblázatban. Az "Általános információk" állandó szöveg. A képek az images/webp/tabor/ mappában
+    vannak (a kicsi bélyegképek a thumb/ almappában; az eredeti, nagy fotók az images/originals/tabor/
+    mappában, amit a .gitignore kizár). A letölthető PDF-ek a pdf/ mappában vannak.
   -->
   <!-- A két tábor adatai: időpont, helyszín, főszervezők -->
   <section class="section">
     <div class="container">
       <div class="camp-cards">
+        <!-- TABOROK:START (automatikusan generálja a tools/sync_taborok.py a Google Táblázatból; ne szerkeszd kézzel) -->
         <div class="camp-card">
           <h3>Kiscserkésztábor</h3>
           <p class="camp-card-lead">5 napos tábor azoknak, akik most fejezték be a 4. osztályt.</p>
@@ -92,9 +92,14 @@
           <p class="bank-label">Helyszín</p>
           <p class="camp-card-value">Hamarosan frissítjük!</p>
           <p class="bank-label">Főszervezők</p>
-          <!-- PLACEHOLDER: cseréld le a valódi főszervezők nevére és e-mail címére -->
-          <p class="camp-card-value">Főszervező Neve, <a class="inline-link" href="mailto:foszervezo-kiscserkesz1@example.com">foszervezo-kiscserkesz1@example.com</a></p>
-          <p class="camp-card-value">Főszervező Neve, <a class="inline-link" href="mailto:foszervezo-kiscserkesz2@example.com">foszervezo-kiscserkesz2@example.com</a></p>
+          <p class="camp-card-value camp-person">
+            Korzenszky Gergő<br>
+            <a class="inline-link" href="mailto:korzenszky.gergely@gmail.com">korzenszky.gergely@gmail.com</a>
+          </p>
+          <p class="camp-card-value camp-person">
+            Pálinkás Péter<br>
+            <a class="inline-link" href="mailto:palinkaspeter11@gmail.com">palinkaspeter11@gmail.com</a>
+          </p>
         </div>
 
         <div class="camp-card">
@@ -105,10 +110,13 @@
           <p class="bank-label">Helyszín</p>
           <p class="camp-card-value">Hamarosan frissítjük!</p>
           <p class="bank-label">Főszervezők</p>
-          <!-- PLACEHOLDER: cseréld le a valódi főszervezők nevére és e-mail címére -->
-          <p class="camp-card-value">Főszervező Neve, <a class="inline-link" href="mailto:foszervezo-nagytabor1@example.com">foszervezo-nagytabor1@example.com</a></p>
-          <p class="camp-card-value">Főszervező Neve, <a class="inline-link" href="mailto:foszervezo-nagytabor2@example.com">foszervezo-nagytabor2@example.com</a></p>
+          <p class="camp-card-value camp-person">
+            Bedő Gergő<br>
+            <a class="inline-link" href="mailto:bedo.gergely@cserkesz.hu">bedo.gergely@cserkesz.hu</a>
+          </p>
         </div>
+
+        <!-- TABOROK:END -->
       </div>
     </div>
   </section>

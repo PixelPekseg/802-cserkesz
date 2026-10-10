@@ -23,7 +23,7 @@
 
   <link rel="icon" type="image/jpeg" href="images/webp/kozos/logo_green.jpg?v=1">
   <link rel="apple-touch-icon" href="images/webp/kozos/logo_green.jpg?v=1">
-  <link rel="stylesheet" href="style.css?v=63">
+  <link rel="stylesheet" href="style.css?v=64">
 </head>
 <body>
 
@@ -64,20 +64,15 @@
 
   <!-- Osztályok és rajparancsnokok -->
   <!--
-    Osztályonként a raj neve és a rajparancsnokok (név + saját e-mail cím).
+    A raj-kártyák NEM kézzel szerkesztendők: a "RAJOK:START" és "RAJOK:END" közötti részt a
+    tools/sync_rajok.py írja újra a csapat Google Táblázatának "Rajok" lapjából (óránként, GitHub
+    Actions). Új raj = új sor a táblázatban (Indulás éve = az a tanév kezdő éve, amikor a raj 4.
+    osztályos volt; előre is felvehető, addig rejtve marad).
 
-    AUTOMATIKUS LÉPTETÉS: minden raj kártyáján két attribútum van:
-      data-grade="4"          az az osztály, amelyben a raj a megadott tanévben van
-      data-school-year="2026" a tanév kezdő éve (a 2026/27-es tanév = 2026)
-    Minden év szeptember 1-jén a script.js eggyel feljebb lépteti a rajokat
-    (a kártyán látszó osztály = data-grade + eltelt tanévek). A 4–8. osztály
-    látszik, a 9. osztályba lépett raj eltűnik, a kártya a HTML-ben marad.
-
-    ÚJ 4. OSZTÁLYOS RAJ: másolj le egy kártyát, írd át a raj nevét, a
-    rajparancsnokokat, és állítsd be a data-grade="4" és a data-school-year
-    értékét az új tanév kezdő évére (pl. 2027). Előre is felvehető: a kártya
-    addig rejtve marad, amíg el nem érkezik a szeptember 1. Ha az új raj
-    még nincs felvéve, a 4. osztálynál a "Hamarosan frissítjük!" felirat látszik.
+    AUTOMATIKUS LÉPTETÉS: a script.js a kártyák data-school-year attribútumából minden megnyitáskor
+    kiszámolja az aktuális osztályt (a tanév szeptember 1-jén kezdődik). A 4-8. osztály látszik, a
+    9. osztályba lépő raj eltűnik. Ha a 4. osztályhoz nincs raj, "Hamarosan frissítjük!" látszik.
+    Az "Idősebbként vagy vezetőként" kártya fix szöveg, alább található.
   -->
   <section class="section">
     <div class="container">
@@ -93,80 +88,83 @@
       </div>
 
       <div class="grades-grid" id="gradesGrid">
+        <!-- RAJOK:START (automatikusan generálja a tools/sync_rajok.py a Google Táblázatból; ne szerkeszd kézzel) -->
         <div class="grade-card" data-grade="4" data-school-year="2026">
           <h3>4. osztály</h3>
           <p class="grade-squad">Mexikói Badargomba raj</p>
           <ul>
             <li>
               <span class="leader-name">Korzenszky Gergely</span>
-              <a class="leader-email" href="mailto:korzenszky.gergely@gmail.com">korzenszky.gergely@gmail.com</a>
+              <div class="leader-line"><a class="leader-email" href="mailto:korzenszky.gergely@gmail.com">korzenszky.gergely@gmail.com</a></div>
             </li>
             <li>
               <span class="leader-name">Pálinkás Péter</span>
-              <a class="leader-email" href="mailto:palinkaspeter11@gmail.com">palinkaspeter11@gmail.com</a>
+              <div class="leader-line"><a class="leader-email" href="mailto:palinkaspeter11@gmail.com">palinkaspeter11@gmail.com</a></div>
             </li>
           </ul>
         </div>
 
-        <div class="grade-card" data-grade="5" data-school-year="2026">
+        <div class="grade-card" data-grade="4" data-school-year="2025">
           <h3>5. osztály</h3>
           <p class="grade-squad">Azúrkék Galambgomba raj</p>
           <ul>
             <li>
               <span class="leader-name">Kis Botond</span>
-              <a class="leader-email" href="mailto:kbotond0726@gmail.com">kbotond0726@gmail.com</a>
+              <div class="leader-line"><a class="leader-email" href="mailto:kbotond0726@gmail.com">kbotond0726@gmail.com</a></div>
             </li>
             <li>
               <span class="leader-name">Tanka Ágoston Sándor</span>
-              <a class="leader-email" href="mailto:agoston.sandor.tanka@gmail.com">agoston.sandor.tanka@gmail.com</a>
+              <div class="leader-line"><a class="leader-email" href="mailto:agoston.sandor.tanka@gmail.com">agoston.sandor.tanka@gmail.com</a></div>
             </li>
           </ul>
         </div>
 
-        <div class="grade-card" data-grade="6" data-school-year="2026">
+        <div class="grade-card" data-grade="4" data-school-year="2024">
           <h3>6. osztály</h3>
           <p class="grade-squad">Császárgomba raj</p>
           <ul>
             <li>
               <span class="leader-name">Kovács Franciska</span>
-              <a class="leader-email" href="mailto:kovacsfannie@gmail.com">kovacsfannie@gmail.com</a>
+              <div class="leader-line"><a class="leader-email" href="mailto:kovacsfannie@gmail.com">kovacsfannie@gmail.com</a></div>
             </li>
             <li>
               <span class="leader-name">Paulik Benjámin</span>
-              <a class="leader-email" href="mailto:paulikbeni@gmail.com">paulikbeni@gmail.com</a>
+              <div class="leader-line"><a class="leader-email" href="mailto:paulikbeni@gmail.com">paulikbeni@gmail.com</a></div>
             </li>
           </ul>
         </div>
 
-        <div class="grade-card" data-grade="7" data-school-year="2026">
+        <div class="grade-card" data-grade="4" data-school-year="2023">
           <h3>7. osztály</h3>
           <p class="grade-squad">Mozdonyfüstszagú Pókhálósgomba raj</p>
           <ul>
             <li>
               <span class="leader-name">Móricz Marcell</span>
-              <a class="leader-email" href="mailto:moricz.marcell@gmail.com">moricz.marcell@gmail.com</a>
+              <div class="leader-line"><a class="leader-email" href="mailto:moricz.marcell@gmail.com">moricz.marcell@gmail.com</a></div>
             </li>
             <li>
               <span class="leader-name">Rólik Péter</span>
-              <a class="leader-email" href="mailto:rolikpeti5@gmail.com">rolikpeti5@gmail.com</a>
+              <div class="leader-line"><a class="leader-email" href="mailto:rolikpeti5@gmail.com">rolikpeti5@gmail.com</a></div>
             </li>
           </ul>
         </div>
 
-        <div class="grade-card" data-grade="8" data-school-year="2026">
+        <div class="grade-card" data-grade="4" data-school-year="2022">
           <h3>8. osztály</h3>
           <p class="grade-squad">Rókagomba raj</p>
           <ul>
             <li>
               <span class="leader-name">Vásárhelyi Viktória</span>
-              <a class="leader-email" href="mailto:avasarhelyi.victoria@gmail.com">avasarhelyi.victoria@gmail.com</a>
+              <div class="leader-line"><a class="leader-email" href="mailto:avasarhelyi.victoria@gmail.com">avasarhelyi.victoria@gmail.com</a></div>
             </li>
             <li>
               <span class="leader-name">Hidvégi Zsombor</span>
-              <a class="leader-email" href="mailto:hidvegizsombor@gmail.com">hidvegizsombor@gmail.com</a>
+              <div class="leader-line"><a class="leader-email" href="mailto:hidvegizsombor@gmail.com">hidvegizsombor@gmail.com</a></div>
             </li>
           </ul>
         </div>
+
+        <!-- RAJOK:END -->
 
         <!-- Idősebbeknek, vezetőknek: a rajok léptetése nem érinti, mindig a lista végén marad -->
         <div class="grade-card grade-card-extra">

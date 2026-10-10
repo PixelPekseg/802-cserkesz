@@ -2055,3 +2055,12 @@ section[id] {
   margin: 0 0 12px;
   text-align: center;
 }
+
+/* Több kapcsolati adat egy személynél (e-mail és telefon külön sorban) */
+.leader-line {
+  margin-top: 2px;
+}
+
+.camp-person {
+  margin-bottom: 10px;
+}

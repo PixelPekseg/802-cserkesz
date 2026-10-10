@@ -1,4 +1,4 @@
-# A programok.html programkártyáit a csapat Google Táblázatából (közzétett CSV) frissíti.
+# A programok.html, tabor.html és csatlakozom.html kártyáit a csapat Google Táblázatából (közzétett CSV-k) frissíti.
 # Óránként fut, és kézzel is elindítható (Actions fül -> "Programok frissítése" -> Run workflow).
 # Ha a táblázat hibás vagy nem érhető el, a feladat hibával leáll, és az oldal az utolsó jó
 # állapotot mutatja. A hónapban egyszer egy apró "életjel" módosítás is készül, mert a GitHub
@@ -32,14 +32,30 @@ jobs:
           PROGRAMOK_CSV_URL: https://docs.google.com/spreadsheets/d/e/2PACX-1vRxIhMKUiMXX41ujoCjIpmizaXDQwlRyBieMUQZSqZcFUF3ChIpqB1d5Q2Br608v88gWJOSxcu46zPV/pub?gid=659195366&single=true&output=csv
         run: python tools/sync_programok.py
 
+      # A következő lépések akkor is lefutnak, ha egy előző hibázott (egy rossz táblázat
+      # ne akadályozza a többit); a futás ilyenkor is hibásként jelenik meg a GitHubon.
+      - name: Táborok letöltése és az oldal frissítése
+        if: ${{ !cancelled() }}
+        env:
+          TABOROK_CSV_URL: https://docs.google.com/spreadsheets/d/e/2PACX-1vSKJZCKF6eEgtepX6QnyK6d2cWgMlBenGM2il8-DDNytnpuUNoo1Eh37bdvaoroRgJrwyNfyTDIwzsy/pub?gid=1184983016&single=true&output=csv
+        run: python tools/sync_taborok.py
+
+      - name: Rajok letöltése és az oldal frissítése
+        if: ${{ !cancelled() }}
+        env:
+          RAJOK_CSV_URL: https://docs.google.com/spreadsheets/d/e/2PACX-1vSo3ta8YoCSTVLeuRsM1CHEXhe2TKCUrlYM4wG6UENCMWkkMgbqnwLe-bvMzxjyKxk9IsfZ40NA4__Z/pub?gid=1082322737&single=true&output=csv
+        run: python tools/sync_rajok.py
+
       - name: Havi életjel
+        if: ${{ !cancelled() }}
         run: date +%Y-%m > data/keepalive.txt
 
       - name: Változások mentése
+        if: ${{ !cancelled() }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add programok.html data/
+          git add programok.html tabor.html csatlakozom.html data/
           if git diff --cached --quiet; then
             echo "Nincs változás."
           else
