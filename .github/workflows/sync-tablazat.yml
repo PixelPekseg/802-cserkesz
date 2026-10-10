@@ -1,9 +1,9 @@
 # A programok.html, tabor.html és csatlakozom.html kártyáit a csapat Google Táblázatából (közzétett CSV-k) frissíti.
-# Óránként fut, és kézzel is elindítható (Actions fül -> "Programok frissítése" -> Run workflow).
+# Óránként fut, és kézzel is elindítható (Actions fül -> "Oldal frissítése a táblázatból" -> Run workflow).
 # Ha a táblázat hibás vagy nem érhető el, a feladat hibával leáll, és az oldal az utolsó jó
 # állapotot mutatja. A hónapban egyszer egy apró "életjel" módosítás is készül, mert a GitHub
 # 60 nap tevékenység nélkül leállítja az ütemezett feladatokat.
-name: Programok frissítése
+name: Oldal frissítése a táblázatból
 
 on:
   schedule:
@@ -14,7 +14,7 @@ permissions:
   contents: write
 
 concurrency:
-  group: sync-programok
+  group: sync-tablazat
   cancel-in-progress: false
 
 jobs:
@@ -59,6 +59,6 @@ jobs:
           if git diff --cached --quiet; then
             echo "Nincs változás."
           else
-            git commit -m "Programok frissítése a táblázatból"
+            git commit -m "Oldal frissítése a táblázatból"
             git push
           fi
