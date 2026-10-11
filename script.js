@@ -23,6 +23,49 @@ mainNav.querySelectorAll('a').forEach(link => {
 document.getElementById('year').textContent = new Date().getFullYear();
 
 // ==========================================================
+// Értesítősáv (minden oldal tetején, a Táblázat "Értesítők" lapjából)
+// Minden .notice alapból rejtett; akkor látszik, ha a mai nap a
+// data-from és data-until közé esik (mindkettő opcionális, a data-until
+// napja még beleszámít), és a látogató nem zárta be. A bezárt értesítők
+// azonosítóját (data-id, a tartalomból képzett) a böngésző megjegyzi;
+// ha a szöveg változik, új az azonosító, így újra megjelenik.
+// Az updateNotices(now) tetszőleges időponttal újrafuttatható (tesztelés).
+// ==========================================================
+const NOTICE_STORAGE_KEY = 'closedNotices';
+
+function readClosedNotices() {
+  try {
+    return JSON.parse(localStorage.getItem(NOTICE_STORAGE_KEY)) || [];
+  } catch (e) {
+    return [];
+  }
+}
+
+function updateNotices(now = new Date()) {
+  const closed = readClosedNotices();
+  document.querySelectorAll('.notice').forEach(notice => {
+    const { from, until, id } = notice.dataset;
+    const started = !from || now >= new Date(`${from}T00:00:00`);
+    const notEnded = !until || now <= new Date(`${until}T23:59:59`);
+    notice.hidden = !(started && notEnded && !closed.includes(id));
+  });
+}
+
+document.querySelectorAll('.notice-close').forEach(button => {
+  button.addEventListener('click', () => {
+    const notice = button.closest('.notice');
+    notice.hidden = true;
+    // csak a még az oldalon lévő értesítők azonosítóit tartjuk meg, hogy a lista ne nőjön
+    const current = [...document.querySelectorAll('.notice')].map(n => n.dataset.id);
+    const closed = readClosedNotices().filter(id => current.includes(id));
+    closed.push(notice.dataset.id);
+    try { localStorage.setItem(NOTICE_STORAGE_KEY, JSON.stringify(closed)); } catch (e) { /* nem baj */ }
+  });
+});
+
+updateNotices();
+
+// ==========================================================
 // Még nem feltöltött képek (logó, személyek fotói) kezelése
 // A data-optional attribútumú képet eltávolítjuk, ha nem töltődik be,
 // így nem törött kép ikon látszik, hanem a mögötte lévő monogram
@@ -197,6 +240,17 @@ async function initUpcomingTab(now = new Date()) {
     tab.classList.remove('is-visible');
     try { sessionStorage.setItem('upcomingTabClosed', '1'); } catch (e) { /* nem baj */ }
   });
+
+  // A fül a fejléc alatt marad akkor is, ha fölötte értesítősáv látszik
+  // (a sáv elgörgetése után visszaáll az eredeti, CSS-beli helyére).
+  const header = document.querySelector('.site-header');
+  const placeTab = () => {
+    if (header) tab.style.top = `${Math.max(90, header.getBoundingClientRect().bottom + 19)}px`;
+  };
+  window.addEventListener('scroll', placeTab, { passive: true });
+  window.addEventListener('resize', placeTab);
+  document.querySelectorAll('.notice-close').forEach(button => button.addEventListener('click', placeTab));
+  placeTab();
 
   tab.hidden = false;
   // rövid késleltetés, hogy a becsúszás látszódjon

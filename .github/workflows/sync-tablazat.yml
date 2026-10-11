@@ -1,4 +1,5 @@
-# A programok.html, tabor.html és csatlakozom.html kártyáit a csapat Google Táblázatából (közzétett CSV-k) frissíti.
+# A programok.html, tabor.html és csatlakozom.html kártyáit, valamint minden oldal tetején az
+# értesítősávot a csapat Google Táblázataiból (közzétett CSV-k) frissíti.
 # Óránként fut, és kézzel is elindítható (Actions fül -> "Oldal frissítése a táblázatból" -> Run workflow).
 # Ha a táblázat hibás vagy nem érhető el, a feladat hibával leáll, és az oldal az utolsó jó
 # állapotot mutatja. A hónapban egyszer egy apró "életjel" módosítás is készül, mert a GitHub
@@ -46,6 +47,12 @@ jobs:
           RAJOK_CSV_URL: https://docs.google.com/spreadsheets/d/e/2PACX-1vSo3ta8YoCSTVLeuRsM1CHEXhe2TKCUrlYM4wG6UENCMWkkMgbqnwLe-bvMzxjyKxk9IsfZ40NA4__Z/pub?gid=1082322737&single=true&output=csv
         run: python tools/sync_rajok.py
 
+      - name: Értesítők letöltése és az oldalak frissítése
+        if: ${{ !cancelled() }}
+        env:
+          ERTESITOK_CSV_URL: https://docs.google.com/spreadsheets/d/e/2PACX-1vSCFQEfDB5PGysGIga4CyQ7XH2KX09TWyreCDGbciXWjAP9a4PUgFuH6MbBRCjUZKOWaLA_BzbIuvXs/pub?gid=160520110&single=true&output=csv
+        run: python tools/sync_ertesitok.py
+
       - name: Havi életjel
         if: ${{ !cancelled() }}
         run: date +%Y-%m > data/keepalive.txt
@@ -55,7 +62,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add programok.html tabor.html csatlakozom.html data/
+          git add *.html data/
           if git diff --cached --quiet; then
             echo "Nincs változás."
           else

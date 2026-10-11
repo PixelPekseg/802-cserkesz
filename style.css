@@ -21,6 +21,7 @@
   --color-bg: #f4f9eb;             /* levezetett – fő háttérszín */
   --color-bg-alt: #e8f1d2;         /* levezetett – váltakozó szekció-háttér */
   --color-border: #d3e4ab;         /* levezetett – szegélyek */
+  --color-alert: #b42318;          /* piros – értesítősáv (az oldal tetején) */
 
   --font-heading: 'Georgia', 'Times New Roman', serif;
   --font-body: 'Segoe UI', Arial, sans-serif;
@@ -1289,7 +1290,7 @@ section[id] {
   position: fixed;
   right: 0;
   top: 90px;
-  z-index: 90;
+  z-index: 150;                    /* a ragadós fejléc (100) fölött, a felugró ablakok (200+) alatt */
   width: min(290px, calc(100vw - 24px));
   padding: 16px 40px 16px 18px;
   background: var(--color-primary);
@@ -1302,6 +1303,11 @@ section[id] {
 
 .upcoming-tab.is-visible {
   transform: translateX(0);
+}
+
+/* nyitott mobilmenünél a fül kicsúszik, hogy ne takarja a menüt */
+body:has(.main-nav.open) .upcoming-tab {
+  transform: translateX(110%);
 }
 
 .upcoming-title {
@@ -2238,4 +2244,87 @@ section[id] {
 .camp-block-reverse .camp-media-3 img:nth-child(3) {
   margin-left: auto;
   margin-right: 6%;
+}
+
+/* ==========================================================
+   Értesítősáv (minden oldal tetején, a Google Táblázat "Értesítők" lapjából)
+   Az értesítők alapból rejtettek; a script.js (updateNotices) mutatja
+   az éppen érvényeseket. Több értesítő egymás alatt jelenik meg.
+   ========================================================== */
+.notice {
+  background: var(--color-alert);
+  color: #fff;
+}
+
+.notice + .notice {
+  border-top: 1px solid rgba(255, 255, 255, 0.25);
+}
+
+.notice .container {
+  max-width: none;
+  padding-left: clamp(20px, 3vw, 48px);
+  padding-right: clamp(20px, 3vw, 48px);
+}
+
+.notice-inner {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding-top: 16px;
+  padding-bottom: 16px;
+}
+
+.notice-text {
+  flex: 1;
+  margin: 0;
+  font-size: 0.95rem;
+  line-height: 1.45;
+}
+
+.notice-title {
+  margin-right: 6px;
+}
+
+.notice-deadline {
+  display: inline-block;
+  margin-right: 6px;
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: #fff;
+  color: var(--color-alert);
+  font-size: 0.85rem;
+  font-weight: bold;
+  white-space: nowrap;
+}
+
+.notice-close {
+  flex: none;
+  width: 28px;
+  height: 28px;
+  margin-top: -2px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: #fff;
+  font-size: 1.4rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.notice-close:hover,
+.notice-close:focus-visible {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+@media (max-width: 600px) {
+  .notice-text {
+    font-size: 0.875rem;
+  }
+
+  /* telefonon az üzenet a határidő után új sorban kezdődik */
+  .notice-message {
+    display: block;
+    margin-top: 6px;
+  }
 }

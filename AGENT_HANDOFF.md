@@ -40,15 +40,15 @@ robots.txt, sitemap.xml
 images/webp/…       használt képek (oldalankénti mappák)
 images/originals/…  eredetik (.gitignore-ban, nem kerülnek fel)
 pdf/                letölthető dokumentumok
-data/*.csv          a Táblázatból utoljára letöltött pillanatképek (+ keepalive.txt)
+data/*.csv          a Táblázatokból utoljára letöltött pillanatképek (+ keepalive.txt)
 tools/*.py          a Táblázat → HTML generátorok
 .github/workflows/sync-tablazat.yml
-drafts/             kész, de nem publikált anyagok (.gitignore-ban): adatkezeles.html, régi xlsx-ek
+drafts/             kész, de nem publikált anyagok (.gitignore-ban): adatkezeles.html, xlsx-sablonok (pl. ertesitok.xlsx)
 ```
 
 - **A fejléc és a lábléc minden HTML fájlban külön szerepel** (8 oldal + 404). Menü-/lábléc-módosítást mindenhol át kell vezetni; utána `diff`-eld az oldalakat.
 - **Jekyll-csapda:** a GitHub Pages figyelmen kívül hagyja az `_`-lal kezdődő mappákat. Ezért `images/webp`, `images/originals`, `drafts` (korábban `_webp` stb. volt, a képek emiatt nem látszottak). **Soha ne nevezz el mappát `_`-lal.** `.nojekyll` nincs és nem kell.
-- **Cache-bust:** a HTML-ek `style.css?v=71` és `script.js?v=38` formában hivatkoznak a fájlokra (az utolsó ismert állapot). Bármely CSS/JS módosítás után **minden HTML-ben emeld a számot** (`sed`-del vagy ciklussal), különben a böngésző/CDN a régit mutatja.
+- **Cache-bust:** a HTML-ek `style.css?v=72` és `script.js?v=39` formában hivatkoznak a fájlokra (az utolsó ismert állapot). Bármely CSS/JS módosítás után **minden HTML-ben emeld a számot** (`sed`-del vagy ciklussal), különben a böngésző/CDN a régit mutatja.
 
 ---
 
@@ -71,9 +71,10 @@ drafts/             kész, de nem publikált anyagok (.gitignore-ban): adatkezel
    - `tools/sync_programok.py` → `programok.html` (`<!-- PROGRAMOK:START … -->` … `<!-- PROGRAMOK:END -->`)
    - `tools/sync_taborok.py` → `tabor.html` (`TABOROK:START/END`)
    - `tools/sync_rajok.py` → `csatlakozom.html` (`RAJOK:START/END`)
+   - `tools/sync_ertesitok.py` → **mind a 9 HTML oldal** (`ERTESITOK:START/END`, közvetlenül a `<body>` után) – ez egy **külön** Google Táblázatból jön, lásd 4.8
    - közös segédfüggvények: `tools/sync_common.py` (`sync_programok.py` önálló, de ugyanazokat az elveket követi). Csak a Python standard könyvtárát használják.
-3. A CSV-címek a workflow fájlban vannak (`PROGRAMOK_CSV_URL`, `TABOROK_CSV_URL`, `RAJOK_CSV_URL`). **Új táblázatnál/lapnál itt kell átírni.**
-4. A munkafolyamat a változásokat (`programok.html tabor.html csatlakozom.html data/`) `github-actions[bot]` néven commitolja és pusholja „Oldal frissítése a táblázatból” üzenettel, majd a Pages újraépít.
+3. A CSV-címek a workflow fájlban vannak (`PROGRAMOK_CSV_URL`, `TABOROK_CSV_URL`, `RAJOK_CSV_URL`, `ERTESITOK_CSV_URL`). **Új táblázatnál/lapnál itt kell átírni.**
+4. A munkafolyamat a változásokat (`*.html data/`) `github-actions[bot]` néven commitolja és pusholja „Oldal frissítése a táblázatból” üzenettel, majd a Pages újraépít.
 5. Havonta egy apró „életjel” (`data/keepalive.txt`, `date +%Y-%m`) készül, mert a GitHub 60 nap tevékenység nélkül leállítja az ütemezett workflow-t.
 
 ### 4.2 Késleltetések (amiket a felhasználónak el kell mondani)
@@ -110,6 +111,14 @@ Oszlopok: Raj neve · Indulás éve (a tanév kezdő éve, amikor a raj 4. oszt�
 ### 4.7 Ha a Táblázat átszervezése kell
 Új lap hozzáadása = új CSV-közzététel + új `*_CSV_URL` a workflow-ban + új szkript a `sync_common.py` mintájára + új marker-pár a célfájlban + a `git add` sor kiegészítése a workflow-ban.
 
+### 4.8 Értesítők (piros sáv az oldal tetején)
+Külön, nyilvános Google Táblázat (sablon: `drafts/ertesitok.xlsx`, útmutató lappal). Oszlopok: Cím · Mettől · Meddig · Határidő · Üzenet · Megjelenjen? (kötelező: Cím, Üzenet, Megjelenjen?). Tipikus tartalom: tagdíjfizetési, tábori jelentkezési határidő.
+- A szkript minden oldal `<body>`-ja utáni `ERTESITOK` blokkjába `.notice` elemeket ír `data-from`, `data-until` (üres Meddig esetén a Határidő) és `data-id` (a cím+üzenet+határidő SHA1-ének eleje) attribútummal, **alapból `hidden`**. A Meddig/Határidő alapján már lejárt sor ki sem kerül. Üres lista megengedett (nem hiba, mint a többi lapnál).
+- A `script.js` `updateNotices()` mutatja a ma érvényeseket (a Meddig napja még beleszámít). A × gomb a `data-id`-t a `localStorage` `closedNotices` kulcsába menti; szövegmódosításkor új az id, így újra megjelenik. Teszt: `updateNotices(new Date('2026-11-16T10:00:00'))`.
+- A sáv a ragadós fejléc fölött van, és elgörgethető. A főoldali „Közelgő programok” fül (`initUpcomingTab`) emiatt a fejléc alja alá igazodik (görgetéskor visszaáll 90 px-re).
+- Új oldal létrehozásakor a `<body>` utáni `ERTESITOK` jelölőpárt is másold át, és vedd fel a `PAGES` listába a `sync_ertesitok.py`-ban.
+- Helyben a macOS-es Python `--url`-lel SSL-hibát adhat (hiányzó tanúsítványok); ilyenkor `curl`-lel töltsd le, és `--file`-lal futtasd. Az Actionsben nincs ilyen gond.
+
 ---
 
 ## 5. Oldalankénti tudnivalók
@@ -142,7 +151,7 @@ Oszlopok: Raj neve · Indulás éve (a tanév kezdő éve, amikor a raj 4. oszt�
 1. `_` kezdetű mappa → a Pages nem szolgálja ki (lásd 2. pont).
 2. CSS/JS változtatás után elfelejtett `?v=` emelés → a felhasználó a régit látja.
 3. A robot-commitok miatt „divergent branches”: `git pull` (rebase) push előtt.
-4. A `programok.html`, `tabor.html`, `csatlakozom.html` marker közötti része **minden szinkronnál felülíródik** – kézi szerkesztés elvész. Az oldal többi része szerkeszthető.
+4. A `programok.html`, `tabor.html`, `csatlakozom.html` marker közötti része, valamint minden oldal `ERTESITOK` blokkja **minden szinkronnál felülíródik** – kézi szerkesztés elvész. Az oldal többi része szerkeszthető.
 5. A Táblázat oszlopait nem szabad törölni/átnevezni a szkript tudta nélkül (4.3).
 6. A CSV Google-oldali gyorsítótára és a Pages build miatt a változás nem azonnali.
 7. Korábbi CSS-hiba: a `index('.camp-media {')` típusú szövegcsere hosszabb szelektort is eltalált és levágta a CSS-t – szerkesztéskor ellenőrizd, hogy a fájl végig megvan.
