@@ -23,7 +23,7 @@
 
   <link rel="icon" type="image/jpeg" href="images/webp/kozos/logo_green.jpg?v=1">
   <link rel="apple-touch-icon" href="images/webp/kozos/logo_green.jpg?v=1">
-  <link rel="stylesheet" href="style.css?v=78">
+  <link rel="stylesheet" href="style.css?v=86">
 </head>
 <body>
 
@@ -72,8 +72,13 @@
       <nav class="main-nav" id="mainNav">
         <ul>
           <li><a href="index.html">Főoldal</a></li>
-          <li><a href="programok.html">Programok</a></li>
-          <li><a href="tabor.html">Tábor</a></li>
+          <li class="has-sub">
+            <button class="nav-sub-toggle" type="button" aria-expanded="false" aria-controls="subPrograms">Programok</button>
+            <ul class="sub-nav" id="subPrograms">
+              <li><a href="programok.html">Naptár</a></li>
+              <li><a href="tabor.html">Tábor</a></li>
+            </ul>
+          </li>
           <li><a href="csapatotthon.html">Csapatotthonunk</a></li>
           <li><a href="eszkozok.html" aria-current="page">Eszközbérlés</a></li>
           <li><a href="rolunk.html">Rólunk</a></li>
@@ -174,6 +179,6 @@
     </div>
   </footer>
 
-  <script src="script.js?v=42"></script>
+  <script src="script.js?v=44"></script>
 </body>
 </html>

@@ -18,6 +18,41 @@ mainNav.querySelectorAll('a').forEach(link => {
 });
 
 // ==========================================================
+// Lenyíló almenü (Programok → Naptár, Tábor)
+// Egérrel használt széles képernyőn csak rámutatásra nyílik (ezt a CSS
+// intézi), ott a kattintás nem csinál semmit. Telefonon/tableten (hamburger
+// menü, érintés) kattintásra nyílik/csukódik; kívül kattintás vagy Esc bezárja.
+// ==========================================================
+const subMenus = [...document.querySelectorAll('.has-sub')];
+const hoverMenu = window.matchMedia('(hover: hover) and (min-width: 1301px)');
+
+function closeSubMenus(except) {
+  subMenus.forEach(item => {
+    if (item === except) return;
+    item.classList.remove('open');
+    item.querySelector('.nav-sub-toggle')?.setAttribute('aria-expanded', 'false');
+  });
+}
+
+subMenus.forEach(item => {
+  const toggle = item.querySelector('.nav-sub-toggle');
+  toggle?.addEventListener('click', () => {
+    if (hoverMenu.matches) return;
+    const isOpen = item.classList.toggle('open');
+    toggle.setAttribute('aria-expanded', String(isOpen));
+    closeSubMenus(item);
+  });
+});
+
+document.addEventListener('click', event => {
+  if (!event.target.closest('.has-sub')) closeSubMenus();
+});
+
+document.addEventListener('keydown', event => {
+  if (event.key === 'Escape') closeSubMenus();
+});
+
+// ==========================================================
 // Aktuális év a láblécben
 // ==========================================================
 document.getElementById('year').textContent = new Date().getFullYear();

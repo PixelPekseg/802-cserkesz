@@ -226,6 +226,117 @@ img {
   color: #fff;
 }
 
+/* "Programok" lenyíló menü (Naptár, Tábor): kattintásra és – egérrel – rámutatásra nyílik */
+.has-sub {
+  position: relative;
+}
+
+.nav-sub-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 0;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  background: none;
+  color: inherit;
+  font: inherit;
+  font-size: 0.95rem;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: color 0.2s ease, border-color 0.2s ease;
+}
+
+/* lefelé mutató nyíl, nyitva felfelé fordul */
+.nav-sub-toggle::after {
+  content: '';
+  width: 6px;
+  height: 6px;
+  margin-top: -3px;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: rotate(45deg);
+  transition: transform 0.2s ease, margin 0.2s ease;
+}
+
+.has-sub.open > .nav-sub-toggle::after {
+  margin-top: 3px;
+  transform: rotate(-135deg);
+}
+
+.nav-sub-toggle:hover {
+  color: var(--color-accent);
+}
+
+.has-sub.is-current > .nav-sub-toggle {
+  color: var(--color-primary);
+  border-bottom-color: var(--color-highlight);
+}
+
+.main-nav .sub-nav {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  z-index: 110;
+  display: none;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 2px;
+  min-width: 150px;
+  margin-top: 10px;
+  padding: 6px;
+  background: #fff;
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  box-shadow: 0 10px 28px rgba(35, 63, 42, 0.16);
+  transform: translateX(-50%);
+}
+
+/* láthatatlan "híd" a menüpont és a lenyíló rész között, hogy rámutatáskor ne csukódjon be */
+.main-nav .sub-nav::before {
+  content: '';
+  position: absolute;
+  top: -12px;
+  left: 0;
+  right: 0;
+  height: 12px;
+}
+
+.main-nav .sub-nav a {
+  display: block;
+  padding: 9px 14px;
+  border-bottom: 0;
+  border-radius: 8px;
+}
+
+.main-nav .sub-nav a:hover,
+.main-nav .sub-nav a[aria-current="page"] {
+  background: var(--color-bg-alt);
+  color: var(--color-primary);
+}
+
+.has-sub.open > .sub-nav {
+  display: flex;
+}
+
+/* Egérrel használt széles képernyőn: csak rámutatásra nyílik (kattintásra nem történik semmi),
+   nyíl nélkül; billentyűzettel (Tab) a fókusz nyitja. Érintőképernyőn marad a kattintás + nyíl. */
+@media (hover: hover) and (min-width: 1301px) {
+  .has-sub:hover > .sub-nav,
+  .has-sub:has(:focus-visible) > .sub-nav {
+    display: flex;
+  }
+
+  .nav-sub-toggle {
+    cursor: default;
+  }
+
+  .nav-sub-toggle::after {
+    display: none;
+  }
+}
+
 .nav-toggle {
   display: none;
   flex-direction: column;
@@ -1169,9 +1280,9 @@ section[id] {
 /* ==========================================================
    Reszponzivitás
    ========================================================== */
-/* A hosszú csapatnév + 6 menüpont 1260px alatt már nem fér el egy sorban,
-   ezért itt vált a menü hamburgerre */
-@media (max-width: 1260px) {
+/* A hosszú csapatnév + a menü (7 elem, ebből 1 lenyíló) kb. 1280px alatt már nem fér el egy sorban,
+   ezért itt vált a menü hamburgerre (új menüpontnál mérd újra!) */
+@media (max-width: 1300px) {
   .nav-toggle {
     display: flex;
   }
@@ -1216,6 +1327,45 @@ section[id] {
   .main-nav a.nav-cta {
     margin: 12px 20px;
     text-align: center;
+  }
+
+  /* a lenyíló menü telefonon/tableten a menüponton belül, behúzva nyílik le */
+  .nav-sub-toggle {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    padding: 14px 20px;
+    border-bottom: 0;
+    text-align: left;
+  }
+
+  .nav-sub-toggle::after {
+    margin-right: 4px;
+  }
+
+  .has-sub.is-current > .nav-sub-toggle {
+    border-bottom: 0;
+  }
+
+  .main-nav .sub-nav {
+    position: static;
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+    background: none;
+    transform: none;
+  }
+
+  .main-nav .sub-nav::before {
+    display: none;
+  }
+
+  .main-nav .sub-nav a {
+    padding: 12px 20px 12px 40px;
+    border-radius: 0;
   }
 }
 
