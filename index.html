@@ -164,7 +164,9 @@
 
   <!-- Kapcsolat -->
   <!--
-    A fotók az images/webp/kozos/team/ mappába kerülnek, a megadott fájlnevekkel.
+    A kártyákat (név, szerep, bemutatkozás, "Miért keresd?", e-mail, telefon, fotó) a
+    "Csapatvezetés" Google Táblázat adja; a fotókat a Drive "Képek" mappájából a
+    tools/sync_vezetok.py tölti az images/webp/kozos/team/<név>.webp fájlokba.
     Amíg egy fotó nincs feltöltve, a kártyán a monogram látszik.
   -->
   <section id="kapcsolat" class="section contact">
@@ -172,9 +174,10 @@
       <h2>Kapcsolat</h2>
 
       <div class="people-grid">
+        <!-- VEZETOK:START – a tools/sync_vezetok.py írja a Google Táblázatból (Csapatvezetés), kézzel ne szerkeszd -->
         <div class="person-card has-bio">
           <div class="person-photo" data-initials="CL">
-            <img src="images/webp/kozos/team/cseri-holzman_lili.webp" alt="Cseri-Holzman Lili" data-optional>
+            <img src="images/webp/kozos/team/cseri-holzman-lili.webp" alt="Cseri-Holzman Lili" data-optional>
           </div>
           <h3>Cseri-Holzman Lili</h3>
           <p class="person-role">Csapatparancsnok</p>
@@ -190,15 +193,15 @@
               <li>Bármi</li>
             </ul>
             <ul class="person-bio-contact">
-              <li><a class="person-email" href="mailto:cseri.holzmann.lili@cserkesz.hu">cseri.holzmann.lili@cserkesz.hu</a></li>
               <li><a class="person-email" href="mailto:802@cserkesz.hu">802@cserkesz.hu</a></li>
+              <li><a class="person-email" href="mailto:cseri.holzmann.lili@cserkesz.hu">cseri.holzmann.lili@cserkesz.hu</a></li>
             </ul>
           </div>
         </div>
 
         <div class="person-card has-bio">
           <div class="person-photo" data-initials="CÁ">
-            <img src="images/webp/kozos/team/csiki_adam.webp" alt="Csiki Ádám" data-optional>
+            <img src="images/webp/kozos/team/csiki-adam.webp" alt="Csiki Ádám" data-optional>
           </div>
           <h3>Csiki Ádám</h3>
           <p class="person-role">Pénzügyek</p>
@@ -220,7 +223,7 @@
 
         <div class="person-card has-bio">
           <div class="person-photo" data-initials="GH">
-            <img src="images/webp/kozos/team/grebel_hanna.webp" alt="Grébel Hanna" data-optional>
+            <img src="images/webp/kozos/team/grebel-hanna.webp" alt="Grébel Hanna" data-optional>
           </div>
           <h3>Grébel Hanna</h3>
           <p class="person-role">Bezsilla Villa</p>
@@ -243,7 +246,7 @@
 
         <div class="person-card has-bio">
           <div class="person-photo" data-initials="BG">
-            <img src="images/webp/kozos/team/bedo_gergely.webp" alt="Bedő Gergely" data-optional>
+            <img src="images/webp/kozos/team/bedo-gergely.webp" alt="Bedő Gergely" data-optional>
           </div>
           <h3>Bedő Gergely</h3>
           <p class="person-role">Tábor és programok</p>
@@ -264,13 +267,13 @@
 
         <div class="person-card has-bio">
           <div class="person-photo" data-initials="PA">
-            <img src="images/webp/kozos/team/peter_anna.webp" alt="Péter Anna" data-optional>
+            <img src="images/webp/kozos/team/peter-anna.webp" alt="Péter Anna" data-optional>
           </div>
           <h3>Péter Anna</h3>
           <p class="person-role">Nevelés és gyermekvédelem</p>
           <a class="person-email" href="mailto:peter.anna@cserkesz.hu">peter.anna@<wbr>cserkesz.hu</a>
           <div class="person-bio" hidden>
-            <p class="person-bio-role">Nevelés és gyermekvédelem</p>
+            <p class="person-bio-role">Nevelésért felelős csapatparancsnok-helyettes</p>
             <p class="person-bio-title">Miért keresd?</p>
             <ul class="person-bio-list">
               <li>Nem tudsz jönni egy csapatos programra</li>
@@ -282,6 +285,8 @@
             </ul>
           </div>
         </div>
+
+        <!-- VEZETOK:END -->
       </div>
 
       <!--
