@@ -1,5 +1,5 @@
 # A programok.html, tabor.html és csatlakozom.html kártyáit, valamint minden oldal tetején az
-# értesítősávot és a főoldal/Rólunk számlálóit a csapat Google Táblázataiból (közzétett CSV-k) frissíti.
+# értesítősávot, a főoldal/Rólunk számlálóit, az Eszközbérlés oldalt és a vezetők kártyáit (fotókkal) a csapat Google Táblázataiból (közzétett CSV-k) frissíti.
 # Óránként fut, és kézzel is elindítható (Actions fül -> "Oldal frissítése a táblázatból" -> Run workflow).
 # Ha a táblázat hibás vagy nem érhető el, a feladat hibával leáll, és az oldal az utolsó jó
 # állapotot mutatja. A hónapban egyszer egy apró "életjel" módosítás is készül, mert a GitHub
@@ -59,6 +59,28 @@ jobs:
           SZAMLALOK_CSV_URL: https://docs.google.com/spreadsheets/d/e/2PACX-1vQG9oKFwKR3SA_rogOVR9y6l_pefGSZKirDeMSxZU7_F-PdaYSleD8wkEQKg89VPK_ThCB2xQzJUWLA/pub?gid=1088990736&single=true&output=csv
         run: python tools/sync_szamlalok.py
 
+      # A személyfotók feldolgozásához (WebP, iPhone-os HEIC)
+      - name: Képkezelő csomagok telepítése
+        if: ${{ !cancelled() }}
+        run: pip install --quiet pillow pillow-heif
+
+      - name: Csapatvezetés (kártyák + fotók a Drive-ról) frissítése
+        if: ${{ !cancelled() }}
+        env:
+          VEZETOK_CSV_URL: https://docs.google.com/spreadsheets/d/e/2PACX-1vTZ5xTnj9CNorqCmaTuwwpy-EPoRpyBcjJTMWM5QPH5G1lccxpX-z1DA0uwvh3emtt-OLgib1zOfLHf/pub?gid=1268841503&single=true&output=csv
+          DRIVE_KEPEK_FOLDER_ID: 13jB-lTr4Eqt1WOImYwWhMahGHwDTLALA
+          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+        run: python tools/sync_vezetok.py
+
+      - name: Eszközök letöltése és az oldal frissítése
+        if: ${{ !cancelled() }}
+        env:
+          DRIVE_KEPEK_FOLDER_ID: 13jB-lTr4Eqt1WOImYwWhMahGHwDTLALA
+          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+          ESZKOZOK_CSV_URL: https://docs.google.com/spreadsheets/d/e/2PACX-1vTawBNHKmmN8o2RHWIeLXtHikZ7oJTr19isdSULQXbp2sJte3a5TnaKpjeM_TA5UkxhjZ6OtOVCtMRD/pub?gid=263580124&single=true&output=csv
+          ESZKOZ_KAPCSOLAT_CSV_URL: https://docs.google.com/spreadsheets/d/e/2PACX-1vTawBNHKmmN8o2RHWIeLXtHikZ7oJTr19isdSULQXbp2sJte3a5TnaKpjeM_TA5UkxhjZ6OtOVCtMRD/pub?gid=1765500368&single=true&output=csv
+        run: python tools/sync_eszkozok.py
+
       - name: Havi életjel
         if: ${{ !cancelled() }}
         run: date +%Y-%m > data/keepalive.txt
@@ -68,7 +90,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add *.html data/
+          git add *.html data/ images/webp/kozos/team/
           if git diff --cached --quiet; then
             echo "Nincs változás."
           else
