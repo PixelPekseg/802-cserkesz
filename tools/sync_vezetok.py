@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """A közzétett Google Táblázat (Csapatvezetés lap, CSV) alapján frissíti a csapatparancsnok
 és a helyettesek kártyáit a főoldal "Kapcsolat" részén, valamint a Bezsilla-felelős kártyáját
-a Csapatotthonunk oldalon. A fotókat a Drive "Képek" mappájából tölti (drive_photos.py).
+a Csapatotthonunk oldalon. Oszlopok: Név · Szerep · Bemutatkozás (rövid szöveg) · E-mail (egy) ·
+Telefon · Fotó (a Drive "Képek" mappájában lévő fájl neve; drive_photos.py) · Megjelenjen?
 
 Használat:
     python tools/sync_vezetok.py
@@ -11,7 +12,7 @@ Használat:
 
 Az index.html <!-- VEZETOK:START/END --> és a csapatotthon.html
 <!-- VEZETOK_BEZSILLA:START/END --> közötti részét írja újra. A Csapatotthonunk oldalra az
-kerül, akinek a szerepében szerepel a "bezsilla" szó. A kártyára kattintva a script.js
+kerül, akinek a szerepében szerepel a "csapatotthon" szó. A kártyára kattintva a script.js
 felugró ablakban mutatja a rejtett .person-bio tartalmát.
 Hibás táblázat esetén hibával leáll, és semmit nem módosít.
 """
@@ -27,10 +28,12 @@ from person_card import build_card
 INDEX = os.path.join(common.ROOT, 'index.html')
 HOME = os.path.join(common.ROOT, 'csapatotthon.html')
 SNAPSHOT = os.path.join(common.ROOT, 'data', 'vezetok.csv')
+# akinek a szerepében ez a szó szerepel, a Csapatotthonunk oldalra is bekerül
+HOME_ROLE_WORD = 'csapatotthon'
 
 COLUMNS = {
-    'name': 'név', 'role': 'szerep', 'intro': 'bemutatkozás', 'why': 'miért keresd',
-    'email': 'e-mail', 'phone': 'telefon', 'filename': 'fájlnév', 'visible': 'megjelenjen',
+    'name': 'név', 'role': 'szerep', 'intro': 'bemutatkozás', 'email': 'e-mail', 'phone': 'telefon',
+    'filename': ('fotó', 'fájlnév'), 'visible': 'megjelenjen',
 }
 
 
@@ -49,14 +52,13 @@ def main():
             continue
         for key in COLUMNS:
             row.setdefault(key, '')
-        row['emails'] = []
-        for email in re.split(r'[,;\s]+', row['email']):
-            if not email:
-                continue
-            if '@' in email:
-                row['emails'].append(email)
-            else:
-                common.warn(f'{line_number}. sor: az e-mail cím nem tűnik érvényesnek, kihagyva: "{email}"')
+        emails = [e for e in re.split(r'[,;\s]+', row['email']) if e]
+        if len(emails) > 1:
+            common.warn(f'{line_number}. sor: több e-mail cím van megadva, csak az elsőt használom.')
+        row['email'] = emails[0] if emails else ''
+        if row['email'] and '@' not in row['email']:
+            common.warn(f'{line_number}. sor: az e-mail cím nem tűnik érvényesnek, kihagyva: "{row["email"]}"')
+            row['email'] = ''
         row['photo'] = photos.photo_for(row['name'], row['filename'], f'{line_number}. sor ({row["name"]})')
         people.append(row)
     if not people:
@@ -65,13 +67,13 @@ def main():
     index_body = '\n\n'.join(build_card(row, row['photo'], ' ' * 8) for row in people)
     changed = [p for p, ok in [('index.html', common.replace_block(INDEX, 'VEZETOK', index_body, ' ' * 8))] if ok]
 
-    bezsilla = [row for row in people if 'bezsilla' in row['role'].lower()]
+    bezsilla = [row for row in people if HOME_ROLE_WORD in row['role'].lower()]
     if bezsilla:
         home_body = '\n\n'.join(build_card(row, row['photo'], ' ' * 8) for row in bezsilla)
         if common.replace_block(HOME, 'VEZETOK_BEZSILLA', home_body, ' ' * 8):
             changed.append('csapatotthon.html')
     else:
-        common.warn('Senkinek a szerepében nincs "Bezsilla", a Csapatotthonunk oldal kártyája változatlan marad.')
+        common.warn('Senkinek a szerepében nincs "Csapatotthon", a Csapatotthonunk oldal kártyája változatlan marad.')
 
     photos.save_state()
     common.save_snapshot(SNAPSHOT, csv_text)

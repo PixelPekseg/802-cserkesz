@@ -49,7 +49,8 @@ def fetch(args, env_name):
 
 
 def read_table(csv_text, columns, required):
-    """A fejléc alapján oszlopindexeket keres (a fejléc ELEJÉT kisbetűsen hasonlítja), és
+    """A fejléc alapján oszlopindexeket keres (a fejléc ELEJÉT kisbetűsen hasonlítja; egy kulcshoz
+    több előtag is megadható tuple-ként), és
     a sorokat szótárakként adja vissza: [(sorszám, {kulcs: érték}), ...]."""
     rows = list(csv.reader(io.StringIO(csv_text)))
     if not rows:
@@ -57,11 +58,12 @@ def read_table(csv_text, columns, required):
     lowered = [cell.strip().lower() for cell in rows[0]]
     index = {}
     for key, prefix in columns.items():
+        prefixes = prefix if isinstance(prefix, tuple) else (prefix,)   # több elfogadott fejléc is lehet
         for i, cell in enumerate(lowered):
-            if cell.startswith(prefix):
+            if cell.startswith(prefixes):
                 index[key] = i
                 break
-    missing = [columns[key] for key in required if key not in index]
+    missing = [(lambda p: p if isinstance(p, str) else p[0])(columns[key]) for key in required if key not in index]
     if missing:
         fail('A táblázat fejlécéből hiányzik: ' + ', '.join(missing) + '. Valaki átírta az első sort?')
     result = []

@@ -31,7 +31,7 @@ SNAPSHOTS = (os.path.join(common.ROOT, 'data', 'eszkozok.csv'),
 FALLBACK_EMAIL = '802@cserkesz.hu'
 
 ITEM_COLUMNS = {'name': 'eszköz', 'count': 'darabszám', 'note': 'megjegyzés', 'visible': 'megjelenjen'}
-CONTACT_COLUMNS = {'name': 'név', 'role': 'szerep', 'email': 'e-mail', 'phone': 'telefon', 'filename': 'fájlnév',
+CONTACT_COLUMNS = {'name': 'név', 'role': 'szerep', 'email': 'e-mail', 'phone': 'telefon', 'filename': ('fotó', 'fájlnév'),
                    'visible': 'megjelenjen'}
 
 
@@ -99,12 +99,10 @@ def main():
         for key in ('role', 'email', 'phone', 'filename'):
             row.setdefault(key, '')
         row['role'] = row['role'] or 'Kapcsolattartó'
-        row['emails'] = []
-        for email in re.split(r'[,;\s]+', row['email']):
-            if email and '@' in email:
-                row['emails'].append(email)
-            elif email:
-                common.warn(f'Kapcsolattartó, {line_number}. sor: az e-mail cím nem tűnik érvényesnek, kihagyva: "{email}"')
+        emails = [e for e in re.split(r'[,;\s]+', row['email']) if e]
+        row['email'] = emails[0] if emails and '@' in emails[0] else ''
+        if emails and not row['email']:
+            common.warn(f'Kapcsolattartó, {line_number}. sor: az e-mail cím nem tűnik érvényesnek, kihagyva: "{emails[0]}"')
         row['photo'] = photos.photo_for(row['name'], row['filename'], f'Kapcsolattartó, {line_number}. sor ({row["name"]})')
         contacts.append(row)
 

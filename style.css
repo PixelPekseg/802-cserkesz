@@ -2244,6 +2244,12 @@ body:has(.main-nav.open) .upcoming-tab {
   color: var(--color-accent);
 }
 
+.person-bio-text {
+  margin: 0 0 18px;
+  line-height: 1.6;
+  text-align: center;
+}
+
 .person-bio-title {
   margin: 0 0 8px;
   font-size: 0.8rem;
