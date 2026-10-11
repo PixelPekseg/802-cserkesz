@@ -24,7 +24,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import sync_common as common
 
 PAGES = ['index.html', 'rolunk.html', 'tabor.html', 'csatlakozom.html', 'csapatotthon.html',
-         'programok.html', 'tamogass.html', 'dokumentumok.html', '404.html']
+         'programok.html', 'tamogass.html', 'eszkozok.html', 'dokumentumok.html', '404.html']
 SNAPSHOT = os.path.join(common.ROOT, 'data', 'ertesitok.csv')
 MONTHS = ['január', 'február', 'március', 'április', 'május', 'június', 'július',
           'augusztus', 'szeptember', 'október', 'november', 'december']

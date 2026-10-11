@@ -2431,3 +2431,104 @@ body:has(.main-nav.open) .upcoming-tab {
     font-size: 0.7rem;
   }
 }
+
+/* ==========================================================
+   Eszközbérlés (eszkozok.html; a lista és a kapcsolattartó a
+   Google Táblázat "Eszközök" és "Kapcsolattartó" lapjából)
+   ========================================================== */
+.gear-intro {
+  margin-bottom: 36px;
+}
+
+.gear-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+  gap: 24px;
+  align-items: start;
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+.gear-card {
+  padding: 28px 28px 20px;
+  background: #fff;
+  border: 1px solid var(--color-border);
+  border-top: 4px solid var(--color-accent);
+  border-radius: 12px;
+}
+
+.gear-card h2 {
+  margin: 0 0 12px;
+  font-size: 1.5rem;
+}
+
+.gear-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.gear-item {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 10px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.gear-item:last-child {
+  border-bottom: 0;
+}
+
+.gear-name {
+  font-weight: bold;
+}
+
+.gear-note {
+  color: var(--color-text-muted);
+  font-size: 0.9rem;
+}
+
+.gear-count {
+  margin-left: auto;
+  padding: 2px 10px;
+  border-radius: 999px;
+  background: var(--color-bg-alt);
+  color: var(--color-primary);
+  font-size: 0.9rem;
+  font-weight: bold;
+  white-space: nowrap;
+}
+
+.gear-contact {
+  text-align: center;
+}
+
+.gear-contact > h3 {
+  margin: 4px 0 16px;
+  font-size: 1.3rem;
+}
+
+/* a kapcsolattartó(k) a főoldaliakhoz hasonló személykártyán (kattintásra bemutatkozó ablak) */
+.gear-contact-cards {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 16px;
+}
+
+.gear-contact-cards .person-card {
+  flex: 0 1 240px;
+  background: #fff;
+}
+
+@media (max-width: 768px) {
+  .gear-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .gear-card {
+    padding: 22px 20px 14px;
+  }
+}
