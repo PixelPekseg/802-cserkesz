@@ -1,5 +1,5 @@
 # A programok.html, tabor.html és csatlakozom.html kártyáit, valamint minden oldal tetején az
-# értesítősávot a csapat Google Táblázataiból (közzétett CSV-k) frissíti.
+# értesítősávot és a főoldal/Rólunk számlálóit a csapat Google Táblázataiból (közzétett CSV-k) frissíti.
 # Óránként fut, és kézzel is elindítható (Actions fül -> "Oldal frissítése a táblázatból" -> Run workflow).
 # Ha a táblázat hibás vagy nem érhető el, a feladat hibával leáll, és az oldal az utolsó jó
 # állapotot mutatja. A hónapban egyszer egy apró "életjel" módosítás is készül, mert a GitHub
@@ -52,6 +52,12 @@ jobs:
         env:
           ERTESITOK_CSV_URL: https://docs.google.com/spreadsheets/d/e/2PACX-1vSCFQEfDB5PGysGIga4CyQ7XH2KX09TWyreCDGbciXWjAP9a4PUgFuH6MbBRCjUZKOWaLA_BzbIuvXs/pub?gid=160520110&single=true&output=csv
         run: python tools/sync_ertesitok.py
+
+      - name: Számlálók letöltése és az oldalak frissítése
+        if: ${{ !cancelled() }}
+        env:
+          SZAMLALOK_CSV_URL: https://docs.google.com/spreadsheets/d/e/2PACX-1vQG9oKFwKR3SA_rogOVR9y6l_pefGSZKirDeMSxZU7_F-PdaYSleD8wkEQKg89VPK_ThCB2xQzJUWLA/pub?gid=1088990736&single=true&output=csv
+        run: python tools/sync_szamlalok.py
 
       - name: Havi életjel
         if: ${{ !cancelled() }}

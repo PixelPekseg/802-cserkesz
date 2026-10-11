@@ -310,6 +310,75 @@ function updateGrades(now = new Date()) {
 updateGrades();
 
 // ==========================================================
+// Számlálók – odagörgetéskor "feltekerődnek", mint egy kilométeróra
+// Minden .stat-number data-count attribútuma a végső érték (a HTML-ben
+// is ez áll, így JS nélkül is helyes). A szkript minden számjegyet egy
+// 0–9 számokat tartalmazó, függőlegesen gördülő szalagra cserél; ha a
+// kártyák láthatóvá válnak, a szalagok a helyes számjegyig tekerednek
+// (jobbról balra egyre később állnak meg). Csak egyszer fut le.
+// Csökkentett mozgás beállításnál, illetve régi böngészőben nincs animáció.
+// ==========================================================
+function initCounters() {
+  const numbers = [...document.querySelectorAll('.stat-number[data-count]')];
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (numbers.length === 0 || reduceMotion || !('IntersectionObserver' in window)) return;
+
+  const turns = 2; // ennyi teljes kört tesz meg a szalag a megállás előtt
+
+  numbers.forEach(element => {
+    const text = (Number.parseInt(element.dataset.count, 10) || 0).toLocaleString('hu-HU');
+    element.setAttribute('aria-label', text);
+    element.textContent = '';
+    [...text].forEach(char => {
+      if (!/\d/.test(char)) {
+        const separator = document.createElement('span');
+        separator.className = 'odo-sep';
+        separator.setAttribute('aria-hidden', 'true');
+        separator.textContent = char;
+        element.append(separator);
+        return;
+      }
+      const digit = document.createElement('span');
+      digit.className = 'odo-digit';
+      digit.setAttribute('aria-hidden', 'true');
+      const strip = document.createElement('span');
+      strip.className = 'odo-strip';
+      strip.dataset.stop = String(turns * 10 + Number(char));
+      for (let i = 0; i <= turns * 10 + 9; i++) {
+        const item = document.createElement('span');
+        item.textContent = String(i % 10);
+        strip.append(item);
+      }
+      digit.append(strip);
+      element.append(digit);
+    });
+  });
+
+  const roll = stats => {
+    stats.querySelectorAll('.stat-number').forEach(number => {
+      const strips = [...number.querySelectorAll('.odo-strip')];
+      strips.forEach((strip, index) => {
+        // a bal oldali számjegyek állnak meg előbb, a jobb szélső utoljára
+        strip.style.transitionDelay = `${index * 0.12}s`;
+        strip.style.transform = `translateY(calc(-${strip.dataset.stop} * var(--odo-h)))`;
+      });
+    });
+  };
+
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) return;
+      observer.unobserve(entry.target);
+      roll(entry.target);
+    });
+  }, { threshold: 0.5 });
+
+  document.querySelectorAll('.stats').forEach(stats => observer.observe(stats));
+}
+
+initCounters();
+
+// ==========================================================
 // Programok – a kártyasor léptetése nyilakkal
 // Egyszerre 3 kártya látszik (keskenyebb képernyőn 2, illetve 1); a nyilak
 // egy kártyányit lépnek. Ha minden kártya elfér, a nyilak elrejtődnek,

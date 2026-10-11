@@ -23,7 +23,7 @@
 
   <link rel="icon" type="image/jpeg" href="images/webp/kozos/logo_green.jpg?v=1">
   <link rel="apple-touch-icon" href="images/webp/kozos/logo_green.jpg?v=1">
-  <link rel="stylesheet" href="style.css?v=73">
+  <link rel="stylesheet" href="style.css?v=78">
 </head>
 <body>
 
@@ -86,6 +86,11 @@
   <!-- Címsáv -->
   <section class="page-banner">
     <h1>Rólunk</h1>
+    <!-- Ugrás a két ponthoz (a címsávon belül, fehér gombokkal) -->
+    <nav class="page-jump" aria-label="Rólunk menüpontjai">
+      <a href="#csapatunkrol">Csapatunkról</a>
+      <a href="#cserkeszetrol">Cserkészetről</a>
+    </nav>
   </section>
 
   <!--
@@ -94,16 +99,31 @@
     idézőjel-hibákat javítottunk benne.
   -->
 
-  <!-- Ugrás a két ponthoz -->
-  <nav class="page-jump" aria-label="Rólunk menüpontjai">
-    <a href="#csapatunkrol">Csapatunkról</a>
-    <a href="#cserkeszetrol">Cserkészetről</a>
-  </nav>
-
   <!-- 1. Csapatunkról -->
   <section id="csapatunkrol" class="section has-side-photos">
     <div class="container prose">
       <h2>Csapatunkról</h2>
+
+      <!-- Számlálók (odagörgetéskor feltekerődnek) -->
+      <div class="stats-band">
+        <!-- SZAMLALOK:START – a tools/sync_szamlalok.py írja a Google Táblázatból, kézzel ne szerkeszd -->
+        <div class="stats">
+          <div class="stat-card">
+            <span class="stat-number" data-count="411">411</span>
+            <span class="stat-label">Tag</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-number" data-count="10">10</span>
+            <span class="stat-label">Raj</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-number" data-count="47">47</span>
+            <span class="stat-label">Őrs</span>
+          </div>
+        </div>
+
+        <!-- SZAMLALOK:END -->
+      </div>
 
       <h3>Kedves Látogató!</h3>
       <p>A 802-es számú Szent Korona cserkészcsapat honlapján jársz. Csapatunk Gödöllőn működik, a város és a környék fiataljai, gyerekei alkotják, több mint 400-an.</p>
@@ -218,6 +238,6 @@
     </div>
   </footer>
 
-  <script src="script.js?v=39"></script>
+  <script src="script.js?v=42"></script>
 </body>
 </html>

@@ -43,12 +43,12 @@ pdf/                letölthető dokumentumok
 data/*.csv          a Táblázatokból utoljára letöltött pillanatképek (+ keepalive.txt)
 tools/*.py          a Táblázat → HTML generátorok
 .github/workflows/sync-tablazat.yml
-drafts/             kész, de nem publikált anyagok (.gitignore-ban): adatkezeles.html, xlsx-sablonok (pl. ertesitok.xlsx)
+drafts/             kész, de nem publikált anyagok (.gitignore-ban): adatkezeles.html
 ```
 
 - **A fejléc és a lábléc minden HTML fájlban külön szerepel** (8 oldal + 404). Menü-/lábléc-módosítást mindenhol át kell vezetni; utána `diff`-eld az oldalakat.
 - **Jekyll-csapda:** a GitHub Pages figyelmen kívül hagyja az `_`-lal kezdődő mappákat. Ezért `images/webp`, `images/originals`, `drafts` (korábban `_webp` stb. volt, a képek emiatt nem látszottak). **Soha ne nevezz el mappát `_`-lal.** `.nojekyll` nincs és nem kell.
-- **Cache-bust:** a HTML-ek `style.css?v=72` és `script.js?v=39` formában hivatkoznak a fájlokra (az utolsó ismert állapot). Bármely CSS/JS módosítás után **minden HTML-ben emeld a számot** (`sed`-del vagy ciklussal), különben a böngésző/CDN a régit mutatja.
+- **Cache-bust:** a HTML-ek `style.css?v=78` és `script.js?v=42` formában hivatkoznak a fájlokra (az utolsó ismert állapot). Bármely CSS/JS módosítás után **minden HTML-ben emeld a számot** (`sed`-del vagy ciklussal), különben a böngésző/CDN a régit mutatja.
 
 ---
 
@@ -71,9 +71,10 @@ drafts/             kész, de nem publikált anyagok (.gitignore-ban): adatkezel
    - `tools/sync_programok.py` → `programok.html` (`<!-- PROGRAMOK:START … -->` … `<!-- PROGRAMOK:END -->`)
    - `tools/sync_taborok.py` → `tabor.html` (`TABOROK:START/END`)
    - `tools/sync_rajok.py` → `csatlakozom.html` (`RAJOK:START/END`)
+   - `tools/sync_szamlalok.py` → `index.html` és `rolunk.html` (`SZAMLALOK:START/END`) – külön táblázat, lásd 4.9
    - `tools/sync_ertesitok.py` → **mind a 9 HTML oldal** (`ERTESITOK:START/END`, közvetlenül a `<body>` után) – ez egy **külön** Google Táblázatból jön, lásd 4.8
    - közös segédfüggvények: `tools/sync_common.py` (`sync_programok.py` önálló, de ugyanazokat az elveket követi). Csak a Python standard könyvtárát használják.
-3. A CSV-címek a workflow fájlban vannak (`PROGRAMOK_CSV_URL`, `TABOROK_CSV_URL`, `RAJOK_CSV_URL`, `ERTESITOK_CSV_URL`). **Új táblázatnál/lapnál itt kell átírni.**
+3. A CSV-címek a workflow fájlban vannak (`PROGRAMOK_CSV_URL`, `TABOROK_CSV_URL`, `RAJOK_CSV_URL`, `ERTESITOK_CSV_URL`, `SZAMLALOK_CSV_URL`). **Új táblázatnál/lapnál itt kell átírni.**
 4. A munkafolyamat a változásokat (`*.html data/`) `github-actions[bot]` néven commitolja és pusholja „Oldal frissítése a táblázatból” üzenettel, majd a Pages újraépít.
 5. Havonta egy apró „életjel” (`data/keepalive.txt`, `date +%Y-%m`) készül, mert a GitHub 60 nap tevékenység nélkül leállítja az ütemezett workflow-t.
 
@@ -112,12 +113,19 @@ Oszlopok: Raj neve · Indulás éve (a tanév kezdő éve, amikor a raj 4. oszt�
 Új lap hozzáadása = új CSV-közzététel + új `*_CSV_URL` a workflow-ban + új szkript a `sync_common.py` mintájára + új marker-pár a célfájlban + a `git add` sor kiegészítése a workflow-ban.
 
 ### 4.8 Értesítők (piros sáv az oldal tetején)
-Külön, nyilvános Google Táblázat (sablon: `drafts/ertesitok.xlsx`, útmutató lappal). Oszlopok: Cím · Mettől · Meddig · Határidő · Üzenet · Megjelenjen? (kötelező: Cím, Üzenet, Megjelenjen?). Tipikus tartalom: tagdíjfizetési, tábori jelentkezési határidő.
+Külön, nyilvános Google Táblázat (útmutató lappal; a táblázatok a tulajdonos Google Drive-ján vannak, xlsx-másolatot a repóban nem tartunk). Oszlopok: Cím · Mettől · Meddig · Határidő · Üzenet · Megjelenjen? (kötelező: Cím, Üzenet, Megjelenjen?). Tipikus tartalom: tagdíjfizetési, tábori jelentkezési határidő.
 - A szkript minden oldal `<body>`-ja utáni `ERTESITOK` blokkjába `.notice` elemeket ír `data-from`, `data-until` (üres Meddig esetén a Határidő) és `data-id` (a cím+üzenet+határidő SHA1-ének eleje) attribútummal, **alapból `hidden`**. A Meddig/Határidő alapján már lejárt sor ki sem kerül. Üres lista megengedett (nem hiba, mint a többi lapnál).
 - A `script.js` `updateNotices()` mutatja a ma érvényeseket (a Meddig napja még beleszámít). A × gomb a `data-id`-t a `localStorage` `closedNotices` kulcsába menti; szövegmódosításkor új az id, így újra megjelenik. Teszt: `updateNotices(new Date('2026-11-16T10:00:00'))`.
 - A sáv a ragadós fejléc fölött van, és elgörgethető. A főoldali „Közelgő programok” fül (`initUpcomingTab`) emiatt a fejléc alja alá igazodik (görgetéskor visszaáll 90 px-re).
 - Új oldal létrehozásakor a `<body>` utáni `ERTESITOK` jelölőpárt is másold át, és vedd fel a `PAGES` listába a `sync_ertesitok.py`-ban.
 - Helyben a macOS-es Python `--url`-lel SSL-hibát adhat (hiányzó tanúsítványok); ilyenkor `curl`-lel töltsd le, és `--file`-lal futtasd. Az Actionsben nincs ilyen gond.
+
+### 4.9 Számlálók (Tag / Raj / Őrs)
+Külön, nyilvános Google Táblázat. Oszlopok: Felirat · Szám · Megjelenjen? (mind kötelező fejléc). Minden sor egy kártya, a sorrend a kártyák sorrendje; a dizájn 3 kártyára készült.
+- Helyük: a főoldalon a „Csapatunk” bekezdés és a „Tovább a Rólunk oldalra” gomb között (zöld háttéren fehér kártyák); a Rólunkon a „Csapatunkról” h2 alatt, a `.prose`-on belül, az első h3 előtt – az `initSplitBlocks()` az első h3 előtti elemekhez nem nyúl, ezért ott biztonságos.
+- A HTML-ben a végső szám áll (`data-count` is). A `script.js` `initCounters()` a számjegyeket 0–9-es, függőleges „szalagokra” cseréli (2 teljes kör + a célszámjegy), és IntersectionObserverrel, egyszer tekeri fel őket. A cella magassága a `--odo-h` CSS-változó (`.stat-number`), a JS is ezzel tol.
+- A számok betűje szándékosan **nem Georgia** (annak „régies”, eltérő magasságú számjegyei gördülés közben ugrálnak), hanem Times New Roman / Noto Serif.
+- Nincs megjelenő sor → a szkript hibával leáll, az oldal változatlan marad.
 
 ---
 
