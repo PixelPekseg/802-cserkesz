@@ -1891,65 +1891,6 @@ section[id] {
   color: #fff;
 }
 
-/* Rólunk: fotók a szöveg két oldalán.
-   Széles képernyőn szabadon (eltérő méretben és magasságban) a két szélső sávban állnak,
-   keskenyebb képernyőn a szöveg alatt, 2 oszlopos rácsban. Kattintásra nagyban megnyílnak. */
-.side-photos {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-  max-width: 800px;
-  margin: 32px auto 0;
-  padding: 0 20px;
-}
-
-.side-photos img {
-  display: block;
-  width: 100%;
-  height: auto;
-  border-radius: 14px;
-  box-shadow: 0 6px 18px rgba(35, 63, 42, 0.25);
-  cursor: zoom-in;
-}
-
-@media (min-width: 1300px) {
-  .has-side-photos {
-    position: relative;
-  }
-
-  .side-photos {
-    display: block;
-    position: absolute;
-    inset: 0;
-    max-width: none;
-    margin: 0;
-    padding: 0;
-    pointer-events: none;
-  }
-
-  .side-photos img {
-    position: absolute;
-    top: var(--top);
-    width: calc(min(300px, (100vw - 800px) / 2 - 72px) * var(--k, 1));
-    transform: translateX(var(--nudge, 0));
-    pointer-events: auto;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-  }
-
-  .side-left {
-    right: calc(50% + 400px + 36px);
-  }
-
-  .side-right {
-    left: calc(50% + 400px + 36px);
-  }
-
-  .side-photos img:hover {
-    transform: translateX(var(--nudge, 0)) scale(1.03);
-    box-shadow: 0 10px 26px rgba(35, 63, 42, 0.35);
-  }
-}
-
 /* Csapatunk szekció asztali nézeten: a kép lekerekített, árnyékos kártya a zöld háttéren,
    mellette a szöveg. Telefonon (768 px alatt) nem érvényes, ott marad a korábbi elrendezés. */
 @media (min-width: 769px) {
@@ -1974,47 +1915,6 @@ section[id] {
 
   .team-split-text {
     padding: 0;
-  }
-}
-
-/* Csapatotthon: a szöveg középen (keskenyebb oszlop), a képek két oldalt (lásd Rólunk: .side-photos).
-   Keskenyebb képernyőn a képek 2 oszlopos mozaikban a szekció tetejére kerülnek. */
-.home-center {
-  max-width: 800px;
-}
-
-.side-photos-masonry {
-  display: block;
-  column-count: 2;
-  column-gap: 12px;
-}
-
-.side-photos-masonry img {
-  margin-bottom: 12px;
-  break-inside: avoid;
-}
-
-@media (max-width: 1299px) {
-  .home-section {
-    display: flex;
-    flex-direction: column;
-  }
-
-  .home-section .side-photos {
-    order: -1;
-    width: 100%;
-    max-width: 640px;
-    margin: 0 auto 32px;
-  }
-}
-
-@media (min-width: 1300px) {
-  .side-photos-masonry {
-    column-count: auto;
-  }
-
-  .side-photos-masonry img {
-    margin-bottom: 0;
   }
 }
 
@@ -2063,4 +1963,279 @@ section[id] {
 
 .camp-person {
   margin-bottom: 10px;
+}
+
+/* Telefonon a kapcsolati kártyák 2 oszlopban, kisebb méretben; az utolsó, páratlan kártya középen */
+@media (max-width: 640px) {
+  .people-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  .people-grid .person-card {
+    flex: none;
+    padding: 14px 8px 12px;
+  }
+
+  .people-grid .person-card:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+    justify-self: center;
+    width: calc(50% - 6px);
+  }
+
+  .people-grid .person-photo {
+    width: 84px;
+    height: 84px;
+    margin-bottom: 8px;
+    border-width: 2px;
+  }
+
+  .people-grid .person-card h3 {
+    font-size: 0.95rem;
+    line-height: 1.25;
+  }
+
+  .people-grid .person-role {
+    margin-bottom: 6px;
+    font-size: 0.75rem;
+  }
+
+  .people-grid .person-email {
+    font-size: 0.72rem;
+  }
+
+  .people-grid .copy-btn {
+    width: 24px;
+    height: 24px;
+  }
+}
+
+/* Személyek: kattintható kártya + bemutatkozó ablak */
+.person-card.has-bio {
+  cursor: pointer;
+}
+
+.person-card.has-bio:focus-visible {
+  outline: 3px solid var(--color-highlight);
+  outline-offset: 2px;
+}
+
+.person-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 210;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(10, 20, 12, 0.7);
+}
+
+.person-modal[hidden] {
+  display: none;
+}
+
+.person-modal-card {
+  position: relative;
+  width: 100%;
+  max-width: 520px;
+  max-height: calc(100vh - 40px);
+  overflow-y: auto;
+  padding: 32px 28px 28px;
+  background: var(--color-bg);
+  border-radius: 18px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45);
+}
+
+.person-modal-close {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  width: 36px;
+  height: 36px;
+  border: 0;
+  border-radius: 50%;
+  background: var(--color-bg-alt);
+  color: var(--color-primary);
+  font-size: 1.6rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.person-modal-close:hover {
+  background: var(--color-highlight);
+}
+
+.person-modal-head {
+  text-align: center;
+}
+
+.person-modal-head .person-photo {
+  width: 120px;
+  height: 120px;
+  margin: 0 auto 12px;
+}
+
+.person-modal-head h3 {
+  margin: 0 0 4px;
+  font-size: 1.5rem;
+}
+
+.person-modal-role {
+  margin: 0 0 18px;
+  font-weight: 700;
+  color: var(--color-accent);
+}
+
+.person-bio-title {
+  margin: 0 0 8px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--color-accent);
+}
+
+.person-modal-body ul {
+  margin: 0 0 16px;
+  padding-left: 1.3em;
+}
+
+.person-modal-body li {
+  margin-bottom: 6px;
+}
+
+.person-modal-body .person-bio-contact {
+  padding-left: 0;
+  list-style: none;
+  text-align: center;
+}
+
+.person-modal-body .person-bio-contact li {
+  margin-bottom: 8px;
+}
+
+.person-modal-body .person-bio-contact .email-copy {
+  justify-content: center;
+}
+
+.person-modal-body .person-email {
+  font-size: 1rem;
+}
+
+.person-modal-body li {
+  overflow-wrap: anywhere;
+}
+
+/* Rólunk / Csapatotthonunk: a szöveg és a fotók váltakozó blokkokban, mint a Tábor oldalon (.camp-block).
+   A blokkokat a script.js építi a .side-photos fotóiból és a szöveg szakaszaiból; JS nélkül a fotók a
+   szöveg alatt, kétoszlopos rácsban látszanak. */
+.side-photos {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  max-width: 800px;
+  margin: 32px auto 0;
+  padding: 0 20px;
+}
+
+.side-photos img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 14px;
+  box-shadow: 0 6px 18px rgba(35, 63, 42, 0.25);
+}
+
+.home-center {
+  max-width: 800px;
+}
+
+.split-layout {
+  max-width: 1100px;
+}
+
+.split-layout > h2 {
+  margin-bottom: 36px;
+}
+
+.split-layout .camp-block {
+  margin-bottom: 56px;
+}
+
+.split-layout .camp-text h3 {
+  margin: 26px 0 10px;
+  font-size: 1.3rem;
+}
+
+.split-layout .camp-text h3:first-child {
+  margin-top: 0;
+}
+
+.home-center.split-layout {
+  max-width: 1100px;
+}
+
+/* A Csapatotthon oldal többi eleme (elérhetőség, térkép) maradjon keskeny, középre igazított oszlopban */
+.home-center.split-layout > :not(.home-story) {
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* 3 képes blokk: lépcsőzetes, kissé egymásra csúszó képek egy oszlopban (balra - jobbra - balra);
+   a jobb oldali (fordított) blokkokban tükrözve. */
+.camp-media-3 {
+  display: block;
+  position: relative;
+}
+
+.camp-media-3 img {
+  display: block;
+  position: relative;
+  height: auto;
+  border-radius: 14px;
+  box-shadow: 0 6px 18px rgba(35, 63, 42, 0.28);
+  cursor: zoom-in;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.camp-media-3 img:hover,
+.camp-media-3 img:focus-visible {
+  transform: scale(1.02);
+  box-shadow: 0 10px 26px rgba(35, 63, 42, 0.38);
+}
+
+.camp-media-3 img:nth-child(1) {
+  z-index: 1;
+  width: 62%;
+}
+
+.camp-media-3 img:nth-child(2) {
+  z-index: 2;
+  width: 56%;
+  margin-left: auto;
+  margin-top: -12%;
+}
+
+.camp-media-3 img:nth-child(3) {
+  z-index: 3;
+  width: 60%;
+  margin-left: 6%;
+  margin-top: -10%;
+}
+
+.camp-block-reverse .camp-media-3 img:nth-child(1) {
+  margin-left: auto;
+}
+
+.camp-block-reverse .camp-media-3 img:nth-child(2) {
+  margin-left: 0;
+  margin-right: auto;
+}
+
+.camp-block-reverse .camp-media-3 img:nth-child(3) {
+  margin-left: auto;
+  margin-right: 6%;
 }

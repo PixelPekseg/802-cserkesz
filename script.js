@@ -530,7 +530,8 @@ document.querySelectorAll('a[href^="mailto:"]').forEach(link => {
 // léptetés: nyilak a gombokkal vagy a billentyűzeten (bal/jobb nyíl).
 // ==========================================================
 (function initLightbox() {
-  const images = [...document.querySelectorAll('.camp-col img, .side-photos img, .home-gallery img, .team-split-image img')];
+  const SELECTOR = '.camp-col img, .camp-media-3 img, .side-photos img, .home-gallery img, .team-split-image img';
+  let images = [...document.querySelectorAll(SELECTOR)];
   if (images.length === 0) return;
 
   const overlay = document.createElement('div');
@@ -559,8 +560,11 @@ document.querySelectorAll('a[href^="mailto:"]').forEach(link => {
   }
 
   function open(i, trigger) {
+    // a képek sorrendje a megjelenés (DOM) szerinti, ha a képek időközben átrendeződtek
+    images = [...document.querySelectorAll(SELECTOR)];
+    const position = images.indexOf(trigger);
     opener = trigger;
-    show(i);
+    show(position >= 0 ? position : i);
     overlay.hidden = false;
     document.body.style.overflow = 'hidden';
     closeButton.focus();
@@ -734,3 +738,192 @@ document.addEventListener('click', async event => {
     button.classList.remove('is-copied');
   }, 2000));
 });
+
+// ==========================================================
+// Személyek bemutatkozó ablaka
+// A .person-card.has-bio kártyára kattintva felugró ablakban megjelenik a személy
+// képe, neve, szerepe, a "Miért keresd?" lista és a másolható e-mail cím(ek).
+// A tartalom a kártyán belüli rejtett .person-bio blokkból jön. Bezárás: × gomb,
+// háttérre kattintás vagy Esc. A kártyán lévő linkekre/gombokra kattintás nem nyitja meg.
+// ==========================================================
+(function initPersonModals() {
+  const cards = [...document.querySelectorAll('.person-card.has-bio')];
+  if (cards.length === 0) return;
+
+  const overlay = document.createElement('div');
+  overlay.className = 'person-modal';
+  overlay.hidden = true;
+  overlay.setAttribute('role', 'dialog');
+  overlay.setAttribute('aria-modal', 'true');
+  overlay.innerHTML =
+    '<div class="person-modal-card">' +
+    '<button class="person-modal-close" type="button" aria-label="Bezárás">&times;</button>' +
+    '<div class="person-modal-head"></div>' +
+    '<div class="person-modal-body"></div>' +
+    '</div>';
+  document.body.append(overlay);
+
+  const head = overlay.querySelector('.person-modal-head');
+  const body = overlay.querySelector('.person-modal-body');
+  const closeButton = overlay.querySelector('.person-modal-close');
+  let opener = null;
+
+  function open(card) {
+    opener = card;
+    const name = card.querySelector('h3')?.textContent.trim() ?? '';
+    const bio = card.querySelector('.person-bio');
+    const role = bio?.querySelector('.person-bio-role')?.textContent.trim()
+      || card.querySelector('.person-role')?.textContent.trim() || '';
+
+    head.replaceChildren();
+    const photo = card.querySelector('.person-photo')?.cloneNode(true);
+    if (photo) head.append(photo);
+    const title = document.createElement('h3');
+    title.textContent = name;
+    const roleLine = document.createElement('p');
+    roleLine.className = 'person-modal-role';
+    roleLine.textContent = role;
+    head.append(title, roleLine);
+
+    body.replaceChildren();
+    bio?.childNodes.forEach(node => {
+      if (node.nodeType === 1 && node.classList.contains('person-bio-role')) return; // a szerep a fejlécben van
+      body.append(node.cloneNode(true));
+    });
+
+    overlay.setAttribute('aria-label', `${name} bemutatkozása`);
+    overlay.hidden = false;
+    document.body.style.overflow = 'hidden';
+    closeButton.focus();
+  }
+
+  function close() {
+    overlay.hidden = true;
+    document.body.style.overflow = '';
+    opener?.focus();
+  }
+
+  cards.forEach(card => {
+    card.tabIndex = 0;
+    card.setAttribute('role', 'button');
+    card.setAttribute('aria-haspopup', 'dialog');
+    card.title = 'Kattints a bemutatkozásért';
+    card.addEventListener('click', event => {
+      if (event.target.closest('a, button')) return;
+      open(card);
+    });
+    card.addEventListener('keydown', event => {
+      if (event.target !== card) return;
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        open(card);
+      }
+    });
+  });
+
+  closeButton.addEventListener('click', close);
+  overlay.addEventListener('click', event => {
+    if (event.target === overlay) close();
+  });
+  document.addEventListener('keydown', event => {
+    if (!overlay.hidden && event.key === 'Escape') close();
+  });
+})();
+
+// ==========================================================
+// Rólunk / Csapatotthonunk: váltakozó "szöveg + fotók" blokkok (mint a Tábor oldalon)
+// A .side-photos blokk fotóit és a szöveg szakaszait (h3 címek) a script összepárosítja: a szöveget
+// egyenletes hosszúságú részekre bontja, és mindegyik mellé 2-3 fotót tesz kollázsként
+// (.camp-block / .camp-media / .camp-col, ugyanaz a stílus, mint a Tábor oldalon). A blokkok
+// váltakozva a bal és a jobb oldalra teszik a képeket; telefonon a képek a szöveg fölött állnak.
+// ==========================================================
+(function initSplitBlocks() {
+  document.querySelectorAll('.has-side-photos').forEach(section => {
+    const holder = section.querySelector('.side-photos');
+    const text = section.querySelector('.prose, .home-story');
+    if (!holder || !text) return;
+    const images = [...holder.querySelectorAll('img')];
+    if (images.length === 0) return;
+
+    // a szöveg szakaszai: minden h3-tól a következő h3-ig (a forrás-sor a végén marad)
+    const groups = [];
+    let current = null;
+    let firstHeading = null;
+    for (const el of [...text.children]) {
+      if (el.matches('.prose-source')) break;
+      if (el.matches('h3')) {
+        current = [];
+        groups.push(current);
+        firstHeading = firstHeading || el;
+      }
+      if (current) current.push(el);
+    }
+    if (groups.length === 0) return;
+
+    const weight = group => group.reduce((sum, el) => sum + el.textContent.length, 0);
+    const blockCount = Math.max(1, Math.min(groups.length, Math.floor(images.length / 2), Math.round(images.length / 2.5)));
+    const total = groups.reduce((sum, group) => sum + weight(group), 0);
+
+    // a szakaszokat összefüggő, hozzávetőleg egyenlő hosszú részekre osztjuk
+    const chunks = [];
+    let chunk = [];
+    let acc = 0;
+    groups.forEach((group, i) => {
+      chunk.push(group);
+      acc += weight(group);
+      const remaining = groups.length - i - 1;
+      const needed = blockCount - chunks.length - 1;
+      if ((chunks.length < blockCount - 1) && (acc >= (total / blockCount) * (chunks.length + 1) || remaining === needed)) {
+        chunks.push(chunk);
+        chunk = [];
+      }
+    });
+    if (chunk.length) chunks.push(chunk);
+
+    const base = Math.floor(images.length / chunks.length);
+    const extra = images.length % chunks.length;
+    const fragment = document.createDocumentFragment();
+    // a blokkok helye: az első cím elé tett jelölő (maga a cím is átkerül a szövegdobozba)
+    const marker = document.createComment('');
+    firstHeading.before(marker);
+    let imageIndex = 0;
+
+    chunks.forEach((groupsInChunk, index) => {
+      const size = base + (index < extra ? 1 : 0);
+      const blockImages = images.slice(imageIndex, imageIndex + size);
+      imageIndex += size;
+
+      const block = document.createElement('div');
+      block.className = 'camp-block' + (index % 2 === 1 ? ' camp-block-reverse' : '');
+      const media = document.createElement('div');
+      media.className = 'camp-media';
+      if (index % 2 === 1) media.style.cssText = '--col1:54%;--col2:56%;--overlap:-10%';
+
+      if (blockImages.length === 3) {
+        // 3 kép: egy lépcsőzetes, egymásra kissé ráfedő oszlop (nem két oszlop)
+        media.classList.add('camp-media-3');
+        blockImages.forEach(img => media.append(img));
+      } else {
+        // oszlopok: az első oszlopba kevesebb vagy ugyanannyi kép, a másodikba a többi
+        const firstCount = Math.floor(blockImages.length / 2) || blockImages.length;
+        [blockImages.slice(0, firstCount), blockImages.slice(firstCount)].forEach(list => {
+          if (list.length === 0) return;
+          const col = document.createElement('div');
+          col.className = 'camp-col';
+          list.forEach(img => col.append(img));
+          media.append(col);
+        });
+      }
+
+      const textBox = document.createElement('div');
+      textBox.className = 'camp-text';
+      groupsInChunk.flat().forEach(el => textBox.append(el));
+      block.append(media, textBox);
+      fragment.append(block);
+    });
+
+    marker.replaceWith(fragment);
+    holder.remove();
+    (text.classList.contains('prose') ? text : text.closest('.container') || text).classList.add('split-layout');
+  });
+})();
