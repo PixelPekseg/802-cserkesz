@@ -28,8 +28,15 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Programok letöltése és az oldal frissítése
+      # A Drive-ról jövő képek (személyfotók, programképek) feldolgozásához (WebP, iPhone-os HEIC)
+      - name: Képkezelő csomagok telepítése
+        run: pip install --quiet pillow pillow-heif
+
+      - name: Programok (kártyák + képek a Drive-ról) frissítése
+        if: ${{ !cancelled() }}
         env:
+          DRIVE_KEPEK_FOLDER_ID: 13jB-lTr4Eqt1WOImYwWhMahGHwDTLALA
+          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
           PROGRAMOK_CSV_URL: https://docs.google.com/spreadsheets/d/e/2PACX-1vRxIhMKUiMXX41ujoCjIpmizaXDQwlRyBieMUQZSqZcFUF3ChIpqB1d5Q2Br608v88gWJOSxcu46zPV/pub?gid=659195366&single=true&output=csv
         run: python tools/sync_programok.py
 
@@ -59,11 +66,6 @@ jobs:
           SZAMLALOK_CSV_URL: https://docs.google.com/spreadsheets/d/e/2PACX-1vQG9oKFwKR3SA_rogOVR9y6l_pefGSZKirDeMSxZU7_F-PdaYSleD8wkEQKg89VPK_ThCB2xQzJUWLA/pub?gid=1088990736&single=true&output=csv
         run: python tools/sync_szamlalok.py
 
-      # A személyfotók feldolgozásához (WebP, iPhone-os HEIC)
-      - name: Képkezelő csomagok telepítése
-        if: ${{ !cancelled() }}
-        run: pip install --quiet pillow pillow-heif
-
       - name: Csapatvezetés (kártyák + fotók a Drive-ról) frissítése
         if: ${{ !cancelled() }}
         env:
@@ -90,7 +92,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add *.html data/ images/webp/kozos/team/
+          git add *.html data/ images/webp/kozos/team/ images/webp/programok/
           if git diff --cached --quiet; then
             echo "Nincs változás."
           else

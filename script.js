@@ -119,24 +119,23 @@ document.querySelectorAll('img[data-optional]').forEach(img => {
 
 // ==========================================================
 // Programok – a lejárt események automatikus kezelése
-// Minden .news-card a data-date (és opcionálisan data-end-date)
-// attribútuma alapján "közelgő" vagy "lejárt". A lejárt események az
-// esemény napja után a rács data-keep-days attribútumában megadott
-// ideig (alapból 7 nap) "Elmúlt" címkével, halványítva a lista végén
-// látszanak, utána elrejtődnek. Ha minden elrejtődik, egy üres-állapot
-// üzenet jelenik meg. A data-date nélküli hír mindig látszik.
+// Minden .news-card a data-date (és opcionálisan data-end-date) attribútuma
+// alapján "közelgő" vagy "lejárt". A közelgők a #newsGrid-ben maradnak dátum
+// szerint növekvő sorrendben; a lejártak (az esemény napja után) átkerülnek a
+// "Program Archívum" sávba (#archiveGrid), a legfrissebb elöl. Ha nincs lejárt
+// program, az archívum sáv rejtve marad; ha nincs közelgő, üres-állapot üzenet
+// jelenik meg. A data-date nélküli hír mindig a közelgők között marad.
 // Az updateNews(now) tetszőleges időponttal újrafuttatható (tesztelés).
 // ==========================================================
 function updateNews(now = new Date()) {
   const grid = document.getElementById('newsGrid');
+  const archive = document.getElementById('archiveGrid');
+  const archiveSection = document.getElementById('archivum');
   const emptyMessage = document.getElementById('newsEmpty');
   if (!grid) return;
 
-  const keepDays = Number.parseFloat(grid.dataset.keepDays);
-  const keepMs = (Number.isFinite(keepDays) ? keepDays : 7) * 24 * 60 * 60 * 1000;
-
   // Az eredeti (HTML-beli) sorrendet megjegyezzük, hogy többször is lefuttatható legyen
-  const cards = [...grid.querySelectorAll('.news-card')];
+  const cards = [...grid.querySelectorAll('.news-card'), ...(archive ? archive.querySelectorAll('.news-card') : [])];
   cards.forEach((card, index) => {
     if (!card.dataset.order) card.dataset.order = String(index);
   });
@@ -144,27 +143,12 @@ function updateNews(now = new Date()) {
 
   const upcoming = [];
   const past = [];
-
   cards.forEach(card => {
     card.hidden = false;
-    card.classList.remove('news-card-past');
-    card.querySelectorAll('.news-past-label').forEach(label => label.remove());
-
     const endDate = card.dataset.endDate || card.dataset.date;
     const eventEnd = endDate ? new Date(`${endDate}T23:59:59`) : null;
-
-    if (!eventEnd || Number.isNaN(eventEnd.getTime()) || now <= eventEnd) {
-      upcoming.push(card);
-    } else if (now - eventEnd > keepMs) {
-      card.hidden = true;
-    } else {
-      card.classList.add('news-card-past');
-      const label = document.createElement('span');
-      label.className = 'news-past-label';
-      label.textContent = 'Elmúlt';
-      card.querySelector('.news-meta').append(label);
-      past.push(card);
-    }
+    if (!archive || !eventEnd || Number.isNaN(eventEnd.getTime()) || now <= eventEnd) upcoming.push(card);
+    else past.push(card);
   });
 
   // Alapértelmezett kapcsolattartó: ha egy hírnél nincs megadva "Kérdés esetén
@@ -184,24 +168,22 @@ function updateNews(now = new Date()) {
       link.href = `mailto:${defaultEmail}`;
       link.textContent = defaultEmail;
       contact.append(label, document.createElement('br'), `${defaultName}, `, link);
-      const newsLink = card.querySelector('.news-link');
-      if (newsLink) newsLink.before(contact);
+      const after = card.querySelector('.news-gallery, .news-link');
+      if (after) after.before(contact);
       else card.append(contact);
     });
   }
 
-  // Elöl a közelgők, a végén az elmúltak; mindkét csoport dátum szerint
-  // növekvő sorrendben (a dátum nélküli hír a közelgők végére kerül)
   const byDate = (a, b) =>
     (a.dataset.date || '9999-12-31').localeCompare(b.dataset.date || '9999-12-31') ||
     Number(a.dataset.order) - Number(b.dataset.order);
   upcoming.sort(byDate);
-  past.sort(byDate);
-  [...upcoming, ...past].forEach(card => grid.append(card));
+  past.sort((a, b) => byDate(b, a));   // archívum: a legutóbbi elöl
+  upcoming.forEach(card => grid.append(card));
+  past.forEach(card => archive.append(card));
 
-  if (emptyMessage) {
-    emptyMessage.hidden = grid.querySelector('.news-card:not([hidden])') !== null;
-  }
+  if (archiveSection) archiveSection.hidden = past.length === 0;
+  if (emptyMessage) emptyMessage.hidden = upcoming.length > 0;
 
   document.dispatchEvent(new Event('newsupdated'));
 }
@@ -419,11 +401,11 @@ initCounters();
 // egy kártyányit lépnek. Ha minden kártya elfér, a nyilak elrejtődnek,
 // az első/utolsó helyen a megfelelő nyíl inaktív.
 // ==========================================================
-function initNewsCarousel() {
-  const carousel = document.getElementById('newsCarousel');
-  const track = document.getElementById('newsGrid');
-  const prev = document.getElementById('newsPrev');
-  const next = document.getElementById('newsNext');
+function initNewsCarousel(carouselId, trackId, prevId, nextId) {
+  const carousel = document.getElementById(carouselId);
+  const track = document.getElementById(trackId);
+  const prev = document.getElementById(prevId);
+  const next = document.getElementById(nextId);
   if (!carousel || !track || !prev || !next) return;
 
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -461,7 +443,49 @@ function initNewsCarousel() {
   updateButtons();
 }
 
-initNewsCarousel();
+initNewsCarousel('newsCarousel', 'newsGrid', 'newsPrev', 'newsNext');
+initNewsCarousel('archiveCarousel', 'archiveGrid', 'archivePrev', 'archiveNext');
+
+// ==========================================================
+// Programképek a kártyán: egyszerre 2 kép látszik, a két oldali nyíllal
+// képenként lehet lépni (mint a programkártyák között). Eseménydelegálással
+// működik, így a naptárban megnyitott (másolt) kártyákon is.
+// ==========================================================
+function updateGalleryButtons(gallery) {
+  const track = gallery.querySelector('.news-gallery-track');
+  const prev = gallery.querySelector('.gallery-prev');
+  const next = gallery.querySelector('.gallery-next');
+  if (!track || !prev || !next) return;
+  const maxScroll = track.scrollWidth - track.clientWidth;
+  prev.disabled = track.scrollLeft <= 2;
+  next.disabled = track.scrollLeft >= maxScroll - 2;
+}
+
+document.addEventListener('click', event => {
+  const button = event.target.closest('.gallery-btn');
+  if (!button) return;
+  const track = button.closest('.news-gallery')?.querySelector('.news-gallery-track');
+  const image = track?.querySelector('img');
+  if (!image) return;
+  // képindex szerint lépünk (mindig egy kép elejére), így a gyors egymás utáni kattintás sem csúszik el
+  const step = image.getBoundingClientRect().width + (parseFloat(getComputedStyle(track).columnGap) || 0);
+  const current = Math.round(track.scrollLeft / step);
+  const target = Math.max(0, current + (button.classList.contains('gallery-prev') ? -1 : 1));
+  const left = Math.min(target * step, track.scrollWidth - track.clientWidth);
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  track.scrollTo({ left, behavior: reducedMotion ? 'auto' : 'smooth' });
+  // a nyilak állapota azonnal a cél szerint (nem várjuk meg a görgetés végét)
+  const gallery = button.closest('.news-gallery');
+  gallery.querySelector('.gallery-prev').disabled = left <= 2;
+  gallery.querySelector('.gallery-next').disabled = left >= track.scrollWidth - track.clientWidth - 2;
+});
+
+// a görgetés nem buborékol, ezért a dokumentumon "elkapva" figyeljük
+document.addEventListener('scroll', event => {
+  if (event.target.classList?.contains('news-gallery-track')) updateGalleryButtons(event.target.closest('.news-gallery'));
+}, true);
+window.addEventListener('resize', () => document.querySelectorAll('.news-gallery').forEach(updateGalleryButtons));
+document.querySelectorAll('.news-gallery').forEach(updateGalleryButtons);
 
 // ==========================================================
 // Programok – naptár
@@ -481,7 +505,7 @@ function initCalendar() {
   const pad = n => String(n).padStart(2, '0');
   const dayKey = (y, m, d) => `${y}-${pad(m + 1)}-${pad(d)}`;
 
-  const events = [...track.querySelectorAll('.news-card[data-date]')]
+  const events = [...document.querySelectorAll('#newsGrid .news-card[data-date], #archiveGrid .news-card[data-date]')]
     .map(card => ({
       card,
       start: card.dataset.date,
@@ -688,9 +712,8 @@ document.querySelectorAll('a[href^="mailto:"]').forEach(link => {
 // léptetés: nyilak a gombokkal vagy a billentyűzeten (bal/jobb nyíl).
 // ==========================================================
 (function initLightbox() {
-  const SELECTOR = '.camp-col img, .camp-media-3 img, .side-photos img, .home-gallery img, .team-split-image img';
-  let images = [...document.querySelectorAll(SELECTOR)];
-  if (images.length === 0) return;
+  const SELECTOR = '.camp-col img, .camp-media-3 img, .side-photos img, .home-gallery img, .team-split-image img, .news-gallery img';
+  if (!document.querySelector(SELECTOR)) return;
 
   const overlay = document.createElement('div');
   overlay.className = 'lightbox';
@@ -707,6 +730,7 @@ document.querySelectorAll('a[href^="mailto:"]').forEach(link => {
 
   const view = overlay.querySelector('.lightbox-img');
   const closeButton = overlay.querySelector('.lightbox-close');
+  let images = [];
   let index = 0;
   let opener = null;
 
@@ -717,12 +741,14 @@ document.querySelectorAll('a[href^="mailto:"]').forEach(link => {
     view.alt = images[index].alt;
   }
 
-  function open(i, trigger) {
-    // a képek sorrendje a megjelenés (DOM) szerinti, ha a képek időközben átrendeződtek
-    images = [...document.querySelectorAll(SELECTOR)];
-    const position = images.indexOf(trigger);
+  function open(trigger) {
+    // egy program képei (data-gallery) egymás között lapozhatók, a többi kép az egész oldalon;
+    // a sorrend a megjelenés (DOM) szerinti
+    const gallery = trigger.closest('[data-gallery]');
+    images = gallery ? [...gallery.querySelectorAll('img')]
+      : [...document.querySelectorAll(SELECTOR)].filter(img => !img.closest('[data-gallery]'));
     opener = trigger;
-    show(position >= 0 ? position : i);
+    show(Math.max(0, images.indexOf(trigger)));
     overlay.hidden = false;
     document.body.style.overflow = 'hidden';
     closeButton.focus();
@@ -734,17 +760,30 @@ document.querySelectorAll('a[href^="mailto:"]').forEach(link => {
     opener?.focus();
   }
 
-  images.forEach((image, i) => {
+  function prepare(image) {
     image.tabIndex = 0;
     image.setAttribute('role', 'button');
     image.setAttribute('aria-label', `${image.alt} (nagyítás)`);
-    image.addEventListener('click', () => open(i, image));
-    image.addEventListener('keydown', event => {
-      if (event.key === 'Enter' || event.key === ' ') {
-        event.preventDefault();
-        open(i, image);
-      }
-    });
+  }
+  document.querySelectorAll(SELECTOR).forEach(prepare);
+
+  // eseménydelegálás: a később (pl. a naptárban) másolt képek is nagyíthatók
+  document.addEventListener('click', event => {
+    const image = event.target.closest?.(SELECTOR);
+    if (image && !overlay.contains(image)) open(image);
+  });
+  document.addEventListener('keydown', event => {
+    if (!overlay.hidden) {
+      if (event.key === 'Escape') close();
+      else if (event.key === 'ArrowLeft') show(index - 1);
+      else if (event.key === 'ArrowRight') show(index + 1);
+      return;
+    }
+    const image = event.target.closest?.(SELECTOR);
+    if (image && (event.key === 'Enter' || event.key === ' ')) {
+      event.preventDefault();
+      open(image);
+    }
   });
 
   closeButton.addEventListener('click', close);
@@ -752,12 +791,6 @@ document.querySelectorAll('a[href^="mailto:"]').forEach(link => {
   overlay.querySelector('.lightbox-next').addEventListener('click', () => show(index + 1));
   overlay.addEventListener('click', event => {
     if (event.target === overlay) close();
-  });
-  document.addEventListener('keydown', event => {
-    if (overlay.hidden) return;
-    if (event.key === 'Escape') close();
-    else if (event.key === 'ArrowLeft') show(index - 1);
-    else if (event.key === 'ArrowRight') show(index + 1);
   });
 })();
 

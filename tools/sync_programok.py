@@ -11,7 +11,9 @@ A script a programok.html két megjegyzés közötti szakaszát írja újra:
 Ha a letöltés vagy az ellenőrzés hibás (pl. változott a fejléc, vagy egyetlen érvényes sor
 sincs), a script hibával leáll, és semmit nem módosít: az oldal az utolsó jó állapotot mutatja.
 Hibás egyedi sorokat kihagy, és figyelmeztetést ír (GitHub Actionsben "::warning::" jelzést).
-Csak a Python standard könyvtárát használja.
+A "Képek" oszlopban megadott Drive-mappa (Képek/Program képek/<mappa>) képei a kártyára kerülnek
+(program_images.py; ehhez GOOGLE_API_KEY, DRIVE_KEPEK_FOLDER_ID és Pillow kell – nélkülük a meglévő
+képek maradnak).
 """
 import argparse
 import csv
@@ -23,6 +25,9 @@ import re
 import sys
 import unicodedata
 import urllib.request
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from program_images import ProgramImages  # noqa: E402  (a Drive-os képek; PIL csak képfeldolgozáskor kell)
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PAGE = os.path.join(ROOT, 'programok.html')
@@ -42,10 +47,13 @@ COLUMNS = {
     'place': 'helyszín',
     'description': 'leírás',
     'c1_name': 'kapcsolattartó 1 neve',
-    'c1_info': 'kapcsolattartó 1 e-mail',
+    'c1_email': 'kapcsolattartó 1 e-mail',
+    'c1_phone': 'kapcsolattartó 1 telefon',
     'c2_name': 'kapcsolattartó 2 neve',
-    'c2_info': 'kapcsolattartó 2 e-mail',
+    'c2_email': 'kapcsolattartó 2 e-mail',
+    'c2_phone': 'kapcsolattartó 2 telefon',
     'facebook': 'facebook',
+    'images': 'képek',
     'visible': 'megjelenjen',
 }
 REQUIRED = ['name', 'start_date', 'visible']
@@ -128,19 +136,42 @@ def display_date(start, end):
     return f'{full(start)} – {full(end)}'
 
 
-def contact_html(name, info):
-    name, info = name.strip(), info.strip()
-    if not name and not info:
-        return ''
-    escaped_name = html.escape(name)
-    if '@' in info:
-        link = f'<a class="inline-link" href="mailto:{html.escape(info, quote=True)}">{html.escape(info)}</a>'
-        return f'{escaped_name}, {link}' if name else link
-    digits = re.sub(r'[^\d+]', '', info)
+def fix_phone(phone):
+    """Ha a táblázat a "+36 …" számot számmá alakította (pl. 36707582659), visszaadja olvasható
+    formában (+36 70 758 2659). Minden más beírást változatlanul hagy. (Ld. sync_common.fix_phone.)"""
+    raw = phone.strip()
+    if re.fullmatch(r'36\d{9}', raw):
+        return f'+36 {raw[2:4]} {raw[4:7]} {raw[7:]}'
+    if re.fullmatch(r'361\d{7}', raw):
+        return f'+36 1 {raw[3:6]} {raw[6:]}'
+    return phone
+
+
+# a Google Táblázat hibaértékei (pl. "+36 …" képletként értelmezve #ERROR! lesz) – ne kerüljenek ki az oldalra
+SHEET_ERRORS = ('#ERROR!', '#NAME?', '#REF!', '#VALUE!', '#N/A', '#DIV/0!', '#NUM!', '#NULL!')
+
+
+def phone_link(phone):
+    phone = fix_phone(phone)
+    digits = re.sub(r'[^\d+]', '', phone)
     if len(re.sub(r'\D', '', digits)) >= 6:
-        link = f'<a class="inline-link" href="tel:{digits}">{html.escape(info)}</a>'
-        return f'{escaped_name}<br>\n            {link}' if name else link
-    return escaped_name or html.escape(info)
+        return f'<a class="inline-link" href="tel:{digits}">{html.escape(phone)}</a>'
+    return html.escape(phone)
+
+
+def contact_html(name, email, phone):
+    """Egy kapcsolattartó: név, e-mail és/vagy telefon (mind opcionális). A régi, közös
+    "e-mail vagy telefon" oszlopból jövő telefonszámot is felismeri."""
+    name, email, phone = name.strip(), email.strip(), phone.strip()
+    if email and '@' not in email and not phone:
+        email, phone = '', email
+    first = [html.escape(name)] if name else []
+    if email:
+        first.append(f'<a class="inline-link" href="mailto:{html.escape(email, quote=True)}">{html.escape(email)}</a>')
+    text = ', '.join(first)
+    if phone:   # a telefonszám mindig új sorba kerül (a név, illetve az e-mail alá)
+        text = (text + '<br>\n            ' if text else '') + phone_link(phone)
+    return text
 
 
 def build_card(row, used_ids):
@@ -182,13 +213,29 @@ def build_card(row, used_ids):
     if time_text:
         lines.append(f'          <p class="news-detail"><strong>Időpont:</strong> {html.escape(time_text)}</p>')
 
-    contacts = [c for c in (contact_html(row['c1_name'], row['c1_info']),
-                            contact_html(row['c2_name'], row['c2_info'])) if c]
+    contacts = [c for c in (contact_html(row['c1_name'], row['c1_email'], row['c1_phone']),
+                            contact_html(row['c2_name'], row['c2_email'], row['c2_phone'])) if c]
     if contacts:
         lines.append('          <p class="news-detail news-contact">')
         lines.append('            <strong>Kérdés esetén keresd:</strong><br>')
         lines.append('            ' + '<br>\n            '.join(contacts))
         lines.append('          </p>')
+
+    if row.get('images'):
+        # képek a kártya alján (az "Üzenet másolása" fölött): egyszerre 2 látszik, több kép esetén
+        # két oldalt nyilakkal lapozható; kattintásra a nagyító nyílik (script.js)
+        many = len(row['images']) > 2
+        lines.append('          <div class="news-gallery" data-gallery>')
+        if many:
+            lines.append('            <button class="gallery-btn gallery-prev" type="button" aria-label="Előző képek" disabled>&#8249;</button>')
+        lines.append('            <div class="news-gallery-track">')
+        for n, (thumb, full) in enumerate(row['images'], start=1):
+            alt = html.escape(f'{row["name"]} – {n}. kép', quote=True)
+            lines.append(f'              <img src="{thumb}" data-full="{full}" alt="{alt}" loading="lazy">')
+        lines.append('            </div>')
+        if many:
+            lines.append('            <button class="gallery-btn gallery-next" type="button" aria-label="Következő képek">&#8250;</button>')
+        lines.append('          </div>')
 
     lines.append('        </article>')
     return '\n'.join(lines)
@@ -202,7 +249,12 @@ def parse_rows(csv_text):
 
     def cell(row, key):
         i = index.get(key)
-        return row[i].strip() if i is not None and i < len(row) else ''
+        value = row[i].strip() if i is not None and i < len(row) else ''
+        if value.upper() in SHEET_ERRORS:
+            warn(f'Egy cellában táblázathiba van ({value}), üresnek veszem. (Telefonszámnál a "+" jel okozza: '
+                 'állítsd az oszlopot Egyszerű szövegre, vagy írd így: \'+36 …)')
+            return ''
+        return value
 
     parsed = []
     for line_number, row in enumerate(reader[1:], start=2):
@@ -238,9 +290,9 @@ def parse_rows(csv_text):
             'start_time': start_time, 'end_time': end_time,
             'time_note': cell(row, 'time_note'), 'place': cell(row, 'place'),
             'description': cell(row, 'description'),
-            'c1_name': cell(row, 'c1_name'), 'c1_info': cell(row, 'c1_info'),
-            'c2_name': cell(row, 'c2_name'), 'c2_info': cell(row, 'c2_info'),
-            'facebook': facebook,
+            'c1_name': cell(row, 'c1_name'), 'c1_email': cell(row, 'c1_email'), 'c1_phone': cell(row, 'c1_phone'),
+            'c2_name': cell(row, 'c2_name'), 'c2_email': cell(row, 'c2_email'), 'c2_phone': cell(row, 'c2_phone'),
+            'facebook': facebook, 'image_folder': cell(row, 'images'), 'label': label,
         })
     parsed.sort(key=lambda r: (r['start'], r['start_time'] or ''))
     return parsed
@@ -256,6 +308,11 @@ def main():
     rows = parse_rows(csv_text)
     if not rows and not os.environ.get('ALLOW_EMPTY'):
         fail('Egyetlen érvényes, megjelenő program sincs a táblázatban, ezért nem írom felül az oldalt.')
+
+    images = ProgramImages()
+    for row in rows:
+        row['images'] = images.images_for(row['image_folder'], row['label'])
+    images.finish()
 
     used_ids = set()
     cards = '\n\n'.join(build_card(row, used_ids) for row in rows)
@@ -278,7 +335,8 @@ def main():
         with open(SNAPSHOT, 'w', encoding='utf-8') as handle:
             handle.write(csv_text)
 
-    print(f'{len(rows)} program, programok.html {"frissítve" if changed else "változatlan"}.')
+    print(f'{len(rows)} program; frissített képek: {len(images.updated)}; '
+          f'programok.html {"frissítve" if changed else "változatlan"}.')
 
 
 if __name__ == '__main__':
