@@ -18,11 +18,11 @@
         "modified": "2026-10-12T14:29:25.973Z"
       },
       "test-video": {
-        "file": "test_video.mp4",
-        "id": "1oZI0zOTSq5PbckA39SjVOBxtEg9wZQnZ",
+        "file": "test_video.MOV",
+        "id": "137SIv4yYaQtDAezWuOQBvxaLSZnAxe3w",
         "kind": "video",
-        "modified": "2026-10-12T15:22:27.286Z",
-        "poster": false
+        "modified": "2026-10-12T15:43:38.000Z",
+        "poster": true
       }
     },
     "folder": "csm",
