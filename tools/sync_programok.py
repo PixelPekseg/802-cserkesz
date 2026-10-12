@@ -11,7 +11,8 @@ A script a programok.html két megjegyzés közötti szakaszát írja újra:
 Ha a letöltés vagy az ellenőrzés hibás (pl. változott a fejléc, vagy egyetlen érvényes sor
 sincs), a script hibával leáll, és semmit nem módosít: az oldal az utolsó jó állapotot mutatja.
 Hibás egyedi sorokat kihagy, és figyelmeztetést ír (GitHub Actionsben "::warning::" jelzést).
-A "Képek" oszlopban megadott Drive-mappa (Képek/Program képek/<mappa>) képei a kártyára kerülnek
+A "Képek" oszlopban megadott Drive-mappa (Képek és videók/Program képek/<mappa>) képei és videói
+a kártyára kerülnek (a videókat a Drive lejátszója játssza le)
 (program_images.py; ehhez GOOGLE_API_KEY, DRIVE_KEPEK_FOLDER_ID és Pillow kell – nélkülük a meglévő
 képek maradnak).
 """
@@ -229,9 +230,12 @@ def build_card(row, used_ids):
         if many:
             lines.append('            <button class="gallery-btn gallery-prev" type="button" aria-label="Előző képek" disabled>&#8249;</button>')
         lines.append('            <div class="news-gallery-track">')
-        for n, (thumb, full) in enumerate(row['images'], start=1):
-            alt = html.escape(f'{row["name"]} – {n}. kép', quote=True)
-            lines.append(f'              <img src="{thumb}" data-full="{full}" alt="{alt}" loading="lazy">')
+        for n, item in enumerate(row['images'], start=1):
+            # videó: a Drive lejátszója játssza le (a felugró ablakban, kattintásra); itt az előnézete
+            video = f' data-video="{html.escape(item["video"], quote=True)}"' if item['video'] else ''
+            kind = 'videó' if item['video'] else 'kép'
+            alt = html.escape(f'{row["name"]} – {n}. {kind}', quote=True)
+            lines.append(f'              <img src="{item["thumb"]}" data-full="{item["full"]}"{video} alt="{alt}" loading="lazy">')
         lines.append('            </div>')
         if many:
             lines.append('            <button class="gallery-btn gallery-next" type="button" aria-label="Következő képek">&#8250;</button>')

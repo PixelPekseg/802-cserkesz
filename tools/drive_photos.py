@@ -1,11 +1,12 @@
 """Képek a Google Drive "Képek" mappájából – közös rész a sync_vezetok.py, a sync_eszkozok.py és
 a sync_programok.py számára.
 
-A nyilvános "Képek" mappát a Drive API-val olvassa (GOOGLE_API_KEY + DRIVE_KEPEK_FOLDER_ID).
-Szerkezete:
-    Képek/
+A nyilvános "Képek és videók" mappát a Drive API-val olvassa (GOOGLE_API_KEY + DRIVE_KEPEK_FOLDER_ID;
+az azonosító átnevezéskor sem változik). Szerkezete:
+    Képek és videók/
         Csapatvezetés/      személyfotók (és bármely más almappa, illetve maga a gyökér)
-        Program képek/      programonként egy-egy almappa (pl. "csm"), benne a képek
+        Program képek/      programonként egy-egy almappa (pl. "csm"), benne a képek és videók
+                            (bármely "Program…" kezdetű név jó)
 
 Személyfotók (PhotoSync): a táblázatban csak a fájl NEVÉT adják meg (kiterjesztéssel). A modul a
 Képek gyökerében és az almappáiban (a "Program képek" kivételével) név szerint keresi (kis/nagybetű
@@ -33,7 +34,7 @@ TEAM_DIR = os.path.join(common.ROOT, *TEAM_DIR_REL.split('/'))
 STATE = os.path.join(common.ROOT, 'data', 'fotok.json')
 API = 'https://www.googleapis.com/drive/v3/files'
 FOLDER_MIME = 'application/vnd.google-apps.folder'
-PROGRAM_FOLDER = 'program képek'     # a Képeken belüli almappa neve (kisbetűvel)
+PROGRAM_FOLDER = 'program'           # a programok almappája: aminek a neve így kezdődik (pl. "Program képek")
 MAX_SHORT_SIDE = 400   # személyfotó: a kártyán legfeljebb ~120 px-es kör
 MAX_LONG_SIDE = 600
 
@@ -74,6 +75,14 @@ def is_image(item):
     return item.get('mimeType', '').startswith('image/')
 
 
+def is_video(item):
+    return item.get('mimeType', '').startswith('video/')
+
+
+def is_program_folder(item):
+    return item.get('mimeType') == FOLDER_MIME and item['name'].strip().lower().startswith(PROGRAM_FOLDER)
+
+
 class Drive:
     """A "Képek" mappa olvasása: a Drive API-val, vagy teszteléshez egy helyi mappából."""
 
@@ -100,7 +109,7 @@ class Drive:
             while True:
                 params = {
                     'q': f"'{folder_id}' in parents and trashed = false",
-                    'fields': 'nextPageToken, files(id, name, mimeType, modifiedTime)',
+                    'fields': 'nextPageToken, files(id, name, mimeType, modifiedTime, thumbnailLink)',
                     'pageSize': '1000',
                     'key': self.api_key,
                 }
@@ -161,7 +170,7 @@ class PhotoSync:
         self.files = {}
         folders = [self.drive.root_id]
         for item in self.drive.children(self.drive.root_id):
-            if item.get('mimeType') == FOLDER_MIME and item['name'].strip().lower() != PROGRAM_FOLDER:
+            if item.get('mimeType') == FOLDER_MIME and not is_program_folder(item):
                 folders.append(item['id'])
         for folder in folders:
             for item in self.drive.children(folder):
