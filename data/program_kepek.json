@@ -16,6 +16,13 @@
       "csm4": {
         "file": "csm4.JPG",
         "modified": "2026-10-12T14:29:25.973Z"
+      },
+      "test-video": {
+        "file": "test_video.mp4",
+        "id": "1oZI0zOTSq5PbckA39SjVOBxtEg9wZQnZ",
+        "kind": "video",
+        "modified": "2026-10-12T15:22:27.286Z",
+        "poster": false
       }
     },
     "folder": "csm",
@@ -23,7 +30,8 @@
       "csm1",
       "csm2",
       "csm3",
-      "csm4"
+      "csm4",
+      "test-video"
     ]
   }
 }
