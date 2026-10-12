@@ -147,9 +147,25 @@ document.querySelectorAll('img[data-optional]').forEach(img => {
 // jelenik meg. A data-date nélküli hír mindig a közelgők között marad.
 // Az updateNews(now) tetszőleges időponttal újrafuttatható (tesztelés).
 // ==========================================================
+function isPastCard(card, now = new Date()) {
+  const endDate = card.dataset.endDate || card.dataset.date;
+  const eventEnd = endDate ? new Date(`${endDate}T23:59:59`) : null;
+  return Boolean(eventEnd && !Number.isNaN(eventEnd.getTime()) && now > eventEnd);
+}
+
+// lejárt programnál a leírás helyett a beszámoló (ha van), és nincs Facebook-link
+function applyPastState(card, isPast) {
+  const report = card.querySelector('.news-report');
+  const description = card.querySelector('.news-desc');
+  if (report) report.hidden = !isPast;
+  if (description) description.hidden = Boolean(isPast && report);
+  card.querySelectorAll('.news-fb').forEach(link => { link.hidden = Boolean(isPast); });
+}
+
 function updateNews(now = new Date()) {
-  const grid = document.getElementById('newsGrid');
-  const archive = document.getElementById('archiveGrid');
+  const grid = document.getElementById('newsGrid') || document.getElementById('calendarSource');
+  const onCalendarPage = grid?.id === 'calendarSource';   // naptar.html: rejtett kártyák, nincs rendezés
+  const archive = onCalendarPage ? null : document.getElementById('archiveGrid');
   const archiveSection = document.getElementById('archivum');
   const emptyMessage = document.getElementById('newsEmpty');
   if (!grid) return;
@@ -165,17 +181,10 @@ function updateNews(now = new Date()) {
   const past = [];
   cards.forEach(card => {
     card.hidden = false;
-    const endDate = card.dataset.endDate || card.dataset.date;
-    const eventEnd = endDate ? new Date(`${endDate}T23:59:59`) : null;
-    const isPast = archive && eventEnd && !Number.isNaN(eventEnd.getTime()) && now > eventEnd;
-    (isPast ? past : upcoming).push(card);
-    // az archívumban a leírás helyett a beszámoló látszik (ha van)
-    const report = card.querySelector('.news-report');
-    const description = card.querySelector('.news-desc');
-    if (report) report.hidden = !isPast;
-    if (description) description.hidden = Boolean(isPast && report);
-    // az archívumban a Facebook-esemény linkje sem látszik
-    card.querySelectorAll('.news-fb').forEach(link => { link.hidden = Boolean(isPast); });
+    const isPast = isPastCard(card, now);
+    applyPastState(card, isPast);
+    if (onCalendarPage) return;
+    ((isPast && archive) ? past : upcoming).push(card);
   });
 
   // Alapértelmezett kapcsolattartó: ha egy hírnél nincs megadva "Kérdés esetén
@@ -204,6 +213,7 @@ function updateNews(now = new Date()) {
   const byDate = (a, b) =>
     (a.dataset.date || '9999-12-31').localeCompare(b.dataset.date || '9999-12-31') ||
     Number(a.dataset.order) - Number(b.dataset.order);
+  if (onCalendarPage) return;
   upcoming.sort(byDate);
   past.sort((a, b) => byDate(b, a));   // archívum: a legutóbbi elöl
   upcoming.forEach(card => grid.append(card));
@@ -523,8 +533,7 @@ document.querySelectorAll('.news-gallery').forEach(updateGalleryButtons);
 function initCalendar() {
   const root = document.getElementById('calendar');
   const detail = document.getElementById('calendarDetail');
-  const track = document.getElementById('newsGrid');
-  if (!root || !detail || !track) return;
+  if (!root || !detail) return;
 
   const monthNames = ['január', 'február', 'március', 'április', 'május', 'június',
     'július', 'augusztus', 'szeptember', 'október', 'november', 'december'];
@@ -532,7 +541,8 @@ function initCalendar() {
   const pad = n => String(n).padStart(2, '0');
   const dayKey = (y, m, d) => `${y}-${pad(m + 1)}-${pad(d)}`;
 
-  const events = [...document.querySelectorAll('#newsGrid .news-card[data-date], #archiveGrid .news-card[data-date]')]
+  const events = [...document.querySelectorAll(
+    '#newsGrid .news-card[data-date], #archiveGrid .news-card[data-date], #calendarSource .news-card[data-date]')]
     .map(card => ({
       card,
       start: card.dataset.date,
@@ -744,7 +754,7 @@ document.querySelectorAll('a[href^="mailto:"]').forEach(link => {
 // A naptár alatt megjelenő (másolt) kártyákon is működik.
 // ==========================================================
 (function initProgramModal() {
-  if (!document.getElementById('newsGrid')) return;
+  if (!document.getElementById('newsGrid') && !document.getElementById('calendarSource')) return;
   const CARDS = '#newsGrid .news-card, #archiveGrid .news-card, #calendarDetail .news-card';
 
   const overlay = document.createElement('div');
@@ -874,7 +884,7 @@ document.querySelectorAll('a[href^="mailto:"]').forEach(link => {
 (function initLightbox() {
   const SELECTOR = '.camp-col img, .camp-media-3 img, .side-photos img, .home-gallery img, .team-split-image img, .program-modal-gallery img, .site-gallery img';
   // a programok oldalán a képek csak a felugró ablakban jelennek meg később, ezért ott is kell
-  if (!document.querySelector(SELECTOR) && !document.getElementById('newsGrid')) return;
+  if (!document.querySelector(SELECTOR) && !document.querySelector('#newsGrid, #calendarSource')) return;
 
   const overlay = document.createElement('div');
   overlay.className = 'lightbox';
@@ -1013,7 +1023,7 @@ function buildShareMessage(card, id) {
   const date = card.querySelector('.news-date')?.textContent.trim() ?? '';
   const time = detailValue(card, 'időpont');
   const place = detailValue(card, 'helyszín');
-  const url = `${location.origin}${location.pathname}#${id}`;
+  const url = programsUrl(id);
 
   const lines = [title];
   if (date) lines.push(`\u{1F4C5} ${date}`);
@@ -1071,7 +1081,7 @@ function buildCalendarLink(card) {
   const place = detailValue(card, 'helyszín');
   const description = (card.querySelector('.news-desc p') || card.querySelector(':scope > p:not(.news-detail)'))
     ?.textContent.replace(/\s+/g, ' ').trim() ?? '';
-  const url = `${location.origin}${location.pathname}#${card.id}`;
+  const url = programsUrl(card.id);
 
   const params = new URLSearchParams({
     action: 'TEMPLATE',
@@ -1084,7 +1094,10 @@ function buildCalendarLink(card) {
   return `https://calendar.google.com/calendar/render?${params}`;
 }
 
-document.querySelectorAll('#newsGrid .news-card[id]').forEach(card => {
+const programsUrl = id => `${location.origin}${location.pathname.replace(/[^/]*$/, '')}programok.html#${id}`;
+
+document.querySelectorAll('#newsGrid .news-card[id], #calendarSource .news-card[id]').forEach(card => {
+  if (card.closest('#calendarSource') && isPastCard(card)) return;   // lejárt programhoz nem kell
   const actions = document.createElement('div');
   actions.className = 'news-actions';
   const button = document.createElement('button');

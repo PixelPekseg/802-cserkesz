@@ -6,7 +6,8 @@ Használat:
     python tools/sync_programok.py --url <link>    # megadott CSV-hivatkozásból
     python tools/sync_programok.py --file x.csv    # helyi CSV-fájlból (teszteléshez)
 
-A script a programok.html két megjegyzés közötti szakaszát írja újra:
+A script a programok.html és a naptar.html (ott rejtve, a naptárnézethez) két megjegyzés közötti
+szakaszát írja újra:
     <!-- PROGRAMOK:START ... -->  ...  <!-- PROGRAMOK:END -->
 Ha a letöltés vagy az ellenőrzés hibás (pl. változott a fejléc, vagy egyetlen érvényes sor
 sincs), a script hibával leáll, és semmit nem módosít: az oldal az utolsó jó állapotot mutatja.
@@ -32,6 +33,7 @@ from program_images import ProgramImages  # noqa: E402  (a Drive-os képek; PIL 
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PAGE = os.path.join(ROOT, 'programok.html')
+PAGES = [PAGE, os.path.join(ROOT, 'naptar.html')]   # a naptár oldal rejtve, a naptárnézethez
 SNAPSHOT = os.path.join(ROOT, 'data', 'programok.csv')
 
 MONTHS = ['január', 'február', 'március', 'április', 'május', 'június',
@@ -334,17 +336,19 @@ def main():
     used_ids = set()
     cards = '\n\n'.join(build_card(row, used_ids) for row in rows)
 
-    with open(PAGE, encoding='utf-8') as handle:
-        page = handle.read()
+    # ugyanazok a kártyák a Programok oldalra és (rejtve, a naptárhoz) a Naptár oldalra
     pattern = re.compile(r'(<!-- PROGRAMOK:START[^\n]*-->\n)(.*?)(\n[ \t]*<!-- PROGRAMOK:END -->)', re.S)
-    if not pattern.search(page):
-        fail('A programok.html-ben nem találom a PROGRAMOK:START / PROGRAMOK:END jelölőket.')
-    new_page = pattern.sub(lambda m: m.group(1) + cards + '\n\n        <!-- PROGRAMOK:END -->', page, count=1)
-
-    changed = new_page != page
-    if changed:
-        with open(PAGE, 'w', encoding='utf-8') as handle:
-            handle.write(new_page)
+    changed = False
+    for path in PAGES:
+        with open(path, encoding='utf-8') as handle:
+            page = handle.read()
+        if not pattern.search(page):
+            fail(f'A {os.path.basename(path)}-ben nem találom a PROGRAMOK:START / PROGRAMOK:END jelölőket.')
+        new_page = pattern.sub(lambda m: m.group(1) + cards + '\n\n        <!-- PROGRAMOK:END -->', page, count=1)
+        if new_page != page:
+            with open(path, 'w', encoding='utf-8') as handle:
+                handle.write(new_page)
+            changed = True
 
     os.makedirs(os.path.dirname(SNAPSHOT), exist_ok=True)
     old_snapshot = open(SNAPSHOT, encoding='utf-8').read() if os.path.exists(SNAPSHOT) else None
@@ -353,7 +357,7 @@ def main():
             handle.write(csv_text)
 
     print(f'{len(rows)} program; frissített képek: {len(images.updated)}; '
-          f'programok.html {"frissítve" if changed else "változatlan"}.')
+          f'programok.html/naptar.html {"frissítve" if changed else "változatlan"}.')
 
 
 if __name__ == '__main__':
