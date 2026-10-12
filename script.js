@@ -707,13 +707,147 @@ document.querySelectorAll('a[href^="mailto:"]').forEach(link => {
 });
 
 // ==========================================================
+// Programkártya nagyítva: a kártyára kattintva felugró ablak nyílik. Bal
+// oldalt (telefonon felül) a kártya szövegei és gombjai, a fő helyen a
+// program képei és videói több oszlopos, fel-le görgethető galériában (vágás
+// nélkül); a képre vagy videóra kattintva a nagyító nyílik (a videó ott,
+// a lejátszás gombra kattintva indul a Drive lejátszójával). A kártyán lévő linkek, gombok és
+// lapozónyilak a megszokott módon működnek; a kártya bélyegképére kattintva
+// az ablak annál a képnél nyílik meg. Bezárás: ×, háttérre kattintás, Esc.
+// A naptár alatt megjelenő (másolt) kártyákon is működik.
+// ==========================================================
+(function initProgramModal() {
+  if (!document.getElementById('newsGrid')) return;
+  const CARDS = '#newsGrid .news-card, #archiveGrid .news-card, #calendarDetail .news-card';
+
+  const overlay = document.createElement('div');
+  overlay.className = 'program-modal';
+  overlay.hidden = true;
+  overlay.setAttribute('role', 'dialog');
+  overlay.setAttribute('aria-modal', 'true');
+  overlay.innerHTML =
+    '<div class="program-modal-card">' +
+    '<button class="program-modal-close" type="button" aria-label="Bezárás">&times;</button>' +
+    '<article class="news-card program-modal-text"></article>' +
+    '<div class="program-modal-gallery" data-gallery></div>' +
+    '</div>';
+  document.body.append(overlay);
+
+  const box = overlay.querySelector('.program-modal-card');
+  const text = overlay.querySelector('.program-modal-text');
+  const gallery = overlay.querySelector('.program-modal-gallery');
+  const closeButton = overlay.querySelector('.program-modal-close');
+  let opener = null;
+
+  function open(card, imageIndex = -1) {
+    opener = card;
+    // a szövegek és gombok (a kártya képsávja nélkül); a megosztás gomb a .news-card-ból dolgozik
+    text.replaceChildren(...[...card.children]
+      .filter(child => !child.classList.contains('news-gallery'))
+      .map(child => child.cloneNode(true)));
+    text.querySelectorAll('.share-btn').forEach(btn => {
+      btn.classList.remove('is-copied');
+      const span = btn.querySelector('span');
+      if (span) span.textContent = 'Üzenet másolása';
+    });
+
+    const images = [...card.querySelectorAll('.news-gallery img')];
+    gallery.replaceChildren(...images.map(source => {
+      if (source.dataset.video) return videoTile(source);
+      const img = document.createElement('img');
+      img.src = source.dataset.full || source.src;   // itt a nagy változat
+      img.dataset.full = source.dataset.full || source.src;
+      img.alt = source.alt;
+      img.loading = 'lazy';
+      img.tabIndex = 0;
+      img.setAttribute('role', 'button');
+      img.setAttribute('aria-label', `${source.alt} (nagyítás)`);
+      return img;
+    }));
+    box.classList.toggle('no-images', images.length === 0);
+
+    overlay.setAttribute('aria-label', card.querySelector('h3')?.textContent.trim() ?? 'Program');
+    overlay.hidden = false;
+    document.body.style.overflow = 'hidden';
+    box.scrollTop = 0;
+    text.scrollTop = 0;
+    gallery.scrollTop = 0;
+    if (imageIndex >= 0 && gallery.children[imageIndex]) {
+      gallery.children[imageIndex].scrollIntoView({ block: 'center' });
+    }
+    closeButton.focus();
+  }
+
+  // Videó: előnézeti kép lejátszás ikonnal; kattintásra (mint a képeknél) a nagyító nyílik,
+  // ott indítható a Drive lejátszója
+  function videoTile(source) {
+    const tile = document.createElement('div');
+    tile.className = 'program-modal-video';
+    const poster = document.createElement('img');
+    poster.src = source.dataset.full || source.src;
+    poster.dataset.full = poster.src;
+    poster.dataset.video = source.dataset.video;
+    poster.alt = source.alt;
+    poster.loading = 'lazy';
+    poster.tabIndex = 0;
+    poster.setAttribute('role', 'button');
+    poster.setAttribute('aria-label', `${source.alt} (lejátszás nagyban)`);
+    tile.append(poster);
+    return tile;
+  }
+
+  function close() {
+    overlay.hidden = true;
+    gallery.replaceChildren();
+    document.body.style.overflow = '';
+    opener?.focus();
+  }
+
+  document.addEventListener('click', event => {
+    const card = event.target.closest(CARDS);
+    if (!card || overlay.contains(card)) return;
+    if (event.target.closest('a, button')) return;   // linkek, gombok, lapozónyilak
+    const thumb = event.target.closest('.news-gallery img');
+    const index = thumb ? [...card.querySelectorAll('.news-gallery img')].indexOf(thumb) : -1;
+    open(card, index);
+  });
+
+  document.addEventListener('keydown', event => {
+    if (!overlay.hidden) {
+      // ha fölötte a nagyító is nyitva van, az Esc azt zárja be
+      if (event.key === 'Escape' && document.querySelector('.lightbox:not([hidden])') === null) close();
+      return;
+    }
+    const card = event.target.closest?.(CARDS);
+    if (card && event.target === card && (event.key === 'Enter' || event.key === ' ')) {
+      event.preventDefault();
+      open(card);
+    }
+  });
+
+  closeButton.addEventListener('click', close);
+  overlay.addEventListener('click', event => {
+    if (event.target === overlay) close();
+  });
+
+  // billentyűzettel is elérhető kártyák (a naptár másolatai a klónozással öröklik)
+  const prepare = card => {
+    card.tabIndex = 0;
+    card.setAttribute('aria-haspopup', 'dialog');
+    card.title = 'Kattints a nagyításhoz';
+  };
+  document.querySelectorAll(CARDS).forEach(prepare);
+})();
+
+// ==========================================================
 // Nagyítás (lightbox): a .camp-col képekre kattintva a kép teljes méretben,
 // sötét háttéren jelenik meg (felirat nélkül). Bezárás: × gomb, háttérre kattintás vagy Esc;
 // léptetés: nyilak a gombokkal vagy a billentyűzeten (bal/jobb nyíl).
 // ==========================================================
 (function initLightbox() {
-  const SELECTOR = '.camp-col img, .camp-media-3 img, .side-photos img, .home-gallery img, .team-split-image img, .news-gallery img';
-  if (!document.querySelector(SELECTOR)) return;
+  const SELECTOR = '.camp-col img, .camp-media-3 img, .side-photos img, .home-gallery img, .team-split-image img, .program-modal-gallery img';
+  // a programok oldalán a képek csak a felugró ablakban jelennek meg később, ezért ott is kell
+  if (!document.querySelector(SELECTOR) && !document.getElementById('newsGrid')) return;
 
   const overlay = document.createElement('div');
   overlay.className = 'lightbox';
@@ -724,11 +858,13 @@ document.querySelectorAll('a[href^="mailto:"]').forEach(link => {
   overlay.innerHTML =
     '<button class="lightbox-btn lightbox-close" type="button" aria-label="Bezárás">&times;</button>' +
     '<button class="lightbox-btn lightbox-prev" type="button" aria-label="Előző kép">&#8249;</button>' +
-    '<figure class="lightbox-figure"><img class="lightbox-img" alt=""></figure>' +
+    '<figure class="lightbox-figure"><img class="lightbox-img" alt="">' +
+    '<div class="lightbox-video" hidden></div></figure>' +
     '<button class="lightbox-btn lightbox-next" type="button" aria-label="Következő kép">&#8250;</button>';
   document.body.append(overlay);
 
   const view = overlay.querySelector('.lightbox-img');
+  const videoStage = overlay.querySelector('.lightbox-video');
   const closeButton = overlay.querySelector('.lightbox-close');
   let images = [];
   let index = 0;
@@ -736,9 +872,37 @@ document.querySelectorAll('a[href^="mailto:"]').forEach(link => {
 
   function show(i) {
     index = (i + images.length) % images.length;
-    // a kis bélyegkép helyett a nagy változatot töltjük be (data-full)
-    view.src = images[index].dataset.full || images[index].currentSrc || images[index].src;
-    view.alt = images[index].alt;
+    const item = images[index];
+    const src = item.dataset.full || item.currentSrc || item.src;
+    videoStage.replaceChildren();   // a továbblapozás leállítja az épp futó videót
+    if (item.dataset.video) {
+      // videó: előbb csak az előnézet és a lejátszás gomb; kattintásra indul a Drive lejátszója
+      // (a Google-höz csak ekkor kapcsolódik az oldal)
+      view.hidden = true;
+      videoStage.hidden = false;
+      const poster = document.createElement('img');
+      poster.src = src;
+      poster.alt = item.alt;
+      const play = document.createElement('button');
+      play.type = 'button';
+      play.className = 'lightbox-play';
+      play.setAttribute('aria-label', `${item.alt} lejátszása`);
+      play.addEventListener('click', () => {
+        const frame = document.createElement('iframe');
+        frame.src = `https://drive.google.com/file/d/${encodeURIComponent(item.dataset.video)}/preview`;
+        frame.title = item.alt;
+        frame.allow = 'autoplay; fullscreen';
+        frame.allowFullscreen = true;
+        videoStage.replaceChildren(frame);
+      });
+      videoStage.append(poster, play);
+    } else {
+      videoStage.hidden = true;
+      view.hidden = false;
+      // a kis bélyegkép helyett a nagy változatot töltjük be (data-full)
+      view.src = src;
+      view.alt = item.alt;
+    }
   }
 
   function open(trigger) {
@@ -756,7 +920,8 @@ document.querySelectorAll('a[href^="mailto:"]').forEach(link => {
 
   function close() {
     overlay.hidden = true;
-    document.body.style.overflow = '';
+    videoStage.replaceChildren();   // a videó leáll
+    document.body.style.overflow = document.querySelector('.program-modal:not([hidden])') ? 'hidden' : '';
     opener?.focus();
   }
 
