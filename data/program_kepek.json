@@ -1,1 +1,29 @@
-{}
+{
+  "csm": {
+    "files": {
+      "csm1": {
+        "file": "csm1.JPG",
+        "modified": "2026-10-12T14:29:34.658Z"
+      },
+      "csm2": {
+        "file": "csm2.JPG",
+        "modified": "2026-10-12T14:29:21.120Z"
+      },
+      "csm3": {
+        "file": "csm3.JPG",
+        "modified": "2026-10-12T14:29:30.670Z"
+      },
+      "csm4": {
+        "file": "csm4.JPG",
+        "modified": "2026-10-12T14:29:25.973Z"
+      }
+    },
+    "folder": "csm",
+    "order": [
+      "csm1",
+      "csm2",
+      "csm3",
+      "csm4"
+    ]
+  }
+}
