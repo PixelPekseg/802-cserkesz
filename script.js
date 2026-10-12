@@ -863,7 +863,7 @@ document.querySelectorAll('a[href^="mailto:"]').forEach(link => {
 // léptetés: nyilak a gombokkal vagy a billentyűzeten (bal/jobb nyíl).
 // ==========================================================
 (function initLightbox() {
-  const SELECTOR = '.camp-col img, .camp-media-3 img, .side-photos img, .home-gallery img, .team-split-image img, .program-modal-gallery img';
+  const SELECTOR = '.camp-col img, .camp-media-3 img, .side-photos img, .home-gallery img, .team-split-image img, .program-modal-gallery img, .site-gallery img';
   // a programok oldalán a képek csak a felugró ablakban jelennek meg később, ezért ott is kell
   if (!document.querySelector(SELECTOR) && !document.getElementById('newsGrid')) return;
 

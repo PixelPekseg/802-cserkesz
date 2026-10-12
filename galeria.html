@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Galéria – 802. sz. Szent Korona Cserkészcsapat</title>
+  <meta name="description" content="Fotók és videók a 802. sz. Szent Korona Cserkészcsapat életéből: programok, táborok, csapatotthon.">
+
+  <!-- FONTOS: a "https://www.YOUR-DOMAIN-HERE.com" placeholdert cseréld le a valódi domainre (lásd index.html) -->
+  <link rel="canonical" href="https://www.YOUR-DOMAIN-HERE.com/galeria.html">
+
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Galéria – 802. sz. Szent Korona Cserkészcsapat">
+  <meta property="og:description" content="Fotók és videók a csapat életéből.">
+  <meta property="og:url" content="https://www.YOUR-DOMAIN-HERE.com/galeria.html">
+  <meta property="og:image" content="https://www.YOUR-DOMAIN-HERE.com/images/webp/kozos/share.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="A 802. sz. Szent Korona Cserkészcsapat tagjai közös csoportképen">
+  <meta property="og:site_name" content="802. sz. Szent Korona Cserkészcsapat">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta property="og:locale" content="hu_HU">
+
+  <link rel="icon" type="image/jpeg" href="images/webp/kozos/logo_green.jpg?v=1">
+  <link rel="apple-touch-icon" href="images/webp/kozos/logo_green.jpg?v=1">
+  <link rel="stylesheet" href="style.css?v=96">
+</head>
+<body>
+
+  <!-- Értesítősáv (piros, az oldal tetején) -->
+  <!-- ERTESITOK:START – a tools/sync_ertesitok.py írja a Google Táblázatból, kézzel ne szerkeszd -->
+  <div class="notice-bar" id="noticeBar">
+    <div class="notice" data-id="55c9686b34" data-from="2026-10-11" data-until="2026-10-18" hidden>
+      <div class="container notice-inner">
+        <p class="notice-text">
+          <strong class="notice-title">Tagdíj befizetés</strong>
+          <span class="notice-deadline">Határidő: 2026. október 18.</span>
+          <span class="notice-message">Kérjük, a féléves tagdíjat utald át a csapat számlájára. A számlaszámot a Támogass minket oldalon találod.</span>
+        </p>
+        <button type="button" class="notice-close" aria-label="Értesítés bezárása">&times;</button>
+      </div>
+    </div>
+    <div class="notice" data-id="4f63410636" data-from="2027-03-01" data-until="2027-05-31" hidden>
+      <div class="container notice-inner">
+        <p class="notice-text">
+          <strong class="notice-title">Nagytábori jelentkezés</strong>
+          <span class="notice-deadline">Határidő: 2027. május 15.</span>
+          <span class="notice-message">Elindult a jelentkezés a nyári nagytáborra! Részletek a Tábor oldalon.</span>
+        </p>
+        <button type="button" class="notice-close" aria-label="Értesítés bezárása">&times;</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ERTESITOK:END -->
+
+  <!-- Fejléc / navigáció -->
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="index.html" class="logo">
+        <img class="logo-img" src="images/webp/kozos/logo_white.webp" alt="" data-optional>
+        <span class="logo-text">802. sz. Szent Korona Cserkészcsapat</span>
+      </a>
+
+      <!-- Hamburger gomb mobil nézethez -->
+      <button class="nav-toggle" id="navToggle" type="button" aria-label="Menü megnyitása" aria-expanded="false" aria-controls="mainNav">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+
+      <nav class="main-nav" id="mainNav">
+        <ul>
+          <li><a href="index.html">Főoldal</a></li>
+          <li class="has-sub">
+            <button class="nav-sub-toggle" type="button" aria-expanded="false" aria-controls="subPrograms">Események</button>
+            <ul class="sub-nav" id="subPrograms">
+              <li><a href="programok.html">Naptár</a></li>
+              <li><a href="tabor.html">Tábor</a></li>
+            </ul>
+          </li>
+          <li><a href="csapatotthon.html">Csapatotthonunk</a></li>
+          <li><a href="eszkozok.html">Eszközbérlés</a></li>
+          <li><a href="rolunk.html">Rólunk</a></li>
+          <li><a class="nav-cta nav-cta-join" href="csatlakozom.html">Csatlakozom</a></li>
+          <li><a class="nav-cta" href="tamogass.html">Támogass minket</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Címsáv -->
+  <section class="page-banner">
+    <h1>Galéria</h1>
+    <p>Fotók és videók a csapat életéből</p>
+  </section>
+
+  <!--
+    A galériát a tools/sync_galeria.py állítja össze az oldal képeiből és a programok
+    Drive-ról jövő képeiből/videóiból (óránként, a többi szinkronnal együtt). A vezetők
+    portréi, a logók és a plakátok kimaradnak. Kattintásra nagyító nyílik, amely az egész
+    galérián végiglapoz (data-gallery); a videók a nagyítóban, kattintásra indulnak.
+  -->
+  <section class="section">
+    <div class="container gallery-page" data-gallery>
+      <!-- GALERIA:START – a tools/sync_galeria.py írja, kézzel ne szerkeszd -->
+      <section class="gallery-section" id="galeria-programok">
+        <h2>Programjaink</h2>
+        <h3 class="gallery-subtitle">Cserkészmise <span class="gallery-date">2027. január 10.</span></h3>
+        <div class="site-gallery">
+          <img src="images/webp/programok/csm/thumb/csm1.webp" data-full="images/webp/programok/csm/csm1.webp" alt="Cserkészmise – 1. kép" loading="lazy">
+          <img src="images/webp/programok/csm/thumb/csm2.webp" data-full="images/webp/programok/csm/csm2.webp" alt="Cserkészmise – 2. kép" loading="lazy">
+          <img src="images/webp/programok/csm/thumb/csm3.webp" data-full="images/webp/programok/csm/csm3.webp" alt="Cserkészmise – 3. kép" loading="lazy">
+          <img src="images/webp/programok/csm/thumb/csm4.webp" data-full="images/webp/programok/csm/csm4.webp" alt="Cserkészmise – 4. kép" loading="lazy">
+          <img src="images/webp/programok/csm/thumb/test-video.webp" data-full="images/webp/programok/csm/test-video.webp" data-video="1oZI0zOTSq5PbckA39SjVOBxtEg9wZQnZ" alt="Cserkészmise – 5. videó" loading="lazy">
+        </div>
+      </section>
+      <section class="gallery-section" id="galeria-tabor">
+        <h2>Tábor</h2>
+        <div class="site-gallery">
+          <img src="images/webp/tabor/thumb/epitkezes1.webp" data-full="images/webp/tabor/epitkezes1.webp" alt="Gyerekek és vezetők építkeznek a tábor helyszínén, egy fa tövében" loading="lazy">
+          <img src="images/webp/tabor/thumb/epitkezes2.webp" data-full="images/webp/tabor/epitkezes2.webp" alt="Egy fiú ásóval dolgozik a tábor építésekor" loading="lazy">
+          <img src="images/webp/tabor/thumb/felszereles1.webp" data-full="images/webp/tabor/felszereles1.webp" alt="Hátizsákos gyerekek gyülekeznek a tábor kezdetén" loading="lazy">
+          <img src="images/webp/tabor/thumb/felszereles2.webp" data-full="images/webp/tabor/felszereles2.webp" alt="Egy vezető áll a tábori gyülekezőn, körülötte gyerekek" loading="lazy">
+          <img src="images/webp/tabor/thumb/programok1.webp" data-full="images/webp/tabor/programok1.webp" alt="Zászlófelvonás a tábori zászlórúdnál" loading="lazy">
+          <img src="images/webp/tabor/thumb/programok2.webp" data-full="images/webp/tabor/programok2.webp" alt="Gyerekek és vezetők csoportja gyalogol az erdőben" loading="lazy">
+          <img src="images/webp/tabor/thumb/programok3.webp" data-full="images/webp/tabor/programok3.webp" alt="Íjászat a táborban" loading="lazy">
+          <img src="images/webp/tabor/thumb/km1.webp" data-full="images/webp/tabor/km1.webp" alt="Jelmezes vezető páncélban, lándzsával és pajzzsal a keretmese egyik jelenetében" loading="lazy">
+          <img src="images/webp/tabor/thumb/km2.webp" data-full="images/webp/tabor/km2.webp" alt="Star Wars-jelmezes vezetők fénykardokkal a keretmese egyik jelenetében" loading="lazy">
+        </div>
+      </section>
+      <section class="gallery-section" id="galeria-csapatotthonunk">
+        <h2>Csapatotthonunk</h2>
+        <div class="site-gallery">
+          <img src="images/webp/csapatotthon/bezsilla4.webp" data-full="images/webp/csapatotthon/bezsilla4.webp" alt="Cserkészek a Bezsilla villa kertjében, padoknál és asztaloknál" loading="lazy">
+          <img src="images/webp/csapatotthon/bezsilla2.webp" data-full="images/webp/csapatotthon/bezsilla2.webp" alt="Két ember a falra festett Baden-Powell-portré mellett" loading="lazy">
+          <img src="images/webp/csapatotthon/bezsilla6.webp" data-full="images/webp/csapatotthon/bezsilla6.webp" alt="Fiatalok a Bezsilla villa bejárata előtt télen" loading="lazy">
+          <img src="images/webp/csapatotthon/bezsilla1.webp" data-full="images/webp/csapatotthon/bezsilla1.webp" alt="A Bezsilla villa napsütésben, fák alatt" loading="lazy">
+          <img src="images/webp/csapatotthon/bezsilla5.webp" data-full="images/webp/csapatotthon/bezsilla5.webp" alt="Két hóember a Bezsilla villa előtt télen" loading="lazy">
+          <img src="images/webp/csapatotthon/bezsilla3.webp" data-full="images/webp/csapatotthon/bezsilla3.webp" alt="A Bezsilla villa és a kert zászlókkal" loading="lazy">
+        </div>
+      </section>
+      <section class="gallery-section" id="galeria-csapatunk">
+        <h2>Csapatunk</h2>
+        <div class="site-gallery">
+          <img src="images/webp/fooldal/csapatunk.webp" data-full="images/webp/fooldal/csapatunk.webp" alt="A csapat tagjai közös csoportképen az erdő előtt" loading="lazy">
+          <img src="images/webp/fooldal/hero.webp" data-full="images/webp/fooldal/hero.webp" alt="Cserkészek madártávlatból, a réten kirakott 802-es szám" loading="lazy">
+          <img src="images/webp/rolunk/img_3437.webp" data-full="images/webp/rolunk/img_3437.webp" alt="Cserkészek vonulnak az erdőben" loading="lazy">
+          <img src="images/webp/rolunk/img_9892.webp" data-full="images/webp/rolunk/img_9892.webp" alt="Gyerekek és vezetők egy fából épített tábori építmény körül" loading="lazy">
+          <img src="images/webp/rolunk/img_7323.webp" data-full="images/webp/rolunk/img_7323.webp" alt="Gyerekek körben fogják egymás kezét egy réten" loading="lazy">
+          <img src="images/webp/rolunk/img_6306.webp" data-full="images/webp/rolunk/img_6306.webp" alt="Egy gyerek a hátán cipel egy másikat egy réten" loading="lazy">
+          <img src="images/webp/rolunk/img_0915.webp" data-full="images/webp/rolunk/img_0915.webp" alt="Cserkészek tisztelegnek sorban egy zászló előtt" loading="lazy">
+          <img src="images/webp/rolunk/img_6220.webp" data-full="images/webp/rolunk/img_6220.webp" alt="Vezetők és fiatalok csoportja az erdőben" loading="lazy">
+          <img src="images/webp/rolunk/img_1338.webp" data-full="images/webp/rolunk/img_1338.webp" alt="Jelmezes gyerekek kardokkal játszanak az erdőben" loading="lazy">
+          <img src="images/webp/rolunk/img_3298.webp" data-full="images/webp/rolunk/img_3298.webp" alt="Cserkészek szabadtéri szentmisén az erdőben" loading="lazy">
+          <img src="images/webp/rolunk/img_3226.webp" data-full="images/webp/rolunk/img_3226.webp" alt="Vezetők és gyerekek egy fából épített pallóhídon" loading="lazy">
+          <img src="images/webp/rolunk/img_6290.webp" data-full="images/webp/rolunk/img_6290.webp" alt="Gyerekek egy sátor mellett a táborban" loading="lazy">
+          <img src="images/webp/rolunk/img_7015.webp" data-full="images/webp/rolunk/img_7015.webp" alt="Pap a cserkészmisén" loading="lazy">
+          <img src="images/webp/rolunk/img_6550.webp" data-full="images/webp/rolunk/img_6550.webp" alt="Fiatalok egy fa asztalnál a táborban" loading="lazy">
+          <img src="images/webp/rolunk/img_6676.webp" data-full="images/webp/rolunk/img_6676.webp" alt="Cserkészek pihennek a táborban egy sátor előtt" loading="lazy">
+          <img src="images/webp/rolunk/img_8400.webp" data-full="images/webp/rolunk/img_8400.webp" alt="Cserkészek a ház kertjében munka közben" loading="lazy">
+          <img src="images/webp/rolunk/img_7826.webp" data-full="images/webp/rolunk/img_7826.webp" alt="Hosszú asztalnál vacsorázó cserkészek naplementekor" loading="lazy">
+          <img src="images/webp/rolunk/img_6570.webp" data-full="images/webp/rolunk/img_6570.webp" alt="Függőágyak az erdőben" loading="lazy">
+          <img src="images/webp/rolunk/img_8406.webp" data-full="images/webp/rolunk/img_8406.webp" alt="Gyerekek bográcsban főznek a táborban" loading="lazy">
+          <img src="images/webp/rolunk/img_6571.webp" data-full="images/webp/rolunk/img_6571.webp" alt="Gyerekek egy napraforgó- és szántóföld mellett" loading="lazy">
+        </div>
+      </section>
+
+      <!-- GALERIA:END -->
+    </div>
+  </section>
+
+  <!-- Lábléc -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-links">
+        <a href="mailto:802@cserkesz.hu">802@cserkesz.hu</a>
+        <a href="dokumentumok.html">Dokumentumok</a>
+        <a href="galeria.html">Galéria</a>
+        <a href="https://www.facebook.com/802szentkorona" target="_blank" rel="noopener noreferrer">Facebook</a>
+        <a href="https://www.instagram.com/802szentkorona/" target="_blank" rel="noopener noreferrer">Instagram</a>
+      </div>
+      <p>&copy; <span id="year"></span> 802. sz. Szent Korona Cserkészcsapat. Minden jog fenntartva.</p>
+    </div>
+  </footer>
+
+  <script src="script.js?v=53"></script>
+</body>
+</html>

@@ -3010,3 +3010,74 @@ body:has(.main-nav.open) .upcoming-tab {
     position: fixed;
   }
 }
+
+/* ==========================================================
+   Galéria (galeria.html; a tools/sync_galeria.py állítja össze)
+   Szakaszonként többoszlopos, vágás nélküli képrács; kattintásra nagyító,
+   amely az egész galérián végiglapoz. A videók előnézetén lejátszás ikon van.
+   ========================================================== */
+.gallery-section + .gallery-section {
+  margin-top: 56px;
+}
+
+.gallery-section h2 {
+  margin-bottom: 20px;
+}
+
+.gallery-subtitle {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 12px;
+  margin: 28px 0 12px;
+  font-size: 1.2rem;
+}
+
+.gallery-section h2 + .gallery-subtitle {
+  margin-top: 0;
+}
+
+.gallery-date {
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  font-weight: normal;
+  color: var(--color-text-muted);
+}
+
+.site-gallery {
+  columns: 4 220px;
+  column-gap: 12px;
+}
+
+.site-gallery img {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin: 0 0 12px;
+  border-radius: 10px;
+  break-inside: avoid;
+  background: var(--color-bg-alt);
+  cursor: zoom-in;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.site-gallery img:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(35, 63, 42, 0.18);
+}
+
+.site-gallery img:focus-visible {
+  outline: 3px solid var(--color-highlight);
+  outline-offset: 2px;
+}
+
+@media (max-width: 600px) {
+  .site-gallery {
+    columns: 2;
+    column-gap: 8px;
+  }
+
+  .site-gallery img {
+    margin-bottom: 8px;
+  }
+}

@@ -60,6 +60,29 @@ def _placeholder(width):
     return out.getvalue()
 
 
+def folder_parts(folder_name):
+    """A táblázatba írt mappanév → (útvonal részei a Program… mappán belül, a tárolási mappa neve)."""
+    parts = [p.strip() for p in folder_name.strip().strip('/').split('/') if p.strip()]
+    if len(parts) > 1 and is_program_folder({'mimeType': 'application/vnd.google-apps.folder', 'name': parts[0]}):
+        parts = parts[1:]
+    return parts, '-'.join(slugify(p) for p in parts)
+
+
+def on_disk(state, slug):
+    """A tárolt mappa elemei az állapot alapján: [{'thumb', 'full', 'video'}, ...]."""
+    entry = state.get(slug, {})
+    files = entry.get('files', {})
+    result = []
+    for name in entry.get('order', []):
+        full = f'{DIR_REL}/{slug}/{name}.webp'
+        thumb = f'{DIR_REL}/{slug}/thumb/{name}.webp'
+        if os.path.exists(os.path.join(common.ROOT, full)) and os.path.exists(os.path.join(common.ROOT, thumb)):
+            info = files.get(name, {})
+            result.append({'thumb': thumb, 'full': full,
+                           'video': info.get('id') if info.get('kind') == 'video' else None})
+    return result
+
+
 class ProgramImages:
     def __init__(self):
         self.drive = Drive()
@@ -75,16 +98,9 @@ class ProgramImages:
 
     def images_for(self, folder_name, where):
         """A mappa elemei: [{'thumb', 'full', 'video'}, ...] (a 'video' a Drive-azonosító vagy None)."""
-        folder_name = folder_name.strip().strip('/')
-        if not folder_name:
+        parts, slug = folder_parts(folder_name)
+        if not slug:
             return []
-        parts = [p.strip() for p in folder_name.split('/') if p.strip()]
-        if parts and is_program_folder({'mimeType': 'application/vnd.google-apps.folder', 'name': parts[0]}) \
-                and len(parts) > 1:
-            parts = parts[1:]
-        if not parts:
-            return []
-        slug = '-'.join(slugify(p) for p in parts)
         self.used.add(slug)
         if slug not in self.synced:
             self.synced.add(slug)
@@ -96,17 +112,7 @@ class ProgramImages:
         return self._on_disk(slug)
 
     def _on_disk(self, slug):
-        entry = self.state.get(slug, {})
-        files = entry.get('files', {})
-        result = []
-        for name in entry.get('order', []):
-            full = f'{DIR_REL}/{slug}/{name}.webp'
-            thumb = f'{DIR_REL}/{slug}/thumb/{name}.webp'
-            if os.path.exists(os.path.join(common.ROOT, full)) and os.path.exists(os.path.join(common.ROOT, thumb)):
-                info = files.get(name, {})
-                result.append({'thumb': thumb, 'full': full,
-                               'video': info.get('id') if info.get('kind') == 'video' else None})
-        return result
+        return on_disk(self.state, slug)
 
     def _find_folder(self, parts):
         program_root = next((i for i in self.drive.children(self.drive.root_id) if is_program_folder(i)), None)

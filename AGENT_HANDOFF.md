@@ -35,6 +35,7 @@ programok.html      Programok (léptethető hírdobozok + naptár, Táblázatbó
 tamogass.html       Támogass minket (SZJA 1%, palackvisszaváltás QR, egyesület adatai, számlaszám)
 eszkozok.html       Eszközbérlés (eszközlista + kapcsolattartó a Táblázatból, bevezető szöveg kézzel)
 dokumentumok.html   Dokumentumok (pdf/ mappa; csak a láblécből linkelt)
+galeria.html        Galéria (az oldal összes fotója/videója; a láblécből linkelt; tools/sync_galeria.py)
 404.html            Egyedi hibaoldal
 style.css, script.js
 robots.txt, sitemap.xml
@@ -48,7 +49,7 @@ drafts/             kész, de nem publikált anyagok (.gitignore-ban): adatkezel
 ```
 
 - **Menü:** Főoldal · **Események ▾** (lenyíló: Naptár = `programok.html`, Tábor = `tabor.html`) · Csapatotthonunk · Eszközbérlés · Rólunk · [Csatlakozom] · [Támogass minket]. A lenyíló `li.has-sub` > `button.nav-sub-toggle` + `ul.sub-nav`; az aktuális aloldalnál a `li` `is-current` osztályt, a link `aria-current="page"`-et kap. Egérrel használt széles képernyőn (`@media (hover: hover) and (min-width: 1301px)`) csak rámutatásra (és Tab-fókuszra) nyílik, nyíl nélkül, a kattintás ott szándékosan nem csinál semmit (a tulajdonos kérése); telefonon/érintőképernyőn kattintásra, nyíllal, a hamburger menüben behúzva; a JS (`script.js` eleje) kezeli a nyitást, a kívül kattintást és az Esc-et.
-- **A fejléc és a lábléc minden HTML fájlban külön szerepel** (9 oldal + 404). Menü-/lábléc-módosítást mindenhol át kell vezetni; utána `diff`-eld az oldalakat.
+- **A fejléc és a lábléc minden HTML fájlban külön szerepel** (10 oldal + 404). Menü-/lábléc-módosítást mindenhol át kell vezetni; utána `diff`-eld az oldalakat.
 - **Jekyll-csapda:** a GitHub Pages figyelmen kívül hagyja az `_`-lal kezdődő mappákat. Ezért `images/webp`, `images/originals`, `drafts` (korábban `_webp` stb. volt, a képek emiatt nem látszottak). **Soha ne nevezz el mappát `_`-lal.** `.nojekyll` nincs és nem kell.
 - **Cache-bust:** a HTML-ek `style.css?v=86` és `script.js?v=44` formában hivatkoznak a fájlokra (az utolsó ismert állapot). Bármely CSS/JS módosítás után **minden HTML-ben emeld a számot** (`sed`-del vagy ciklussal), különben a böngésző/CDN a régit mutatja.
 
@@ -75,7 +76,7 @@ drafts/             kész, de nem publikált anyagok (.gitignore-ban): adatkezel
    - `tools/sync_rajok.py` → `csatlakozom.html` (`RAJOK:START/END`)
    - `tools/sync_eszkozok.py` → `eszkozok.html` (`ESZKOZOK`, `ESZKOZ_KAPCSOLAT`) – külön táblázat két lappal, lásd 4.10
    - `tools/sync_szamlalok.py` → `index.html` és `rolunk.html` (`SZAMLALOK:START/END`) – külön táblázat, lásd 4.9
-   - `tools/sync_ertesitok.py` → **mind a 10 HTML oldal** (`ERTESITOK:START/END`, közvetlenül a `<body>` után) – ez egy **külön** Google Táblázatból jön, lásd 4.8
+   - `tools/sync_ertesitok.py` → **mind a 11 HTML oldal** (`ERTESITOK:START/END`, közvetlenül a `<body>` után) – ez egy **külön** Google Táblázatból jön, lásd 4.8
    - közös segédfüggvények: `tools/sync_common.py` (`sync_programok.py` önálló, de ugyanazokat az elveket követi). Csak a Python standard könyvtárát használják.
 3. A CSV-címek a workflow fájlban vannak (`PROGRAMOK_CSV_URL`, `TABOROK_CSV_URL`, `RAJOK_CSV_URL`, `ERTESITOK_CSV_URL`, `SZAMLALOK_CSV_URL`, `ESZKOZOK_CSV_URL`, `ESZKOZ_KAPCSOLAT_CSV_URL`). **Új táblázatnál/lapnál itt kell átírni.**
 4. A munkafolyamat a változásokat (`*.html data/`) `github-actions[bot]` néven commitolja és pusholja „Oldal frissítése a táblázatból” üzenettel, majd a Pages újraépít.
@@ -141,6 +142,9 @@ Külön nyilvános Google Táblázat két, külön közzétett lappal: **Eszköz
 - Az oldal fejléc-menüpont („Eszközbérlés”, a Csapatotthonunk után). Emiatt a hamburgerre váltás határa **1300 px** (`@media (max-width: 1300px)`); a menü+logó kb. 1275 px-et igényel. Újabb menüpontnál mérd újra.
 
 ---
+
+### 4.11 Galéria (`galeria.html`)
+A `tools/sync_galeria.py` a `GALERIA:START/END` blokkot írja (óránként, a programok után fut). Szakaszok: **Programjaink** (a `data/programok.csv` és a `data/program_kepek.json` alapján mappánként, a program nevével és legutóbbi dátumával, a legfrissebb elöl; képek és videók), **Tábor** (`images/webp/tabor/`), **Csapatotthonunk** (`csapatotthon/`), **Csapatunk** (`fooldal/` + `rolunk/`). Kimarad: `kozos/` (vezetők portréi, logók, piktogramok), `tamogass/` (plakát, QR). Az alt szöveget az oldalak `<img>` elemeiből veszi; ahol van `thumb/`, az látszik, a nagyítóban a nagy kép. A rács `columns: 4 220px` (telefonon 2), vágás nélkül; a konténer (`.gallery-page[data-gallery]`) miatt a nagyító az egész galérián végiglapoz, a videók a nagyítóban, kattintásra indulnak. **Új képmappa felvételekor** (pl. új oldal képei) a `STATIC_SECTIONS` listát bővíteni kell. A lábléc minden oldalon tartalmazza a „Galéria” linket.
 
 ## 5. Oldalankénti tudnivalók
 

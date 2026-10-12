@@ -83,6 +83,11 @@ jobs:
           ESZKOZ_KAPCSOLAT_CSV_URL: https://docs.google.com/spreadsheets/d/e/2PACX-1vTawBNHKmmN8o2RHWIeLXtHikZ7oJTr19isdSULQXbp2sJte3a5TnaKpjeM_TA5UkxhjZ6OtOVCtMRD/pub?gid=1765500368&single=true&output=csv
         run: python tools/sync_eszkozok.py
 
+      # a galéria a programok (és képeik) frissítése után áll össze
+      - name: Galéria összeállítása
+        if: ${{ !cancelled() }}
+        run: python tools/sync_galeria.py
+
       - name: Havi életjel
         if: ${{ !cancelled() }}
         run: date +%Y-%m > data/keepalive.txt
