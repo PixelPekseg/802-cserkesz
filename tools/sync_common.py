@@ -48,6 +48,14 @@ def fetch(args, env_name):
     return text.replace('\r\n', '\n').replace('\r', '\n')
 
 
+SHEET_ERRORS = ('#ERROR!', '#NAME?', '#REF!', '#VALUE!', '#N/A', '#DIV/0!', '#NUM!', '#NULL!')
+
+
+def is_sheet_error(value):
+    """A Google Táblázat hibaértéke (pl. "+36 …" képletként értelmezve #ERROR! lesz) – ne kerüljön ki az oldalra."""
+    return value.strip().upper() in SHEET_ERRORS
+
+
 def read_table(csv_text, columns, required):
     """A fejléc alapján oszlopindexeket keres (a fejléc ELEJÉT kisbetűsen hasonlítja; egy kulcshoz
     több előtag is megadható tuple-ként), és
@@ -70,9 +78,28 @@ def read_table(csv_text, columns, required):
     for line_number, row in enumerate(rows[1:], start=2):
         if not any(cell.strip() for cell in row):
             continue
-        record = {key: (row[i].strip() if i < len(row) else '') for key, i in index.items()}
+        record = {}
+        for key, i in index.items():
+            value = row[i].strip() if i < len(row) else ''
+            if is_sheet_error(value):
+                warn(f'{line_number}. sor, "{rows[0][i].strip()}" oszlop: a cellában táblázathiba van ({value}), '
+                     'üresnek veszem. (Telefonszámnál a "+" jel okozza: állítsd az oszlopot Egyszerű szövegre, '
+                     'vagy írd így: \'+36 …)')
+                value = ''
+            record[key] = value
         result.append((line_number, record))
     return result
+
+
+def fix_phone(phone):
+    """Ha a táblázat a "+36 …" számot számmá alakította (pl. 36707582659), visszaadja olvasható
+    formában (+36 70 758 2659). Minden más beírást változatlanul hagy."""
+    raw = phone.strip()
+    if re.fullmatch(r'36\d{9}', raw):          # mobil / vidéki: 36 + 2 jegyű körzet + 7 jegy
+        return f'+36 {raw[2:4]} {raw[4:7]} {raw[7:]}'
+    if re.fullmatch(r'361\d{7}', raw):         # budapesti: 36 1 + 7 jegy
+        return f'+36 1 {raw[3:6]} {raw[6:]}'
+    return phone
 
 
 def contact_lines(email, phone):
@@ -84,6 +111,7 @@ def contact_lines(email, phone):
         else:
             warn(f'Az e-mail cím nem tűnik érvényesnek, kihagyva: "{email}"')
     if phone:
+        phone = fix_phone(phone)
         digits = re.sub(r'[^\d+]', '', phone)
         if len(re.sub(r'\D', '', digits)) >= 6:
             lines.append(f'<a class="inline-link" href="tel:{digits}">{html.escape(phone)}</a>')
