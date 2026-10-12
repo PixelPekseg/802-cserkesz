@@ -140,7 +140,8 @@ document.querySelectorAll('img[data-optional]').forEach(img => {
 // Minden .news-card a data-date (és opcionálisan data-end-date) attribútuma
 // alapján "közelgő" vagy "lejárt". A közelgők a #newsGrid-ben maradnak dátum
 // szerint növekvő sorrendben; a lejártak (az esemény napja után) átkerülnek a
-// "Program Archívum" sávba (#archiveGrid), a legfrissebb elöl. Ha nincs lejárt
+// "Program Archívum" sávba (#archiveGrid), a legfrissebb elöl, és ott a leírás
+// helyett a beszámoló (.news-report) látszik, ha van. Ha nincs lejárt
 // program, az archívum sáv rejtve marad; ha nincs közelgő, üres-állapot üzenet
 // jelenik meg. A data-date nélküli hír mindig a közelgők között marad.
 // Az updateNews(now) tetszőleges időponttal újrafuttatható (tesztelés).
@@ -165,8 +166,13 @@ function updateNews(now = new Date()) {
     card.hidden = false;
     const endDate = card.dataset.endDate || card.dataset.date;
     const eventEnd = endDate ? new Date(`${endDate}T23:59:59`) : null;
-    if (!archive || !eventEnd || Number.isNaN(eventEnd.getTime()) || now <= eventEnd) upcoming.push(card);
-    else past.push(card);
+    const isPast = archive && eventEnd && !Number.isNaN(eventEnd.getTime()) && now > eventEnd;
+    (isPast ? past : upcoming).push(card);
+    // az archívumban a leírás helyett a beszámoló látszik (ha van)
+    const report = card.querySelector('.news-report');
+    const description = card.querySelector('.news-desc');
+    if (report) report.hidden = !isPast;
+    if (description) description.hidden = Boolean(isPast && report);
   });
 
   // Alapértelmezett kapcsolattartó: ha egy hírnél nincs megadva "Kérdés esetén
@@ -1060,7 +1066,8 @@ function buildCalendarLink(card) {
 
   const title = card.querySelector('h3')?.textContent.trim() ?? '';
   const place = detailValue(card, 'helyszín');
-  const description = card.querySelector(':scope > p:not(.news-detail)')?.textContent.replace(/\s+/g, ' ').trim() ?? '';
+  const description = (card.querySelector('.news-desc p') || card.querySelector(':scope > p:not(.news-detail)'))
+    ?.textContent.replace(/\s+/g, ' ').trim() ?? '';
   const url = `${location.origin}${location.pathname}#${card.id}`;
 
   const params = new URLSearchParams({

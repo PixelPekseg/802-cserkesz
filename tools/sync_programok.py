@@ -54,6 +54,7 @@ COLUMNS = {
     'c2_email': 'kapcsolattartó 2 e-mail',
     'c2_phone': 'kapcsolattartó 2 telefon',
     'facebook': 'facebook',
+    'report': 'beszámoló',
     'images': 'képek',
     'visible': 'megjelenjen',
 }
@@ -191,17 +192,28 @@ def build_card(row, used_ids):
         f'          <h3>{html.escape(row["name"])}</h3>',
     ]
 
-    paragraphs = [p.strip() for p in re.split(r'\n\s*\n', row['description'].strip()) if p.strip()]
-    facebook = row['facebook']
-    if not paragraphs and facebook:
-        paragraphs = ['']
-    for i, paragraph in enumerate(paragraphs):
-        text = html.escape(paragraph).replace('\n', '<br>')
-        if facebook and i == len(paragraphs) - 1:
-            link = (f'<a class="inline-link" href="{html.escape(facebook, quote=True)}" '
-                    f'target="_blank" rel="noopener noreferrer">Facebook-eseményen</a>')
-            text = (text + ' ' if text else '') + f'Részletek a {link}.'
-        lines.append(f'          <p>{text}</p>')
+    # leírás (a közelgő programoknál) és beszámoló (rejtve; a script.js mutatja a leírás helyett,
+    # ha a program már az archívumba került); a Facebook-link mindkettő végére kerül
+    def text_block(source, css_class, hidden=False):
+        paragraphs = [p.strip() for p in re.split(r'\n\s*\n', source.strip()) if p.strip()]
+        if not paragraphs and row['facebook']:
+            paragraphs = ['']
+        if not paragraphs:
+            return []
+        block = [f'          <div class="news-text {css_class}"{" hidden" if hidden else ""}>']
+        for i, paragraph in enumerate(paragraphs):
+            text = html.escape(paragraph).replace('\n', '<br>')
+            if row['facebook'] and i == len(paragraphs) - 1:
+                link = (f'<a class="inline-link" href="{html.escape(row["facebook"], quote=True)}" '
+                        f'target="_blank" rel="noopener noreferrer">Facebook-eseményen</a>')
+                text = (text + ' ' if text else '') + f'Részletek a {link}.'
+            block.append(f'            <p>{text}</p>')
+        block.append('          </div>')
+        return block
+
+    lines += text_block(row['description'], 'news-desc')
+    if row['report'].strip():
+        lines += text_block(row['report'], 'news-report', hidden=True)
 
     if row['place']:
         lines.append(f'          <p class="news-detail"><strong>Helyszín:</strong> {html.escape(row["place"])}</p>')
@@ -293,7 +305,7 @@ def parse_rows(csv_text):
             'name': cell(row, 'name'), 'start': start, 'end': end,
             'start_time': start_time, 'end_time': end_time,
             'time_note': cell(row, 'time_note'), 'place': cell(row, 'place'),
-            'description': cell(row, 'description'),
+            'description': cell(row, 'description'), 'report': cell(row, 'report'),
             'c1_name': cell(row, 'c1_name'), 'c1_email': cell(row, 'c1_email'), 'c1_phone': cell(row, 'c1_phone'),
             'c2_name': cell(row, 'c2_name'), 'c2_email': cell(row, 'c2_email'), 'c2_phone': cell(row, 'c2_phone'),
             'facebook': facebook, 'image_folder': cell(row, 'images'), 'label': label,
