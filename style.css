@@ -2835,16 +2835,17 @@ body:has(.main-nav.open) .upcoming-tab {
   height: 38px;
   border: 0;
   border-radius: 50%;
-  background: var(--color-bg-alt);
-  color: var(--color-primary);
+  background: var(--color-primary);   /* sötétzöld, fehér ×: a világos háttéren is jól látszik */
+  color: #fff;
   font-size: 1.7rem;
   line-height: 1;
   cursor: pointer;
-  box-shadow: 0 2px 8px rgba(35, 63, 42, 0.2);
+  box-shadow: 0 3px 10px rgba(35, 63, 42, 0.35);
 }
 
-.program-modal-close:hover {
-  background: var(--color-highlight);
+.program-modal-close:hover,
+.program-modal-close:focus-visible {
+  background: var(--color-primary-dark);
 }
 
 /* a szöveges rész a kártya elemeit használja, de keret és hover-hatás nélkül */
