@@ -193,25 +193,26 @@ def build_card(row, used_ids):
     ]
 
     # leírás (a közelgő programoknál) és beszámoló (rejtve; a script.js mutatja a leírás helyett,
-    # ha a program már az archívumba került); a Facebook-link mindkettő végére kerül
-    def text_block(source, css_class, hidden=False):
+    # ha a program már az archívumba került). A Facebook-link csak a leírás végére kerül
+    # (.news-fb), és az archívumban az is elrejtődik.
+    def text_block(source, css_class, hidden=False, facebook=''):
         paragraphs = [p.strip() for p in re.split(r'\n\s*\n', source.strip()) if p.strip()]
-        if not paragraphs and row['facebook']:
+        if not paragraphs and facebook:
             paragraphs = ['']
         if not paragraphs:
             return []
         block = [f'          <div class="news-text {css_class}"{" hidden" if hidden else ""}>']
         for i, paragraph in enumerate(paragraphs):
             text = html.escape(paragraph).replace('\n', '<br>')
-            if row['facebook'] and i == len(paragraphs) - 1:
-                link = (f'<a class="inline-link" href="{html.escape(row["facebook"], quote=True)}" '
+            if facebook and i == len(paragraphs) - 1:
+                link = (f'<a class="inline-link" href="{html.escape(facebook, quote=True)}" '
                         f'target="_blank" rel="noopener noreferrer">Facebook-eseményen</a>')
-                text = (text + ' ' if text else '') + f'Részletek a {link}.'
+                text = (text + ' ' if text else '') + f'<span class="news-fb">Részletek a {link}.</span>'
             block.append(f'            <p>{text}</p>')
         block.append('          </div>')
         return block
 
-    lines += text_block(row['description'], 'news-desc')
+    lines += text_block(row['description'], 'news-desc', facebook=row['facebook'])
     if row['report'].strip():
         lines += text_block(row['report'], 'news-report', hidden=True)
 

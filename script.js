@@ -141,7 +141,8 @@ document.querySelectorAll('img[data-optional]').forEach(img => {
 // alapján "közelgő" vagy "lejárt". A közelgők a #newsGrid-ben maradnak dátum
 // szerint növekvő sorrendben; a lejártak (az esemény napja után) átkerülnek a
 // "Program Archívum" sávba (#archiveGrid), a legfrissebb elöl, és ott a leírás
-// helyett a beszámoló (.news-report) látszik, ha van. Ha nincs lejárt
+// helyett a beszámoló (.news-report) látszik, ha van (a Facebook-link pedig
+// egyáltalán nem). Ha nincs lejárt
 // program, az archívum sáv rejtve marad; ha nincs közelgő, üres-állapot üzenet
 // jelenik meg. A data-date nélküli hír mindig a közelgők között marad.
 // Az updateNews(now) tetszőleges időponttal újrafuttatható (tesztelés).
@@ -173,6 +174,8 @@ function updateNews(now = new Date()) {
     const description = card.querySelector('.news-desc');
     if (report) report.hidden = !isPast;
     if (description) description.hidden = Boolean(isPast && report);
+    // az archívumban a Facebook-esemény linkje sem látszik
+    card.querySelectorAll('.news-fb').forEach(link => { link.hidden = Boolean(isPast); });
   });
 
   // Alapértelmezett kapcsolattartó: ha egy hírnél nincs megadva "Kérdés esetén
