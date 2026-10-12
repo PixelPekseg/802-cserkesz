@@ -2542,22 +2542,26 @@ body:has(.main-nav.open) .upcoming-tab {
 
 .notice-close {
   flex: none;
-  width: 28px;
-  height: 28px;
-  margin-top: -2px;
-  padding: 0;
+  width: 32px;
+  height: 32px;
+  margin-top: -4px;
+  padding: 0 0 2px;
   border: 0;
   border-radius: 50%;
-  background: transparent;
-  color: #fff;
-  font-size: 1.4rem;
+  background: #fff;                  /* fehér kör piros ×-szel: jól elüt a piros sávtól */
+  color: var(--color-alert);
+  font-size: 1.5rem;
+  font-weight: bold;
   line-height: 1;
   cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+  transition: transform 0.15s ease, background 0.15s ease;
 }
 
 .notice-close:hover,
 .notice-close:focus-visible {
-  background: rgba(255, 255, 255, 0.2);
+  background: #ffe9e6;
+  transform: scale(1.08);
 }
 
 @media (max-width: 600px) {
