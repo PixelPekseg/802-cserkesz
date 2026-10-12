@@ -58,26 +58,47 @@ document.addEventListener('keydown', event => {
 document.getElementById('year').textContent = new Date().getFullYear();
 
 // ==========================================================
-// Értesítősáv (minden oldal tetején, a Táblázat "Értesítők" lapjából)
-// Minden .notice alapból rejtett; akkor látszik, ha a mai nap a
-// data-from és data-until közé esik (mindkettő opcionális, a data-until
-// napja még beleszámít), és a látogató nem zárta be. A bezárt értesítők
-// azonosítóját (data-id, a tartalomból képzett) a böngésző megjegyzi;
-// ha a szöveg változik, új az azonosító, így újra megjelenik.
-// Az updateNotices(now) tetszőleges időponttal újrafuttatható (tesztelés).
+// Bezárások megjegyzése (értesítősáv, főoldali "Közelgő programok" fül)
+// A bezárás az oldalon belüli lapozás (és a vissza gomb) alatt megmarad, de
+// újratöltéskor, illetve a böngészőlap bezárása és újbóli megnyitása után az
+// elem újra megjelenik. Ehhez a böngészőlaphoz kötött sessionStorage-ot
+// használjuk, és újratöltéskor kiürítjük.
 // ==========================================================
-const NOTICE_STORAGE_KEY = 'closedNotices';
+const DISMISS_KEYS = ['closedNotices', 'upcomingTabClosed'];
 
-function readClosedNotices() {
+(function resetDismissalsOnReload() {
+  const navigation = performance.getEntriesByType?.('navigation')[0];
   try {
-    return JSON.parse(localStorage.getItem(NOTICE_STORAGE_KEY)) || [];
+    localStorage.removeItem('closedNotices');   // a korábbi, tartós megjegyzés maradványa
+    if (navigation?.type === 'reload') DISMISS_KEYS.forEach(key => sessionStorage.removeItem(key));
+  } catch (e) { /* a tárolás nem elérhető – minden megjelenik */ }
+})();
+
+function readDismissed(key) {
+  try {
+    return JSON.parse(sessionStorage.getItem(key)) || [];
   } catch (e) {
     return [];
   }
 }
 
+function addDismissed(key, id, keepOnly) {
+  // csak a még létező elemek azonosítóit tartjuk meg, hogy a lista ne nőjön
+  const list = readDismissed(key).filter(item => !keepOnly || keepOnly.includes(item));
+  if (!list.includes(id)) list.push(id);
+  try { sessionStorage.setItem(key, JSON.stringify(list)); } catch (e) { /* nem baj */ }
+}
+
+// ==========================================================
+// Értesítősáv (minden oldal tetején, a Táblázat "Értesítők" lapjából)
+// Minden .notice alapból rejtett; akkor látszik, ha a mai nap a
+// data-from és data-until közé esik (mindkettő opcionális, a data-until
+// napja még beleszámít), és a látogató nem zárta be (a bezárás a fenti
+// szabály szerint csak újratöltésig / a böngészőlap bezárásáig érvényes).
+// Az updateNotices(now) tetszőleges időponttal újrafuttatható (tesztelés).
+// ==========================================================
 function updateNotices(now = new Date()) {
-  const closed = readClosedNotices();
+  const closed = readDismissed('closedNotices');
   document.querySelectorAll('.notice').forEach(notice => {
     const { from, until, id } = notice.dataset;
     const started = !from || now >= new Date(`${from}T00:00:00`);
@@ -90,11 +111,8 @@ document.querySelectorAll('.notice-close').forEach(button => {
   button.addEventListener('click', () => {
     const notice = button.closest('.notice');
     notice.hidden = true;
-    // csak a még az oldalon lévő értesítők azonosítóit tartjuk meg, hogy a lista ne nőjön
     const current = [...document.querySelectorAll('.notice')].map(n => n.dataset.id);
-    const closed = readClosedNotices().filter(id => current.includes(id));
-    closed.push(notice.dataset.id);
-    try { localStorage.setItem(NOTICE_STORAGE_KEY, JSON.stringify(closed)); } catch (e) { /* nem baj */ }
+    addDismissed('closedNotices', notice.dataset.id, current);
   });
 });
 
@@ -195,7 +213,9 @@ updateNews();
 // A programokat az programok.html hírdobozaiból olvassa ki (data-date /
 // data-end-date), így nincs külön adatot karbantartani. Ha nincs közelgő
 // program, vagy az programok.html nem olvasható (pl. fájlból megnyitva),
-// a fül nem jelenik meg. A bezárást a munkamenet erejéig megjegyzi.
+// a fül nem jelenik meg. A ma és a következő 7 napban kezdődő (vagy épp tartó)
+// programokat mutatja. A bezárás az oldalon belüli lapozás alatt megmarad,
+// újratöltéskor vagy a böngészőlap újbóli megnyitásakor a fül újra megjelenik.
 // ==========================================================
 async function initUpcomingTab(now = new Date()) {
   const tab = document.getElementById('upcomingTab');
@@ -203,9 +223,7 @@ async function initUpcomingTab(now = new Date()) {
   const closeButton = document.getElementById('upcomingClose');
   if (!tab || !list || !closeButton) return;
 
-  try {
-    if (sessionStorage.getItem('upcomingTabClosed') === '1') return;
-  } catch (e) { /* a tárolás nem elérhető – a fül megjelenhet */ }
+  if (readDismissed('upcomingTabClosed').length) return;
 
   const windowDays = 7;
   const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
@@ -255,7 +273,7 @@ async function initUpcomingTab(now = new Date()) {
 
   closeButton.addEventListener('click', () => {
     tab.classList.remove('is-visible');
-    try { sessionStorage.setItem('upcomingTabClosed', '1'); } catch (e) { /* nem baj */ }
+    addDismissed('upcomingTabClosed', 'closed');
   });
 
   // A fül a fejléc alatt marad akkor is, ha fölötte értesítősáv látszik
