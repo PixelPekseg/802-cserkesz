@@ -2872,6 +2872,21 @@ body:has(.main-nav.open) .upcoming-tab {
   column-gap: 12px;
 }
 
+/* asztali nézetben a bezáró gomb saját sávot kap a képek fölött, hogy ne lógjon rájuk:
+   a galéria egy keretben görget, a gomb sávja fölötte fix */
+@media (min-width: 769px) {
+  .program-modal-card:not(.no-images) {
+    grid-template-rows: 100%;
+  }
+
+  .program-modal-gallery {
+    align-self: end;
+    height: calc(100% - 58px);
+    padding-top: 14px;
+    border-top: 1px solid var(--color-border);
+  }
+}
+
 .program-modal-gallery img {
   display: block;
   width: 100%;
