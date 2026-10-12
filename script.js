@@ -638,9 +638,12 @@ function initCalendar() {
       const cell = element(dayEvents.length ? 'button' : 'div', 'cal-day');
       if (date.getMonth() !== month) cell.classList.add('other-month');
       if (key === todayKey) cell.classList.add('today');
-      // a hónap első napja mellett a hónap rövid neve is látszik (pl. "nov. 1")
-      cell.append(element('span', 'cal-num',
-        day === 1 ? `${monthNames[date.getMonth()].slice(0, 3)}. 1` : String(day)));
+      // a hónap első napja mellett a hónap rövid neve is látszik (pl. "nov. 1"); telefonon a
+      // keskeny cellában ez elrejtődik (.cal-mon), ott csak a szám áll
+      const num = element('span', 'cal-num');
+      if (day === 1) num.append(element('span', 'cal-mon', `${monthNames[date.getMonth()].slice(0, 3)}. `));
+      num.append(String(day));
+      cell.append(num);
 
       if (dayEvents.length) {
         cell.type = 'button';
