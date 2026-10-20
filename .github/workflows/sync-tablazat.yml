@@ -30,7 +30,7 @@ jobs:
 
       # A Drive-ról jövő képek (személyfotók, programképek) feldolgozásához (WebP, iPhone-os HEIC)
       - name: Képkezelő csomagok telepítése
-        run: pip install --quiet pillow pillow-heif
+        run: pip install --quiet pillow pillow-heif openpyxl
 
       - name: Programok (kártyák + képek a Drive-ról) frissítése
         if: ${{ !cancelled() }}
@@ -82,6 +82,16 @@ jobs:
           ESZKOZOK_CSV_URL: https://docs.google.com/spreadsheets/d/e/2PACX-1vTawBNHKmmN8o2RHWIeLXtHikZ7oJTr19isdSULQXbp2sJte3a5TnaKpjeM_TA5UkxhjZ6OtOVCtMRD/pub?gid=263580124&single=true&output=csv
           ESZKOZ_KAPCSOLAT_CSV_URL: https://docs.google.com/spreadsheets/d/e/2PACX-1vTawBNHKmmN8o2RHWIeLXtHikZ7oJTr19isdSULQXbp2sJte3a5TnaKpjeM_TA5UkxhjZ6OtOVCtMRD/pub?gid=1765500368&single=true&output=csv
         run: python tools/sync_eszkozok.py
+
+      # Pénzügyek oldal: fülenként egy táblázat, a TELJES dokumentum Excel (.xlsx) formátumban közzétéve.
+      # Üres cím esetén az a fül kimarad (az oldalon a régi tartalom marad).
+      - name: Pénzügyek (tagdíj, tábordíjak) frissítése
+        if: ${{ !cancelled() }}
+        env:
+          PENZUGY_TAGDIJ_URL: ''
+          PENZUGY_NAGYTABOR_URL: ''
+          PENZUGY_KCSTABOR_URL: ''
+        run: python tools/sync_penzugyek.py
 
       # a galéria a programok (és képeik) frissítése után áll össze
       - name: Galéria összeállítása

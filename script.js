@@ -1332,25 +1332,21 @@ document.addEventListener('click', async event => {
 // Pénzügyek oldal: fülek (Tagdíj / Nagytábordíj / Kcs tábordíj) és időablak
 // Fülsáv nincs (a tulajdonos kérése): a fül a címben lévő #tagdij / #nagytabor /
 // #kcstabor alapján nyílik, azaz a menü Pénzügyek lenyílójából; cím nélkül a Tagdíj.
-// Minden .fee-item a data-from / data-until napjai között látszik (a Meddig napja
-// még beleszámít). Ha egy fülnek egyetlen érvényes tétele sincs, a .fee-content
-// helyett a .fee-empty üzenet jelenik meg. Teszt a konzolban:
+// Időszak: a fülnek (.fee-panel) a data-from / data-until napjai között látszik a
+// tartalma (a vég napja még beleszámít; data-until nélkül nincs vége); azon kívül,
+// vagy ha nincs data-from, a .fee-empty alapüzenet. A tartalmat a Google Táblázatból
+// a tools/sync_penzugyek.py írja. Teszt a konzolban:
 // updateFees(new Date('2026-03-15T10:00:00'))
 // ==========================================================
 function updateFees(now = new Date()) {
   document.querySelectorAll('.fee-panel').forEach(panel => {
-    let anyVisible = false;
-    panel.querySelectorAll('.fee-item').forEach(item => {
-      const { from, until } = item.dataset;
-      const started = !from || now >= new Date(`${from}T00:00:00`);
-      const notEnded = !until || now <= new Date(`${until}T23:59:59`);
-      item.hidden = !(started && notEnded);
-      if (!item.hidden) anyVisible = true;
-    });
+    const { from, until } = panel.dataset;
+    const active = Boolean(from) && now >= new Date(`${from}T00:00:00`) &&
+      (!until || now <= new Date(`${until}T23:59:59`));
     const content = panel.querySelector('.fee-content');
     const empty = panel.querySelector('.fee-empty');
-    if (content) content.hidden = !anyVisible;
-    if (empty) empty.hidden = anyVisible;
+    if (content) content.hidden = !active;
+    if (empty) empty.hidden = active;
   });
 }
 
@@ -1362,7 +1358,14 @@ function updateFees(now = new Date()) {
 
   function select(name) {
     if (!names.includes(name)) name = names[0];
-    panels.forEach(panel => { panel.hidden = panel.dataset.tab !== name; });
+    panels.forEach(panel => {
+      panel.hidden = panel.dataset.tab !== name;
+      // a beágyazott űrlap (Google) csak akkor töltődik be, ha a fülje látszik
+      if (!panel.hidden) panel.querySelectorAll('iframe[data-src]').forEach(frame => {
+        frame.src = frame.dataset.src;
+        frame.removeAttribute('data-src');
+      });
+    });
     menuLinks.forEach(link => {
       if (link.hash === `#${name}`) link.setAttribute('aria-current', 'page');
       else link.removeAttribute('aria-current');

@@ -23,7 +23,7 @@
 
   <link rel="icon" type="image/jpeg" href="images/webp/kozos/logo_green.jpg?v=1">
   <link rel="apple-touch-icon" href="images/webp/kozos/logo_green.jpg?v=1">
-  <link rel="stylesheet" href="style.css?v=101">
+  <link rel="stylesheet" href="style.css?v=105">
 </head>
 <body>
 
@@ -97,37 +97,31 @@
     Fülek: Tagdíj / Nagytábordíj / Kcs tábordíj. Fülsáv nincs: a menü Pénzügyek lenyílójából
     (penzugyek.html#tagdij, #nagytabor, #kcstabor) nyílik az adott fül; cím nélkül a Tagdíj
     (script.js initFeeTabs).
+    Minden fül ugyanabból a blokksorból áll (később Google Táblázatból generáljuk):
+      1. cím + bevezető (.fee-intro)        2. díjak kártyái (.price-grid)
+      3. szabályok, opcionális (.fee-rules)  4. részletek egymás alatt (.fee-item, időablakkal)
+      5. banki adatok + közlemény + ECSET (.fee-pay, minden fülön azonos)
+      6. költségek, opcionális (.fee-costs) 7. támogatás igénylése, beágyazott űrlap (.fee-form)
     Időablak: minden .fee-item data-from / data-until (ÉÉÉÉ-HH-NN, a Meddig napja még
-    beleszámít) attribútumot kap; a fül tartalma (.fee-content) csak akkor látszik, ha
-    legalább egy tétele épp érvényes, különben a .fee-empty üzenet (script.js updateFees).
-    JS nélkül minden tartalom látszik.
-    Egyelőre kézzel írt példa; később a Google Táblázatból generáljuk.
+    beleszámít); a fül tartalma (.fee-content) csak akkor látszik, ha legalább egy tétele épp
+    érvényes, különben a .fee-empty üzenet (script.js updateFees). JS nélkül minden látszik.
   -->
   <section class="section finance-page">
     <div class="container">
-      <!-- ===== Tagdíj ===== -->
-      <div class="fee-panel" id="panel-tagdij" data-tab="tagdij">
+      <!-- PENZUGY_TAGDIJ:START – a tools/sync_penzugyek.py írja a(z) „Pénzügyek – Tagdíj” Google Táblázatból, kézzel ne szerkeszd -->
+      <div class="fee-panel" id="panel-tagdij" data-tab="tagdij" data-from="2026-09-01" data-until="2026-11-30">
         <div class="fee-content">
           <div class="fee-intro">
             <h2>2026. évi tagdíj</h2>
-            <p class="fee-total"><strong>30 000 Ft/fő</strong> <span>(2 500 Ft/fő/hó)</span></p>
-            <p>
-              Hogy a teher eloszoljon, a tagdíjat két részletben kérjük (2 × 15 000 Ft),
-              de természetesen egy összegben is befizethető.
-            </p>
+            <p>Hogy a teher eloszoljon, a tagdíjat két részletben kérjük, de természetesen egy összegben is befizethető.</p>
           </div>
 
-          <div class="fee-items">
-            <div class="fee-item" data-from="2026-03-01" data-until="2026-04-01">
-              <h3>1. részlet</h3>
-              <dl class="fee-facts">
-                <div><dt>Befizetési határidő</dt><dd>2026. április 1.</dd></div>
-                <div><dt>Összeg</dt><dd>15 000 Ft</dd></div>
-              </dl>
-              <p class="fee-item-note">Ha egy összegben fizeti be, ehhez a határidőhöz 30 000 Ft-ot utaljon.</p>
-            </div>
+          <ul class="price-grid">
+            <li><span class="price-name">Tagdíj</span><span class="price-amount">30 000 Ft/fő</span><span class="price-split">2 × 15 000 Ft (2 500 Ft/hó)</span></li>
+          </ul>
 
-            <div class="fee-item" data-from="2026-09-01" data-until="2026-11-30">
+          <div class="fee-items">
+            <div class="fee-item">
               <h3>2. részlet</h3>
               <dl class="fee-facts">
                 <div><dt>Befizetési határidő</dt><dd>2026. november 30.</dd></div>
@@ -140,58 +134,55 @@
           <div class="fee-pay">
             <div class="bank-card">
               <h3>Banki átutalás az egyesület számlájára</h3>
-              <p class="bank-label">Számlatulajdonos</p>
+              <p class="bank-label">Kedvezményezett neve</p>
               <div class="bank-copy">
                 <p class="bank-value">Gödöllői Cserkészetért Egyesület</p>
-                <button class="copy-btn" type="button" data-copy="Gödöllői Cserkészetért Egyesület" data-copy-label="Számlatulajdonos" aria-label="Számlatulajdonos másolása" title="Másolás"><svg class="icon-copy" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/></svg><svg class="icon-check" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 13l4 4L19 7"/></svg></button>
+                <button class="copy-btn" type="button" data-copy="Gödöllői Cserkészetért Egyesület" data-copy-label="Kedvezményezett neve" aria-label="Kedvezményezett neve másolása" title="Másolás"><svg class="icon-copy" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/></svg><svg class="icon-check" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 13l4 4L19 7"/></svg></button>
               </div>
               <p class="bank-label">Számlaszám</p>
               <div class="bank-copy">
                 <p class="bank-value bank-number">1620 0223 1007 7922 0000 0000</p>
-                <!-- szóközök nélkül másolódik, a bankok így is elfogadják -->
                 <button class="copy-btn" type="button" data-copy="162002231007792200000000" data-copy-label="Számlaszám" aria-label="Számlaszám másolása" title="Másolás"><svg class="icon-copy" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/></svg><svg class="icon-check" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 13l4 4L19 7"/></svg></button>
               </div>
               <p class="bank-label">vagy másodlagos banki azonosító</p>
               <div class="bank-copy">
                 <p class="bank-value bank-number">+36204924970</p>
-                <button class="copy-btn" type="button" data-copy="+36204924970" data-copy-label="Másodlagos azonosító" aria-label="Másodlagos banki azonosító másolása" title="Másolás"><svg class="icon-copy" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/></svg><svg class="icon-check" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 13l4 4L19 7"/></svg></button>
+                <button class="copy-btn" type="button" data-copy="+36204924970" data-copy-label="Másodlagos banki azonosító" aria-label="Másodlagos banki azonosító másolása" title="Másolás"><svg class="icon-copy" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/></svg><svg class="icon-check" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 13l4 4L19 7"/></svg></button>
               </div>
               <p class="bank-label">Közlemény</p>
               <p class="bank-value">„Adomány” + ECSET kód</p>
             </div>
 
-            <div class="fee-box">
-              <h3>ECSET kód</h3>
+            <div class="fee-box fee-warning">
+              <h3>Fontos: csak ez a két adat legyen a közleményben!</h3>
               <p>
-                A közleménybe az „Adomány” szó után az ECSET kódot is írja be (már a tábori
-                befizetésből ismert lehet). A kódokat egy Google Drive-fájlban osztjuk meg
-                a szülőkkel.
+                A közleménybe az „Adomány” szót és a gyermek ECSET kódját írja, ezeken kívül
+                semmilyen más adatot ne adjon meg.
               </p>
-              <p class="fee-box-note">
-                A fájlt csak akkor tudja megnyitni, ha azzal az e-mail-címmel van bejelentkezve
-                a Google-fiókjába, amelyik a csapat levelezőlistáján is szerepel.
-              </p>
-              <a class="btn btn-primary" href="https://drive.google.com/file/d/1ckM3hP6Znzf8MvlFIYrhLcwbrmlWSiMf/view?usp=drive_link" target="_blank" rel="noopener noreferrer">ECSET kódok megnyitása</a>
+              <p class="fee-example">Példa a közleményre: <strong>Adomány AAAAAA-1</strong></p>
+              <ul>
+                <li>Ha hiányzik az „Adomány” szó, a pénzt visszautaljuk, mert csak adományt fogadhatunk.</li>
+                <li>Ha az ECSET kód hiányzik vagy nem a megfelelő formában szerepel, a rendszer nem ismeri fel a befizetést, és a pénzt szintén visszautaljuk.</li>
+              </ul>
+              <p class="fee-box-note">A visszautalás miatt mindkét esetben 1 000 Ft plusz költséget számolunk fel.</p>
             </div>
 
-            <div class="fee-box">
-              <h3>Egyedi támogatás</h3>
-              <p>
-                Ha a tagdíj befizetése nehézséget okoz, kérjük, jelezze nekünk: az alábbi
-                űrlapon egyedi támogatást kérhet.
-              </p>
-              <a class="btn btn-primary" href="https://docs.google.com/forms/d/e/1FAIpQLSeM3oarAXJWU-QBWlYtX1CtuGWXPdtC0kvSM7cJJ61_z0Awsw/viewform?usp=publish-editor" target="_blank" rel="noopener noreferrer">Egyedi támogatás kérése</a>
+            <div class="fee-box fee-ecset">
+              <div>
+                <h3>ECSET kód</h3>
+                <p>A gyermek ECSET kódját a szülőkkel megosztott névsorban találja.</p>
+                <p class="fee-box-note">
+                  A fájlt csak akkor tudja megnyitni, ha azzal az e-mail-címmel van bejelentkezve
+                  a Google-fiókjába, amelyik a csapat levelezőlistáján is szerepel.
+                </p>
+              </div>
+              <a class="btn btn-primary" href="https://drive.google.com/file/d/1ckM3hP6Znzf8MvlFIYrhLcwbrmlWSiMf/view?usp=drive_link" target="_blank" rel="noopener noreferrer">ECSET kódok megnyitása</a>
             </div>
           </div>
 
           <div class="fee-costs">
             <h3>Mire fordítjuk a tagdíjat?</h3>
-            <p>
-              A tagdíjakból fedezzük a csapatotthon fenntartását és a csapat működését.
-              A Bezsilla-villa üzemeltetése továbbra is nehézséget okoz. Igyekszünk takarékoskodni
-              a gáz- és az áramfogyasztással is, de amíg nincs meg a megfelelő korszerűsítés,
-              áttörő változást nem tudunk elérni.
-            </p>
+            <p>A tagdíjakból fedezzük a csapatotthon fenntartását és a csapat működését. A Bezsilla-villa üzemeltetése továbbra is nehézséget okoz. Igyekszünk takarékoskodni a gáz- és az áramfogyasztással is, de amíg nincs meg a megfelelő korszerűsítés, áttörő változást nem tudunk elérni.</p>
             <ul class="cost-list">
               <li style="--share:42%">
                 <span class="cost-name">Közművek (a Bezsilla-villa gáz-, áram- és egyéb költségei)</span>
@@ -210,26 +201,144 @@
               </li>
             </ul>
             <p class="cost-total">Összesen évente: <strong>11 000 000 Ft</strong></p>
-            <p class="cost-note">
-              A Cserkészszövetség tagdíjának terhe a nagy létszámunk miatt szerencsére jobban eloszlik.
-              Az autó éves üzemeltetése így is olcsóbb, mintha nyáron bérelnénk.
+            <p class="cost-note">A Cserkészszövetség tagdíjának terhe a nagy létszámunk miatt szerencsére jobban eloszlik. Az autó éves üzemeltetése így is olcsóbb, mintha nyáron bérelnénk.</p>
+          </div>
+
+          <div class="fee-form">
+            <h3>Támogatás igénylése</h3>
+            <p>
+              A csapat minden évben támogatást oszt a tábordíjhoz és a tagdíjhoz az arra jelentkező
+              családoknak. Amennyiben a befizetés megterhelő Önöknek, kérjük, nyugodtan jelezzék
+              az alábbi űrlap kitöltésével.
             </p>
+            <div class="fee-form-frame">
+              <iframe data-src="https://docs.google.com/forms/d/e/1FAIpQLSeM3oarAXJWU-QBWlYtX1CtuGWXPdtC0kvSM7cJJ61_z0Awsw/viewform?embedded=true" title="Támogatás igénylése (Google Űrlap)" loading="lazy">Betöltés…</iframe>
+            </div>
+            <p class="fee-form-link">Nem jelenik meg az űrlap? <a class="inline-link" href="https://docs.google.com/forms/d/e/1FAIpQLSeM3oarAXJWU-QBWlYtX1CtuGWXPdtC0kvSM7cJJ61_z0Awsw/viewform" target="_blank" rel="noopener noreferrer">Megnyitás új lapon</a></p>
           </div>
         </div>
         <p class="fee-empty" hidden>Jelenleg nincs tagdíj befizetési időszak!</p>
       </div>
 
-      <!-- ===== Nagytábordíj ===== -->
-      <div class="fee-panel" id="panel-nagytabor" data-tab="nagytabor">
-        <div class="fee-content" hidden></div>
-        <p class="fee-empty">Jelenleg nincs tábordíj befizetési időszak!</p>
+      <!-- PENZUGY_TAGDIJ:END -->
+
+      <!-- PENZUGY_NAGYTABOR:START – a tools/sync_penzugyek.py írja a(z) „Pénzügyek – Nagytábordíj” Google Táblázatból, kézzel ne szerkeszd -->
+      <div class="fee-panel" id="panel-nagytabor" data-tab="nagytabor" data-from="2026-10-01" data-until="2026-12-31">
+        <div class="fee-content">
+          <div class="fee-intro">
+            <h2>2026. évi nagytábor díja</h2>
+            <p>A tábor pénzügyeit idén is a Gödöllői Cserkészetért Egyesületen keresztül intézzük. Kérjük, figyelmesen olvassák el és tartsák be a pontos útmutatást.</p>
+            <p>Az árak folyamatos drágulásával minden igyekezetünk ellenére is megnő a költségvetésünk a tavalyihoz képest. Ennek enyhítésére a tábordíjat két részletben kérjük, és már most jelezzük a pontos összeget, hogy a családoknak ne legyen megterhelő ez a kiadás.</p>
+          </div>
+
+          <p class="fee-key">Táborba csak azok jöhetnek, akik a tábor kezdetéig rendezték a tagdíj első felét és a tábordíjat.</p>
+
+          <ul class="price-grid">
+            <li><span class="price-name">Cserkész</span><span class="price-amount">55 000 Ft</span><span class="price-split">2 × 27 500 Ft</span></li>
+            <li><span class="price-name">Cserkészjelölt</span><span class="price-amount">45 000 Ft</span><span class="price-split">2 × 22 500 Ft</span></li>
+            <li><span class="price-name">Vezető</span><span class="price-amount">40 000 Ft</span><span class="price-split">2 × 20 000 Ft</span></li>
+            <li><span class="price-name">GH</span><span class="price-amount">30 000 Ft</span><span class="price-split">2 × 15 000 Ft</span></li>
+          </ul>
+
+          <div class="fee-rules">
+            <p><strong>Vezetők és GH segítők:</strong> őrsvezetőink, operatív vezetőink és GH segítőink egész éves önkéntes munkáját azzal (is) szeretnénk meghálálni, hogy nekik csak az étkezések díját kell kifizetniük, a lent töltött napok számával szorozva. Vezetőnek azok az őrsvezetők számítanak, akiknek őrse lesz a nagytáborban (a kiscserkész őrsvezetők nem tartoznak ide), operatív vezetőnek pedig azok, akik a tábor alatt aktív feladatot látnak el.</p>
+            <p><strong>Előtábor-kedvezmény:</strong> aki legalább 4 napot (4 éjszakát) részt vesz az előtáborban, 5 000 Ft kedvezményre jogosult a teljes tábordíjból. Ilyenkor a rá vonatkozó fizetendő összegből vonják le az 5 000 Ft-ot, és azt utalják el.</p>
+            <p>Napi bontású részvételre idén sincs lehetőség: a program teljessége és a közösségi, nevelési célok miatt arra kérünk mindenkit, hogy a tábor teljes időtartama alatt legyen jelen.</p>
+          </div>
+
+          <div class="fee-items">
+            <div class="fee-item">
+              <h3>1. részlet</h3>
+              <dl class="fee-facts">
+                <div><dt>Befizetési határidő</dt><dd>2026. november 30.</dd></div>
+                <div><dt>Összeg</dt><dd>a fenti leírtak szerinti díj fele</dd></div>
+              </dl>
+              <p class="fee-item-note">Egy összegben is befizethető: ilyenkor ehhez a határidőhöz a teljes díjat utalja.</p>
+            </div>
+            <div class="fee-item">
+              <h3>2. részlet</h3>
+              <dl class="fee-facts">
+                <div><dt>Befizetési határidő</dt><dd>2026. december 31.</dd></div>
+                <div><dt>Összeg</dt><dd>a fenti leírtak szerinti díj fele</dd></div>
+              </dl>
+              <p class="fee-item-note">Aki az 1. részlettel együtt már a teljes tábordíjat befizette, az kérjük hagyja figyelmen kívül ezt a felhívást.</p>
+            </div>
+          </div>
+
+          <div class="fee-pay">
+            <div class="bank-card">
+              <h3>Banki átutalás az egyesület számlájára</h3>
+              <p class="bank-label">Kedvezményezett neve</p>
+              <div class="bank-copy">
+                <p class="bank-value">Gödöllői Cserkészetért Egyesület</p>
+                <button class="copy-btn" type="button" data-copy="Gödöllői Cserkészetért Egyesület" data-copy-label="Kedvezményezett neve" aria-label="Kedvezményezett neve másolása" title="Másolás"><svg class="icon-copy" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/></svg><svg class="icon-check" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 13l4 4L19 7"/></svg></button>
+              </div>
+              <p class="bank-label">Számlaszám</p>
+              <div class="bank-copy">
+                <p class="bank-value bank-number">1620 0223 1007 7922 0000 0000</p>
+                <button class="copy-btn" type="button" data-copy="162002231007792200000000" data-copy-label="Számlaszám" aria-label="Számlaszám másolása" title="Másolás"><svg class="icon-copy" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/></svg><svg class="icon-check" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 13l4 4L19 7"/></svg></button>
+              </div>
+              <p class="bank-label">vagy másodlagos banki azonosító</p>
+              <div class="bank-copy">
+                <p class="bank-value bank-number">+36204924970</p>
+                <button class="copy-btn" type="button" data-copy="+36204924970" data-copy-label="Másodlagos banki azonosító" aria-label="Másodlagos banki azonosító másolása" title="Másolás"><svg class="icon-copy" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/></svg><svg class="icon-check" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 13l4 4L19 7"/></svg></button>
+              </div>
+              <p class="bank-label">Közlemény</p>
+              <p class="bank-value">„Adomány” + ECSET kód</p>
+            </div>
+
+            <div class="fee-box fee-warning">
+              <h3>Fontos: csak ez a két adat legyen a közleményben!</h3>
+              <p>
+                A közleménybe az „Adomány” szót és a gyermek ECSET kódját írja, ezeken kívül
+                semmilyen más adatot ne adjon meg.
+              </p>
+              <p class="fee-example">Példa a közleményre: <strong>Adomány AAAAAA-1</strong></p>
+              <ul>
+                <li>Ha hiányzik az „Adomány” szó, a pénzt visszautaljuk, mert csak adományt fogadhatunk.</li>
+                <li>Ha az ECSET kód hiányzik vagy nem a megfelelő formában szerepel, a rendszer nem ismeri fel a befizetést, és a pénzt szintén visszautaljuk.</li>
+              </ul>
+              <p class="fee-box-note">A visszautalás miatt mindkét esetben 1 000 Ft plusz költséget számolunk fel.</p>
+            </div>
+
+            <div class="fee-box fee-ecset">
+              <div>
+                <h3>ECSET kód</h3>
+                <p>A gyermek ECSET kódját a szülőkkel megosztott névsorban találja.</p>
+                <p class="fee-box-note">
+                  A fájlt csak akkor tudja megnyitni, ha azzal az e-mail-címmel van bejelentkezve
+                  a Google-fiókjába, amelyik a csapat levelezőlistáján is szerepel.
+                </p>
+              </div>
+              <a class="btn btn-primary" href="https://drive.google.com/file/d/1ckM3hP6Znzf8MvlFIYrhLcwbrmlWSiMf/view?usp=drive_link" target="_blank" rel="noopener noreferrer">ECSET kódok megnyitása</a>
+            </div>
+          </div>
+
+          <div class="fee-form">
+            <h3>Támogatás igénylése</h3>
+            <p>
+              A csapat minden évben támogatást oszt a tábordíjhoz és a tagdíjhoz az arra jelentkező
+              családoknak. Amennyiben a befizetés megterhelő Önöknek, kérjük, nyugodtan jelezzék
+              az alábbi űrlap kitöltésével.
+            </p>
+            <div class="fee-form-frame">
+              <iframe data-src="https://docs.google.com/forms/d/e/1FAIpQLSeM3oarAXJWU-QBWlYtX1CtuGWXPdtC0kvSM7cJJ61_z0Awsw/viewform?embedded=true" title="Támogatás igénylése (Google Űrlap)" loading="lazy">Betöltés…</iframe>
+            </div>
+            <p class="fee-form-link">Nem jelenik meg az űrlap? <a class="inline-link" href="https://docs.google.com/forms/d/e/1FAIpQLSeM3oarAXJWU-QBWlYtX1CtuGWXPdtC0kvSM7cJJ61_z0Awsw/viewform" target="_blank" rel="noopener noreferrer">Megnyitás új lapon</a></p>
+          </div>
+        </div>
+        <p class="fee-empty" hidden>Jelenleg nincs tábordíj befizetési időszak!</p>
       </div>
 
-      <!-- ===== Kiscserkésztábor díja ===== -->
+      <!-- PENZUGY_NAGYTABOR:END -->
+
+      <!-- PENZUGY_KCSTABOR:START – a tools/sync_penzugyek.py írja a(z) „Pénzügyek – Kiscserkésztábor díja” Google Táblázatból, kézzel ne szerkeszd -->
       <div class="fee-panel" id="panel-kcstabor" data-tab="kcstabor">
         <div class="fee-content" hidden></div>
         <p class="fee-empty">Jelenleg nincs tábordíj befizetési időszak!</p>
       </div>
+
+      <!-- PENZUGY_KCSTABOR:END -->
 
       <h3 class="home-contact-title fee-contact-title">Kérdése van a befizetésekkel kapcsolatban?</h3>
       <p class="fee-contact-lead">Keresse bizalommal a pénzügyekért felelős csapatparancsnok-helyettest!</p>
@@ -270,6 +379,6 @@
     </div>
   </footer>
 
-  <script src="script.js?v=59"></script>
+  <script src="script.js?v=61"></script>
 </body>
 </html>
