@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pénzügyek – 802. sz. Szent Korona Cserkészcsapat</title>
+  <meta name="description" content="Tagdíj, nagytábordíj és kiscserkésztábor díja: befizetési határidők, összegek és banki adatok a 802. sz. Szent Korona Cserkészcsapat tagjainak.">
+
+  <!-- FONTOS: a "https://www.YOUR-DOMAIN-HERE.com" placeholdert cseréld le a valódi domainre (lásd index.html) -->
+  <link rel="canonical" href="https://www.YOUR-DOMAIN-HERE.com/penzugyek.html">
+
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Pénzügyek – 802. sz. Szent Korona Cserkészcsapat">
+  <meta property="og:description" content="Tagdíj- és tábordíj-befizetés: határidők, összegek, banki adatok.">
+  <meta property="og:url" content="https://www.YOUR-DOMAIN-HERE.com/penzugyek.html">
+  <meta property="og:image" content="https://www.YOUR-DOMAIN-HERE.com/images/webp/kozos/share.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="A 802. sz. Szent Korona Cserkészcsapat tagjai közös csoportképen">
+  <meta property="og:site_name" content="802. sz. Szent Korona Cserkészcsapat">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta property="og:locale" content="hu_HU">
+
+  <link rel="icon" type="image/jpeg" href="images/webp/kozos/logo_green.jpg?v=1">
+  <link rel="apple-touch-icon" href="images/webp/kozos/logo_green.jpg?v=1">
+  <link rel="stylesheet" href="style.css?v=101">
+</head>
+<body>
+
+  <!-- Értesítősáv (piros, az oldal tetején) -->
+  <!-- ERTESITOK:START – a tools/sync_ertesitok.py írja a Google Táblázatból, kézzel ne szerkeszd -->
+  <div class="notice-bar" id="noticeBar">
+    <div class="notice" data-id="4f63410636" data-from="2027-03-01" data-until="2027-05-31" hidden>
+      <div class="container notice-inner">
+        <p class="notice-text">
+          <strong class="notice-title">Nagytábori jelentkezés</strong>
+          <span class="notice-deadline">Határidő: 2027. május 15.</span>
+          <span class="notice-message">Elindult a jelentkezés a nyári nagytáborra! Részletek a Tábor oldalon.</span>
+        </p>
+        <button type="button" class="notice-close" aria-label="Értesítés bezárása">&times;</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ERTESITOK:END -->
+
+  <!-- Fejléc / navigáció -->
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="index.html" class="logo">
+        <img class="logo-img" src="images/webp/kozos/logo_white.webp" alt="" data-optional>
+        <span class="logo-text">802. sz. Szent Korona Cserkészcsapat</span>
+      </a>
+
+      <!-- Hamburger gomb mobil nézethez -->
+      <button class="nav-toggle" id="navToggle" type="button" aria-label="Menü megnyitása" aria-expanded="false" aria-controls="mainNav">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+
+      <nav class="main-nav" id="mainNav">
+        <ul>
+          <li><a href="index.html">Főoldal</a></li>
+          <li class="has-sub">
+            <button class="nav-sub-toggle" type="button" aria-expanded="false" aria-controls="subPrograms">Események</button>
+            <ul class="sub-nav" id="subPrograms">
+              <li><a href="programok.html">Programok</a></li>
+              <li><a href="naptar.html">Naptár</a></li>
+              <li><a href="tabor.html">Tábor</a></li>
+            </ul>
+          </li>
+          <li><a href="csapatotthon.html">Csapatotthonunk</a></li>
+          <li><a href="eszkozok.html">Eszközbérlés</a></li>
+          <li><a href="rolunk.html">Rólunk</a></li>
+          <li class="has-sub is-current">
+            <button class="nav-sub-toggle" type="button" aria-expanded="false" aria-controls="subFinance">Pénzügyek</button>
+            <ul class="sub-nav" id="subFinance">
+              <li><a href="penzugyek.html#tagdij">Tagdíj</a></li>
+              <li><a href="penzugyek.html#nagytabor">Nagytábordíj</a></li>
+              <li><a href="penzugyek.html#kcstabor">Kcs tábordíj</a></li>
+            </ul>
+          </li>
+          <li><a class="nav-cta nav-cta-join" href="csatlakozom.html">Csatlakozom</a></li>
+          <li><a class="nav-cta" href="tamogass.html">Támogass minket</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Címsáv -->
+  <section class="page-banner">
+    <h1>Pénzügyek</h1>
+  </section>
+
+  <!--
+    Fülek: Tagdíj / Nagytábordíj / Kcs tábordíj. Fülsáv nincs: a menü Pénzügyek lenyílójából
+    (penzugyek.html#tagdij, #nagytabor, #kcstabor) nyílik az adott fül; cím nélkül a Tagdíj
+    (script.js initFeeTabs).
+    Időablak: minden .fee-item data-from / data-until (ÉÉÉÉ-HH-NN, a Meddig napja még
+    beleszámít) attribútumot kap; a fül tartalma (.fee-content) csak akkor látszik, ha
+    legalább egy tétele épp érvényes, különben a .fee-empty üzenet (script.js updateFees).
+    JS nélkül minden tartalom látszik.
+    Egyelőre kézzel írt példa; később a Google Táblázatból generáljuk.
+  -->
+  <section class="section finance-page">
+    <div class="container">
+      <!-- ===== Tagdíj ===== -->
+      <div class="fee-panel" id="panel-tagdij" data-tab="tagdij">
+        <div class="fee-content">
+          <div class="fee-intro">
+            <h2>2026. évi tagdíj</h2>
+            <p class="fee-total"><strong>30 000 Ft/fő</strong> <span>(2 500 Ft/fő/hó)</span></p>
+            <p>
+              Hogy a teher eloszoljon, a tagdíjat két részletben kérjük (2 × 15 000 Ft),
+              de természetesen egy összegben is befizethető.
+            </p>
+          </div>
+
+          <div class="fee-items">
+            <div class="fee-item" data-from="2026-03-01" data-until="2026-04-01">
+              <h3>1. részlet</h3>
+              <dl class="fee-facts">
+                <div><dt>Befizetési határidő</dt><dd>2026. április 1.</dd></div>
+                <div><dt>Összeg</dt><dd>15 000 Ft</dd></div>
+              </dl>
+              <p class="fee-item-note">Ha egy összegben fizeti be, ehhez a határidőhöz 30 000 Ft-ot utaljon.</p>
+            </div>
+
+            <div class="fee-item" data-from="2026-09-01" data-until="2026-11-30">
+              <h3>2. részlet</h3>
+              <dl class="fee-facts">
+                <div><dt>Befizetési határidő</dt><dd>2026. november 30.</dd></div>
+                <div><dt>Összeg</dt><dd>15 000 Ft</dd></div>
+              </dl>
+              <p class="fee-item-note">Aki az 1. részlettel együtt már a teljes éves tagdíjat (30 000 Ft) befizette, az kérjük hagyja figyelmen kívül ezt a felhívást.</p>
+            </div>
+          </div>
+
+          <div class="fee-pay">
+            <div class="bank-card">
+              <h3>Banki átutalás az egyesület számlájára</h3>
+              <p class="bank-label">Számlatulajdonos</p>
+              <div class="bank-copy">
+                <p class="bank-value">Gödöllői Cserkészetért Egyesület</p>
+                <button class="copy-btn" type="button" data-copy="Gödöllői Cserkészetért Egyesület" data-copy-label="Számlatulajdonos" aria-label="Számlatulajdonos másolása" title="Másolás"><svg class="icon-copy" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/></svg><svg class="icon-check" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 13l4 4L19 7"/></svg></button>
+              </div>
+              <p class="bank-label">Számlaszám</p>
+              <div class="bank-copy">
+                <p class="bank-value bank-number">1620 0223 1007 7922 0000 0000</p>
+                <!-- szóközök nélkül másolódik, a bankok így is elfogadják -->
+                <button class="copy-btn" type="button" data-copy="162002231007792200000000" data-copy-label="Számlaszám" aria-label="Számlaszám másolása" title="Másolás"><svg class="icon-copy" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/></svg><svg class="icon-check" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 13l4 4L19 7"/></svg></button>
+              </div>
+              <p class="bank-label">vagy másodlagos banki azonosító</p>
+              <div class="bank-copy">
+                <p class="bank-value bank-number">+36204924970</p>
+                <button class="copy-btn" type="button" data-copy="+36204924970" data-copy-label="Másodlagos azonosító" aria-label="Másodlagos banki azonosító másolása" title="Másolás"><svg class="icon-copy" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/></svg><svg class="icon-check" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 13l4 4L19 7"/></svg></button>
+              </div>
+              <p class="bank-label">Közlemény</p>
+              <p class="bank-value">„Adomány” + ECSET kód</p>
+            </div>
+
+            <div class="fee-box">
+              <h3>ECSET kód</h3>
+              <p>
+                A közleménybe az „Adomány” szó után az ECSET kódot is írja be (már a tábori
+                befizetésből ismert lehet). A kódokat egy Google Drive-fájlban osztjuk meg
+                a szülőkkel.
+              </p>
+              <p class="fee-box-note">
+                A fájlt csak akkor tudja megnyitni, ha azzal az e-mail-címmel van bejelentkezve
+                a Google-fiókjába, amelyik a csapat levelezőlistáján is szerepel.
+              </p>
+              <a class="btn btn-primary" href="https://drive.google.com/file/d/1ckM3hP6Znzf8MvlFIYrhLcwbrmlWSiMf/view?usp=drive_link" target="_blank" rel="noopener noreferrer">ECSET kódok megnyitása</a>
+            </div>
+
+            <div class="fee-box">
+              <h3>Egyedi támogatás</h3>
+              <p>
+                Ha a tagdíj befizetése nehézséget okoz, kérjük, jelezze nekünk: az alábbi
+                űrlapon egyedi támogatást kérhet.
+              </p>
+              <a class="btn btn-primary" href="https://docs.google.com/forms/d/e/1FAIpQLSeM3oarAXJWU-QBWlYtX1CtuGWXPdtC0kvSM7cJJ61_z0Awsw/viewform?usp=publish-editor" target="_blank" rel="noopener noreferrer">Egyedi támogatás kérése</a>
+            </div>
+          </div>
+
+          <div class="fee-costs">
+            <h3>Mire fordítjuk a tagdíjat?</h3>
+            <p>
+              A tagdíjakból fedezzük a csapatotthon fenntartását és a csapat működését.
+              A Bezsilla-villa üzemeltetése továbbra is nehézséget okoz. Igyekszünk takarékoskodni
+              a gáz- és az áramfogyasztással is, de amíg nincs meg a megfelelő korszerűsítés,
+              áttörő változást nem tudunk elérni.
+            </p>
+            <ul class="cost-list">
+              <li style="--share:42%">
+                <span class="cost-name">Közművek (a Bezsilla-villa gáz-, áram- és egyéb költségei)</span>
+                <span class="cost-amount">4 600 000 Ft</span>
+                <span class="cost-bar" aria-hidden="true"></span>
+              </li>
+              <li style="--share:36%">
+                <span class="cost-name">A Cserkészszövetség tagdíja</span>
+                <span class="cost-amount">4 000 000 Ft</span>
+                <span class="cost-bar" aria-hidden="true"></span>
+              </li>
+              <li style="--share:22%">
+                <span class="cost-name">A csapat működtetése (rajok és rajportyák támogatása, a csapat felszerelése, az autó éves üzemeltetése)</span>
+                <span class="cost-amount">2 400 000 Ft</span>
+                <span class="cost-bar" aria-hidden="true"></span>
+              </li>
+            </ul>
+            <p class="cost-total">Összesen évente: <strong>11 000 000 Ft</strong></p>
+            <p class="cost-note">
+              A Cserkészszövetség tagdíjának terhe a nagy létszámunk miatt szerencsére jobban eloszlik.
+              Az autó éves üzemeltetése így is olcsóbb, mintha nyáron bérelnénk.
+            </p>
+          </div>
+        </div>
+        <p class="fee-empty" hidden>Jelenleg nincs tagdíj befizetési időszak!</p>
+      </div>
+
+      <!-- ===== Nagytábordíj ===== -->
+      <div class="fee-panel" id="panel-nagytabor" data-tab="nagytabor">
+        <div class="fee-content" hidden></div>
+        <p class="fee-empty">Jelenleg nincs tábordíj befizetési időszak!</p>
+      </div>
+
+      <!-- ===== Kiscserkésztábor díja ===== -->
+      <div class="fee-panel" id="panel-kcstabor" data-tab="kcstabor">
+        <div class="fee-content" hidden></div>
+        <p class="fee-empty">Jelenleg nincs tábordíj befizetési időszak!</p>
+      </div>
+
+      <h3 class="home-contact-title fee-contact-title">Kérdése van a befizetésekkel kapcsolatban?</h3>
+      <p class="fee-contact-lead">Keresse bizalommal a pénzügyekért felelős csapatparancsnok-helyettest!</p>
+      <div class="home-contact">
+        <!-- VEZETOK_PENZUGY:START – a tools/sync_vezetok.py írja (a Csapatvezetés táblázatból az, akinek a szerepében a "Pénzügy" szó szerepel), kézzel ne szerkeszd -->
+        <div class="person-card has-bio">
+          <div class="person-photo" data-initials="CÁ">
+            <img src="images/webp/kozos/team/csiki-adam.webp" alt="Csiki Ádám" data-optional>
+          </div>
+          <h3>Csiki Ádám</h3>
+          <p class="person-role">Pénzügyek</p>
+          <a class="person-email" href="mailto:cs.adam.b@gmail.com">cs.adam.b@<wbr>gmail.com</a>
+          <div class="person-bio" hidden>
+            <p class="person-bio-role">Pénzügyek</p>
+            <p class="person-bio-text">Tagdíj/tábordíj/VK támogatás<br>Raji pénz<br>Programszervezési költség<br>Hallottál egy jó pályázatról</p>
+            <ul class="person-bio-contact">
+              <li><a class="person-email" href="mailto:cs.adam.b@gmail.com">cs.adam.b@gmail.com</a></li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- VEZETOK_PENZUGY:END -->
+      </div>
+    </div>
+  </section>
+
+  <!-- Lábléc -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-links">
+        <a href="mailto:802@cserkesz.hu">802@cserkesz.hu</a>
+        <a href="dokumentumok.html">Dokumentumok</a>
+        <a href="galeria.html">Galéria</a>
+        <a href="https://www.facebook.com/802szentkorona" target="_blank" rel="noopener noreferrer">Facebook</a>
+        <a href="https://www.instagram.com/802szentkorona/" target="_blank" rel="noopener noreferrer">Instagram</a>
+      </div>
+      <p>&copy; <span id="year"></span> 802. sz. Szent Korona Cserkészcsapat. Minden jog fenntartva.</p>
+    </div>
+  </footer>
+
+  <script src="script.js?v=59"></script>
+</body>
+</html>

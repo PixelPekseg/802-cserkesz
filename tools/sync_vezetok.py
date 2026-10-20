@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """A közzétett Google Táblázat (Csapatvezetés lap, CSV) alapján frissíti a csapatparancsnok
 és a helyettesek kártyáit a főoldal "Kapcsolat" részén, valamint a Bezsilla-felelős kártyáját
-a Csapatotthonunk oldalon. Oszlopok: Név · Szerep · Bemutatkozás (rövid szöveg) · E-mail (egy) ·
+a Csapatotthonunk oldalon, és a pénzügyi felelősét a Pénzügyek oldalon. Oszlopok: Név · Szerep · Bemutatkozás (rövid szöveg) · E-mail (egy) ·
 Telefon · Fotó (a Drive "Képek" mappájában lévő fájl neve; drive_photos.py) · Megjelenjen?
 
 Használat:
@@ -11,8 +11,9 @@ Használat:
     DRIVE_LOCAL_DIR=./kepek python tools/sync_vezetok.py --file v.csv   # Drive helyett helyi mappa
 
 Az index.html <!-- VEZETOK:START/END --> és a csapatotthon.html
-<!-- VEZETOK_BEZSILLA:START/END --> közötti részét írja újra. A Csapatotthonunk oldalra az
-kerül, akinek a szerepében szerepel a "csapatotthon" szó. A kártyára kattintva a script.js
+<!-- VEZETOK_BEZSILLA:START/END --> és a penzugyek.html <!-- VEZETOK_PENZUGY:START/END --> közötti
+részét írja újra. A Csapatotthonunk oldalra az kerül, akinek a szerepében szerepel a "csapatotthon"
+szó, a Pénzügyek oldalra az, akinek a szerepében a "pénzügy" szó. A kártyára kattintva a script.js
 felugró ablakban mutatja a rejtett .person-bio tartalmát.
 Hibás táblázat esetén hibával leáll, és semmit nem módosít.
 """
@@ -30,6 +31,9 @@ HOME = os.path.join(common.ROOT, 'csapatotthon.html')
 SNAPSHOT = os.path.join(common.ROOT, 'data', 'vezetok.csv')
 # akinek a szerepében ez a szó szerepel, a Csapatotthonunk oldalra is bekerül
 HOME_ROLE_WORD = 'csapatotthon'
+FINANCE = os.path.join(common.ROOT, 'penzugyek.html')
+# akinek a szerepében ez a szó szerepel, a Pénzügyek oldalra is bekerül
+FINANCE_ROLE_WORD = 'pénzügy'
 
 COLUMNS = {
     'name': 'név', 'role': 'szerep', 'intro': 'bemutatkozás', 'email': 'e-mail', 'phone': 'telefon',
@@ -74,6 +78,14 @@ def main():
             changed.append('csapatotthon.html')
     else:
         common.warn('Senkinek a szerepében nincs "Csapatotthon", a Csapatotthonunk oldal kártyája változatlan marad.')
+
+    finance = [row for row in people if FINANCE_ROLE_WORD in row['role'].lower()]
+    if finance:
+        finance_body = '\n\n'.join(build_card(row, row['photo'], ' ' * 8) for row in finance)
+        if common.replace_block(FINANCE, 'VEZETOK_PENZUGY', finance_body, ' ' * 8):
+            changed.append('penzugyek.html')
+    else:
+        common.warn('Senkinek a szerepében nincs "Pénzügy", a Pénzügyek oldal kártyája változatlan marad.')
 
     photos.save_state()
     common.save_snapshot(SNAPSHOT, csv_text)

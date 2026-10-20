@@ -24,7 +24,7 @@ mainNav.querySelectorAll('a').forEach(link => {
 // menü, érintés) kattintásra nyílik/csukódik; kívül kattintás vagy Esc bezárja.
 // ==========================================================
 const subMenus = [...document.querySelectorAll('.has-sub')];
-const hoverMenu = window.matchMedia('(hover: hover) and (min-width: 1301px)');
+const hoverMenu = window.matchMedia('(hover: hover) and (min-width: 1381px)');
 
 function closeSubMenus(except) {
   subMenus.forEach(item => {
@@ -1326,4 +1326,50 @@ document.addEventListener('click', async event => {
     holder.remove();
     (text.classList.contains('prose') ? text : text.closest('.container') || text).classList.add('split-layout');
   });
+})();
+
+// ==========================================================
+// Pénzügyek oldal: fülek (Tagdíj / Nagytábordíj / Kcs tábordíj) és időablak
+// Fülsáv nincs (a tulajdonos kérése): a fül a címben lévő #tagdij / #nagytabor /
+// #kcstabor alapján nyílik, azaz a menü Pénzügyek lenyílójából; cím nélkül a Tagdíj.
+// Minden .fee-item a data-from / data-until napjai között látszik (a Meddig napja
+// még beleszámít). Ha egy fülnek egyetlen érvényes tétele sincs, a .fee-content
+// helyett a .fee-empty üzenet jelenik meg. Teszt a konzolban:
+// updateFees(new Date('2026-03-15T10:00:00'))
+// ==========================================================
+function updateFees(now = new Date()) {
+  document.querySelectorAll('.fee-panel').forEach(panel => {
+    let anyVisible = false;
+    panel.querySelectorAll('.fee-item').forEach(item => {
+      const { from, until } = item.dataset;
+      const started = !from || now >= new Date(`${from}T00:00:00`);
+      const notEnded = !until || now <= new Date(`${until}T23:59:59`);
+      item.hidden = !(started && notEnded);
+      if (!item.hidden) anyVisible = true;
+    });
+    const content = panel.querySelector('.fee-content');
+    const empty = panel.querySelector('.fee-empty');
+    if (content) content.hidden = !anyVisible;
+    if (empty) empty.hidden = anyVisible;
+  });
+}
+
+(function initFeeTabs() {
+  const panels = [...document.querySelectorAll('.fee-panel[data-tab]')];
+  if (panels.length === 0) return;
+  const names = panels.map(panel => panel.dataset.tab);
+  const menuLinks = [...document.querySelectorAll('#subFinance a')];
+
+  function select(name) {
+    if (!names.includes(name)) name = names[0];
+    panels.forEach(panel => { panel.hidden = panel.dataset.tab !== name; });
+    menuLinks.forEach(link => {
+      if (link.hash === `#${name}`) link.setAttribute('aria-current', 'page');
+      else link.removeAttribute('aria-current');
+    });
+  }
+
+  window.addEventListener('hashchange', () => select(location.hash.slice(1)));
+  select(location.hash.slice(1));
+  updateFees();
 })();
