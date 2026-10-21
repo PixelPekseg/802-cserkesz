@@ -3,7 +3,7 @@
     "from": "2026.10.01.",
     "until": "2026.12.31.",
     "title": "2026. évi nagytábor díja",
-    "intro": "A tábor pénzügyeit idén is a Gödöllői Cserkészetért Egyesületen keresztül intézzük. Kérjük, figyelmesen olvassák el és tartsák be a pontos útmutatást.\nAz árak folyamatos drágulásával minden igyekezetünk ellenére is megnő a költségvetésünk a tavalyihoz képest. Ennek enyhítésére a tábordíjat két részletben kérjük, és már most jelezzük a pontos összeget, hogy a családoknak ne legyen megterhelő ez a kiadás.",
+    "intro": "A tábor pénzügyeit idén is a Gödöllői Cserkészetért Egyesületen keresztül intézzük. Kérjük, figyelmesen olvassák el és tartsák be a pontos útmutatást.\nAz árak folyamatos drágulásával minden igyekezetünk ellenére is megnő a költségvetésünk a tavalyihoz képest. Ennek enyhítésére a tábordíjat két részletben kérjük, és már most jelezzük a pontos összeget, hogy a családoknak ne legyen megterhelő ez a kiadás.\n**Előtábor-kedvezmény:** aki legalább 4 napot (4 éjszakát) részt vesz az előtáborban, 5 000 Ft kedvezményre jogosult a teljes tábordíjból. Ilyenkor a rá vonatkozó fizetendő összegből vonják le az 5 000 Ft-ot, és azt utalják el.\nNapi bontású részvételre idén sincs lehetőség: a program teljessége és a közösségi, nevelési célok miatt arra kérünk mindenkit, hogy a tábor teljes időtartama alatt legyen jelen.",
     "key": "Táborba csak azok jöhetnek, akik a tábor kezdetéig rendezték a tagdíj első felét és a tábordíjat.",
     "empty": "Jelenleg nincs tábordíj befizetési időszak!",
     "ecset": "https://drive.google.com/file/d/1ckM3hP6Znzf8MvlFIYrhLcwbrmlWSiMf/view?usp=drive_link",
@@ -22,10 +22,10 @@
       "amount": "55000"
     },
     {
-      "rule_title": "Előtábor-kedvezmény",
+      "rule_title": "",
       "split": "2 × 22 500 Ft",
       "visible": "",
-      "rule_text": "aki legalább 4 napot (4 éjszakát) részt vesz az előtáborban, 5 000 Ft kedvezményre jogosult a teljes tábordíjból. Ilyenkor a rá vonatkozó fizetendő összegből vonják le az 5 000 Ft-ot, és azt utalják el.",
+      "rule_text": "",
       "name": "Cserkészjelölt",
       "amount": "45000"
     },
@@ -33,7 +33,7 @@
       "rule_title": "",
       "split": "2 × 20 000 Ft",
       "visible": "",
-      "rule_text": "Napi bontású részvételre idén sincs lehetőség: a program teljessége és a közösségi, nevelési célok miatt arra kérünk mindenkit, hogy a tábor teljes időtartama alatt legyen jelen.",
+      "rule_text": "",
       "name": "Vezető",
       "amount": "40000"
     },
@@ -51,14 +51,14 @@
       "visible": "",
       "deadline": "2026.11.30.",
       "note": "Egy összegben is befizethető: ilyenkor ehhez a határidőhöz a teljes díjat utalja.",
-      "amount": "a fenti leírtak szerinti díj fele",
+      "amount": "a fent leírtak szerinti díj fele",
       "title": "1. részlet"
     },
     {
       "visible": "",
       "deadline": "2026.12.31.",
       "note": "Aki az 1. részlettel együtt már a teljes tábordíjat befizette, az kérjük hagyja figyelmen kívül ezt a felhívást.",
-      "amount": "a fenti leírtak szerinti díj fele",
+      "amount": "a fent leírtak szerinti díj fele",
       "title": "2. részlet"
     }
   ],

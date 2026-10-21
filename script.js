@@ -1355,9 +1355,15 @@ function updateFees(now = new Date()) {
   if (panels.length === 0) return;
   const names = panels.map(panel => panel.dataset.tab);
   const menuLinks = [...document.querySelectorAll('#subFinance a')];
+  const banner = document.querySelector('.page-banner h1');
+  const baseTitle = document.title;
 
   function select(name) {
     if (!names.includes(name)) name = names[0];
+    // a címsávban a fül neve áll (Tagdíj / Nagytábordíj / Kcs tábordíj), nem a "Pénzügyek"
+    const label = panels.find(panel => panel.dataset.tab === name).dataset.label;
+    if (banner && label) banner.textContent = label;
+    if (label) document.title = `${label} – ${baseTitle}`;
     panels.forEach(panel => {
       panel.hidden = panel.dataset.tab !== name;
       // a beágyazott űrlap (Google) csak akkor töltődik be, ha a fülje látszik

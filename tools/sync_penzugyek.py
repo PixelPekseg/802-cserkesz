@@ -50,6 +50,8 @@ TABS = [
     ('nagytabor', 'PENZUGY_NAGYTABOR_URL', 'PENZUGY_NAGYTABOR'),
     ('kcstabor', 'PENZUGY_KCSTABOR_URL', 'PENZUGY_KCSTABOR'),
 ]
+# a fül neve a címsávban (a script.js a data-label-t írja a h1-be)
+LABELS = {'tagdij': 'Tagdíj', 'nagytabor': 'Nagytábordíj', 'kcstabor': 'Kcs tábordíj'}
 INDENT = ' ' * 6
 
 # Az Alapadatok lap mezői (a Mező oszlop ELEJE alapján, kisbetűsen)
@@ -257,8 +259,8 @@ def render_pay(ecset_link):
               <ul>
                 <li>Ha hiányzik az „Adomány” szó, a pénzt visszautaljuk, mert csak adományt fogadhatunk.</li>
                 <li>Ha az ECSET kód hiányzik vagy nem a megfelelő formában szerepel, a rendszer nem ismeri fel a befizetést, és a pénzt szintén visszautaljuk.</li>
+                <li>A visszautalás miatt mindkét esetben 1 000 Ft plusz költséget számolunk fel.</li>
               </ul>
-              <p class="fee-box-note">A visszautalás miatt mindkét esetben 1 000 Ft plusz költséget számolunk fel.</p>
             </div>{ecset}
           </div>
 '''
@@ -297,7 +299,7 @@ def render_tab(key, data, today):
         window = f' data-from="{start.isoformat()}"' + (f' data-until="{end.isoformat()}"' if end else '')
     active = has_content and start <= today and (not end or today <= end)
 
-    out = [f'<div class="fee-panel" id="panel-{key}" data-tab="{key}"{window}>']
+    out = [f'<div class="fee-panel" id="panel-{key}" data-tab="{key}" data-label="{LABELS[key]}"{window}>']
     if not has_content:
         out.append('        <div class="fee-content" hidden></div>')
     else:

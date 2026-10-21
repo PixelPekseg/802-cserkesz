@@ -23,7 +23,7 @@
 
   <link rel="icon" type="image/jpeg" href="images/webp/kozos/logo_green.jpg?v=1">
   <link rel="apple-touch-icon" href="images/webp/kozos/logo_green.jpg?v=1">
-  <link rel="stylesheet" href="style.css?v=105">
+  <link rel="stylesheet" href="style.css?v=106">
 </head>
 <body>
 
@@ -109,7 +109,7 @@
   <section class="section finance-page">
     <div class="container">
       <!-- PENZUGY_TAGDIJ:START – a tools/sync_penzugyek.py írja a(z) „Pénzügyek – Tagdíj” Google Táblázatból, kézzel ne szerkeszd -->
-      <div class="fee-panel" id="panel-tagdij" data-tab="tagdij" data-from="2026-09-01" data-until="2026-11-30">
+      <div class="fee-panel" id="panel-tagdij" data-tab="tagdij" data-label="Tagdíj" data-from="2026-09-01" data-until="2026-11-30">
         <div class="fee-content">
           <div class="fee-intro">
             <h2>2026. évi tagdíj</h2>
@@ -163,8 +163,8 @@
               <ul>
                 <li>Ha hiányzik az „Adomány” szó, a pénzt visszautaljuk, mert csak adományt fogadhatunk.</li>
                 <li>Ha az ECSET kód hiányzik vagy nem a megfelelő formában szerepel, a rendszer nem ismeri fel a befizetést, és a pénzt szintén visszautaljuk.</li>
+                <li>A visszautalás miatt mindkét esetben 1 000 Ft plusz költséget számolunk fel.</li>
               </ul>
-              <p class="fee-box-note">A visszautalás miatt mindkét esetben 1 000 Ft plusz költséget számolunk fel.</p>
             </div>
 
             <div class="fee-box fee-ecset">
@@ -223,12 +223,14 @@
       <!-- PENZUGY_TAGDIJ:END -->
 
       <!-- PENZUGY_NAGYTABOR:START – a tools/sync_penzugyek.py írja a(z) „Pénzügyek – Nagytábordíj” Google Táblázatból, kézzel ne szerkeszd -->
-      <div class="fee-panel" id="panel-nagytabor" data-tab="nagytabor" data-from="2026-10-01" data-until="2026-12-31">
+      <div class="fee-panel" id="panel-nagytabor" data-tab="nagytabor" data-label="Nagytábordíj" data-from="2026-10-01" data-until="2026-12-31">
         <div class="fee-content">
           <div class="fee-intro">
             <h2>2026. évi nagytábor díja</h2>
             <p>A tábor pénzügyeit idén is a Gödöllői Cserkészetért Egyesületen keresztül intézzük. Kérjük, figyelmesen olvassák el és tartsák be a pontos útmutatást.</p>
             <p>Az árak folyamatos drágulásával minden igyekezetünk ellenére is megnő a költségvetésünk a tavalyihoz képest. Ennek enyhítésére a tábordíjat két részletben kérjük, és már most jelezzük a pontos összeget, hogy a családoknak ne legyen megterhelő ez a kiadás.</p>
+            <p><strong>Előtábor-kedvezmény:</strong> aki legalább 4 napot (4 éjszakát) részt vesz az előtáborban, 5 000 Ft kedvezményre jogosult a teljes tábordíjból. Ilyenkor a rá vonatkozó fizetendő összegből vonják le az 5 000 Ft-ot, és azt utalják el.</p>
+            <p>Napi bontású részvételre idén sincs lehetőség: a program teljessége és a közösségi, nevelési célok miatt arra kérünk mindenkit, hogy a tábor teljes időtartama alatt legyen jelen.</p>
           </div>
 
           <p class="fee-key">Táborba csak azok jöhetnek, akik a tábor kezdetéig rendezték a tagdíj első felét és a tábordíjat.</p>
@@ -242,8 +244,6 @@
 
           <div class="fee-rules">
             <p><strong>Vezetők és GH segítők:</strong> őrsvezetőink, operatív vezetőink és GH segítőink egész éves önkéntes munkáját azzal (is) szeretnénk meghálálni, hogy nekik csak az étkezések díját kell kifizetniük, a lent töltött napok számával szorozva. Vezetőnek azok az őrsvezetők számítanak, akiknek őrse lesz a nagytáborban (a kiscserkész őrsvezetők nem tartoznak ide), operatív vezetőnek pedig azok, akik a tábor alatt aktív feladatot látnak el.</p>
-            <p><strong>Előtábor-kedvezmény:</strong> aki legalább 4 napot (4 éjszakát) részt vesz az előtáborban, 5 000 Ft kedvezményre jogosult a teljes tábordíjból. Ilyenkor a rá vonatkozó fizetendő összegből vonják le az 5 000 Ft-ot, és azt utalják el.</p>
-            <p>Napi bontású részvételre idén sincs lehetőség: a program teljessége és a közösségi, nevelési célok miatt arra kérünk mindenkit, hogy a tábor teljes időtartama alatt legyen jelen.</p>
           </div>
 
           <div class="fee-items">
@@ -251,7 +251,7 @@
               <h3>1. részlet</h3>
               <dl class="fee-facts">
                 <div><dt>Befizetési határidő</dt><dd>2026. november 30.</dd></div>
-                <div><dt>Összeg</dt><dd>a fenti leírtak szerinti díj fele</dd></div>
+                <div><dt>Összeg</dt><dd>a fent leírtak szerinti díj fele</dd></div>
               </dl>
               <p class="fee-item-note">Egy összegben is befizethető: ilyenkor ehhez a határidőhöz a teljes díjat utalja.</p>
             </div>
@@ -259,7 +259,7 @@
               <h3>2. részlet</h3>
               <dl class="fee-facts">
                 <div><dt>Befizetési határidő</dt><dd>2026. december 31.</dd></div>
-                <div><dt>Összeg</dt><dd>a fenti leírtak szerinti díj fele</dd></div>
+                <div><dt>Összeg</dt><dd>a fent leírtak szerinti díj fele</dd></div>
               </dl>
               <p class="fee-item-note">Aki az 1. részlettel együtt már a teljes tábordíjat befizette, az kérjük hagyja figyelmen kívül ezt a felhívást.</p>
             </div>
@@ -297,8 +297,8 @@
               <ul>
                 <li>Ha hiányzik az „Adomány” szó, a pénzt visszautaljuk, mert csak adományt fogadhatunk.</li>
                 <li>Ha az ECSET kód hiányzik vagy nem a megfelelő formában szerepel, a rendszer nem ismeri fel a befizetést, és a pénzt szintén visszautaljuk.</li>
+                <li>A visszautalás miatt mindkét esetben 1 000 Ft plusz költséget számolunk fel.</li>
               </ul>
-              <p class="fee-box-note">A visszautalás miatt mindkét esetben 1 000 Ft plusz költséget számolunk fel.</p>
             </div>
 
             <div class="fee-box fee-ecset">
@@ -333,7 +333,7 @@
       <!-- PENZUGY_NAGYTABOR:END -->
 
       <!-- PENZUGY_KCSTABOR:START – a tools/sync_penzugyek.py írja a(z) „Pénzügyek – Kiscserkésztábor díja” Google Táblázatból, kézzel ne szerkeszd -->
-      <div class="fee-panel" id="panel-kcstabor" data-tab="kcstabor">
+      <div class="fee-panel" id="panel-kcstabor" data-tab="kcstabor" data-label="Kcs tábordíj">
         <div class="fee-content" hidden></div>
         <p class="fee-empty">Jelenleg nincs tábordíj befizetési időszak!</p>
       </div>
@@ -379,6 +379,6 @@
     </div>
   </footer>
 
-  <script src="script.js?v=61"></script>
+  <script src="script.js?v=62"></script>
 </body>
 </html>
