@@ -3398,6 +3398,28 @@ body:has(.main-nav.open) .upcoming-tab {
   border: 0;
 }
 
+.fee-form-closed {
+  padding: 20px 24px;
+  text-align: center;
+  font-weight: 600;
+  background: var(--color-bg-alt);
+  border: 1px dashed var(--color-border);
+  border-radius: 12px;
+}
+
+.fee-form-deadline {
+  margin: -4px 0 14px;
+  text-align: center;
+}
+
+.fee-form-deadline strong {
+  display: inline-block;
+  padding: 4px 12px;
+  color: #fff;
+  background: var(--color-primary);
+  border-radius: 30px;
+}
+
 .fee-form-cta {
   text-align: center;
 }
@@ -3423,6 +3445,20 @@ body:has(.main-nav.open) .upcoming-tab {
 
 .fee-contact-title {
   margin: 56px 0 6px;
+}
+
+/* Kcs tábordíj: a 4. osztályos raj rajparancsnokai személykártyán, középen */
+.fee-raj-contact {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 48px;
+}
+
+.fee-raj {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 20px;
 }
 
 .fee-contact-lead {

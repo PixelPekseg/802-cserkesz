@@ -6,7 +6,10 @@ Használat:
     python tools/sync_rajok.py --url <link>
     python tools/sync_rajok.py --file x.csv     # helyi fájlból (teszteléshez)
 
-A csatlakozom.html <!-- RAJOK:START --> és <!-- RAJOK:END --> közötti részét írja újra.
+A csatlakozom.html <!-- RAJOK:START --> és <!-- RAJOK:END --> közötti részét írja újra, valamint a
+penzugyek.html <!-- RAJOK_KCS:START/END --> részét: ott a Kcs tábordíj fül kapcsolata a 4. osztályos
+raj rajparancsnokai, a vezetőkéhez hasonló személykártyákon (fotó nincs, a monogram látszik); minden
+raj kártyái bekerülnek, de csak a most 4. osztályos rajé látszik (a script.js updateKcsContact).
 Minden kártya data-grade="4" és data-school-year="<indulás éve>" attribútumot kap; az osztályt
 (4. osztály = az indulás éve tanévében) a script.js számolja ki a megnyitáskor, így a szeptember
 1-jei léptetés a táblázat változása nélkül is megtörténik.
@@ -19,8 +22,10 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import sync_common as common
+from person_card import build_card as person_card
 
 PAGE = os.path.join(common.ROOT, 'csatlakozom.html')
+FINANCE = os.path.join(common.ROOT, 'penzugyek.html')
 SNAPSHOT = os.path.join(common.ROOT, 'data', 'rajok.csv')
 
 COLUMNS = {
@@ -65,6 +70,21 @@ def build_card(row, start_year, today):
     return '\n'.join(lines)
 
 
+def build_kcs_group(row, start_year, today):
+    """A Pénzügyek oldal Kcs tábordíj fülének kapcsolata: a raj rajparancsnokai személykártyán."""
+    grade = 4 + school_year(today) - start_year
+    hidden = '' if grade == 4 else ' hidden'
+    cards = []
+    for i in (1, 2, 3):
+        if not row[f'n{i}']:
+            continue
+        email = row[f'e{i}'] if '@' in row[f'e{i}'] else ''
+        cards.append(person_card({'name': row[f'n{i}'], 'role': 'Rajparancsnok', 'email': email,
+                                  'phone': common.fix_phone(row[f't{i}'])}, None, ' ' * 12))
+    return (f'          <div class="fee-raj" data-grade="4" data-school-year="{start_year}"{hidden}>\n'
+            + '\n\n'.join(cards) + '\n          </div>')
+
+
 def main():
     args, env_name = common.get_args('RAJOK_CSV_URL')
     csv_text = common.fetch(args, env_name)
@@ -82,15 +102,19 @@ def main():
         if not match or not 2000 <= int(match.group()) <= 2100:
             common.warn(f'{line_number}. sor ({row["name"]}): hibás indulási év ("{row["year"]}"), kihagyva.')
             continue
-        cards.append((int(match.group()), build_card(row, int(match.group()), today)))
+        start = int(match.group())
+        cards.append((start, build_card(row, start, today), build_kcs_group(row, start, today)))
     if not cards and not os.environ.get('ALLOW_EMPTY'):
         common.fail('Egyetlen érvényes, megjelenő raj sincs a táblázatban, ezért nem írom felül az oldalt.')
 
     cards.sort(key=lambda item: -item[0])  # a legfiatalabb (legalacsonyabb osztály) elöl
-    body = '\n\n'.join(card for _, card in cards)
+    body = '\n\n'.join(card for _, card, _ in cards)
     changed = common.replace_block(PAGE, 'RAJOK', body, ' ' * 8)
+    finance_body = '\n\n'.join(card for _, _, card in cards)
+    finance_changed = common.replace_block(FINANCE, 'RAJOK_KCS', finance_body, ' ' * 10)
     common.save_snapshot(SNAPSHOT, csv_text)
-    print(f'{len(cards)} raj, csatlakozom.html {"frissítve" if changed else "változatlan"}.')
+    print(f'{len(cards)} raj, csatlakozom.html {"frissítve" if changed else "változatlan"}, '
+          f'penzugyek.html {"frissítve" if finance_changed else "változatlan"}.')
 
 
 if __name__ == '__main__':

@@ -23,7 +23,7 @@
 
   <link rel="icon" type="image/jpeg" href="images/webp/kozos/logo_green.jpg?v=1">
   <link rel="apple-touch-icon" href="images/webp/kozos/logo_green.jpg?v=1">
-  <link rel="stylesheet" href="style.css?v=106">
+  <link rel="stylesheet" href="style.css?v=110">
 </head>
 <body>
 
@@ -109,11 +109,13 @@
   <section class="section finance-page">
     <div class="container">
       <!-- PENZUGY_TAGDIJ:START – a tools/sync_penzugyek.py írja a(z) „Pénzügyek – Tagdíj” Google Táblázatból, kézzel ne szerkeszd -->
-      <div class="fee-panel" id="panel-tagdij" data-tab="tagdij" data-label="Tagdíj" data-from="2026-09-01" data-until="2026-11-30">
+      <div class="fee-panel" id="panel-tagdij" data-tab="tagdij" data-label="Tagdíj" data-from="2026-09-01" data-until="2026-12-31">
         <div class="fee-content">
           <div class="fee-intro">
             <h2>2026. évi tagdíj</h2>
-            <p>Hogy a teher eloszoljon, a tagdíjat két részletben kérjük, de természetesen egy összegben is befizethető.</p>
+            <p>Kedves Szülők!</p>
+            <p>A tagdíjat az eddigiekhez hasonlóan, kérjük, hogy az egyesület lent feltüntetett bankszámlájára utalják át. Az utalás közleményében kérjük, tüntessék fel az „Adomány” szót és gyermekük ECSET kódját. Mást ne írjanak a közleménybe! Az ECSET kódokat a lent található linken érik el.</p>
+            <p>Hogy enyhítsük a tagdíj terhét, azt két részletben kérjük, illetve továbbra is biztosítunk lehetőséget arra, hogy amelyik család számára megterhelő ez a befizetés, az támogatási kérelmet nyújtson be. Az ehhez szükséges űrlapot az oldal alján találják. Kérjük, figyeljenek a támogatási igény leadásának határidejére, ugyanis ezt követően nem áll módunkban új igényt befogadni.</p>
           </div>
 
           <ul class="price-grid">
@@ -122,9 +124,17 @@
 
           <div class="fee-items">
             <div class="fee-item">
-              <h3>2. részlet</h3>
+              <h3>1. részlet</h3>
               <dl class="fee-facts">
                 <div><dt>Befizetési határidő</dt><dd>2026. november 30.</dd></div>
+                <div><dt>Összeg</dt><dd>15 000 Ft</dd></div>
+              </dl>
+              <p class="fee-item-note">A tagdíjat van lehetőség egy összegben is befizetni. Kérjük, ilyenkor a teljes összeget az első részlet határidejéig utalják át!</p>
+            </div>
+            <div class="fee-item">
+              <h3>2. részlet</h3>
+              <dl class="fee-facts">
+                <div><dt>Befizetési határidő</dt><dd>2026. december 31.</dd></div>
                 <div><dt>Összeg</dt><dd>15 000 Ft</dd></div>
               </dl>
               <p class="fee-item-note">Aki az 1. részlettel együtt már a teljes éves tagdíjat (30 000 Ft) befizette, az kérjük hagyja figyelmen kívül ezt a felhívást.</p>
@@ -161,7 +171,7 @@
               </p>
               <p class="fee-example">Példa a közleményre: <strong>Adomány AAAAAA-1</strong></p>
               <ul>
-                <li>Ha hiányzik az „Adomány” szó, a pénzt visszautaljuk, mert csak adományt fogadhatunk.</li>
+                <li>Ha hiányzik az „Adomány” szó, a pénzt visszautaljuk, mert csak adományt fogadhatunk el.</li>
                 <li>Ha az ECSET kód hiányzik vagy nem a megfelelő formában szerepel, a rendszer nem ismeri fel a befizetést, és a pénzt szintén visszautaljuk.</li>
                 <li>A visszautalás miatt mindkét esetben 1 000 Ft plusz költséget számolunk fel.</li>
               </ul>
@@ -182,7 +192,7 @@
 
           <div class="fee-costs">
             <h3>Mire fordítjuk a tagdíjat?</h3>
-            <p>A tagdíjakból fedezzük a csapatotthon fenntartását és a csapat működését. A Bezsilla-villa üzemeltetése továbbra is nehézséget okoz. Igyekszünk takarékoskodni a gáz- és az áramfogyasztással is, de amíg nincs meg a megfelelő korszerűsítés, áttörő változást nem tudunk elérni.</p>
+            <p>A tagdíjakból fedezzük a csapatotthon fenntartását és a csapat működését. A Bezsilla-villa üzemeltetése, elsősorban rossz szigetelése miatt, továbbra is nehézséget okoz. Igyekszünk takarékoskodni a gáz- és az áramfogyasztással is, de amíg nem történik meg a megfelelő korszerűsítés, áttörő változást nem tudunk elérni. Ezen kívül a tagdíj jelentős részét az országos szervezetnek kell továbbítanunk, mellyel a Magyar Cserkészszövetség működését fedezik.</p>
             <ul class="cost-list">
               <li style="--share:42%">
                 <span class="cost-name">Közművek (a Bezsilla-villa gáz-, áram- és egyéb költségei)</span>
@@ -201,20 +211,23 @@
               </li>
             </ul>
             <p class="cost-total">Összesen évente: <strong>11 000 000 Ft</strong></p>
-            <p class="cost-note">A Cserkészszövetség tagdíjának terhe a nagy létszámunk miatt szerencsére jobban eloszlik. Az autó éves üzemeltetése így is olcsóbb, mintha nyáron bérelnénk.</p>
           </div>
 
-          <div class="fee-form">
+          <div class="fee-form" data-until="2026-11-15">
             <h3>Támogatás igénylése</h3>
-            <p>
-              A csapat minden évben támogatást oszt a tábordíjhoz és a tagdíjhoz az arra jelentkező
-              családoknak. Amennyiben a befizetés megterhelő Önöknek, kérjük, nyugodtan jelezzék
-              az alábbi űrlap kitöltésével.
-            </p>
-            <div class="fee-form-frame">
-              <iframe data-src="https://docs.google.com/forms/d/e/1FAIpQLSeM3oarAXJWU-QBWlYtX1CtuGWXPdtC0kvSM7cJJ61_z0Awsw/viewform?embedded=true" title="Támogatás igénylése (Google Űrlap)" loading="lazy">Betöltés…</iframe>
+            <div class="fee-form-open">
+              <p class="fee-form-deadline">Igénylési határidő: <strong>2026. november 15.</strong></p>
+              <p>
+                A csapat minden évben támogatást oszt a tábordíjhoz és a tagdíjhoz az arra jelentkező
+                családoknak. Amennyiben a befizetés megterhelő Önöknek, kérjük, nyugodtan jelezzék
+                az alábbi űrlap kitöltésével.
+              </p>
+              <div class="fee-form-frame">
+                <iframe data-src="https://docs.google.com/forms/d/e/1FAIpQLSeM3oarAXJWU-QBWlYtX1CtuGWXPdtC0kvSM7cJJ61_z0Awsw/viewform?embedded=true" title="Támogatás igénylése (Google Űrlap)" loading="lazy">Betöltés…</iframe>
+              </div>
+              <p class="fee-form-link">Nem jelenik meg az űrlap? <a class="inline-link" href="https://docs.google.com/forms/d/e/1FAIpQLSeM3oarAXJWU-QBWlYtX1CtuGWXPdtC0kvSM7cJJ61_z0Awsw/viewform" target="_blank" rel="noopener noreferrer">Megnyitás új lapon</a></p>
             </div>
-            <p class="fee-form-link">Nem jelenik meg az űrlap? <a class="inline-link" href="https://docs.google.com/forms/d/e/1FAIpQLSeM3oarAXJWU-QBWlYtX1CtuGWXPdtC0kvSM7cJJ61_z0Awsw/viewform" target="_blank" rel="noopener noreferrer">Megnyitás új lapon</a></p>
+            <p class="fee-form-closed" hidden>A támogatási igények leadási határideje november 15. volt, sajnos már nem áll lehetőségünkben támogatási igényeket befogadni.</p>
           </div>
         </div>
         <p class="fee-empty" hidden>Jelenleg nincs tagdíj befizetési időszak!</p>
@@ -227,23 +240,27 @@
         <div class="fee-content">
           <div class="fee-intro">
             <h2>2026. évi nagytábor díja</h2>
-            <p>A tábor pénzügyeit idén is a Gödöllői Cserkészetért Egyesületen keresztül intézzük. Kérjük, figyelmesen olvassák el és tartsák be a pontos útmutatást.</p>
-            <p>Az árak folyamatos drágulásával minden igyekezetünk ellenére is megnő a költségvetésünk a tavalyihoz képest. Ennek enyhítésére a tábordíjat két részletben kérjük, és már most jelezzük a pontos összeget, hogy a családoknak ne legyen megterhelő ez a kiadás.</p>
-            <p><strong>Előtábor-kedvezmény:</strong> aki legalább 4 napot (4 éjszakát) részt vesz az előtáborban, 5 000 Ft kedvezményre jogosult a teljes tábordíjból. Ilyenkor a rá vonatkozó fizetendő összegből vonják le az 5 000 Ft-ot, és azt utalják el.</p>
+            <p>A tábor pénzügyeit idén is a Gödöllői Cserkészetért Egyesületen keresztül intézzük. Kérjük, figyelmesen olvassák el és tartsák be az útmutatást.</p>
+            <p>Az árak folyamatos drágulásával minden igyekezetünk ellenére is megnő a költségvetésünk a tavalyihoz képest. Ennek enyhítésére a tábordíjat két részletben kérjük, illetve továbbra is biztosítunk lehetőséget arra, hogy amelyik család számára megterhelő ez a befizetés, az támogatási kérelmet nyújtson be. Az ehhez szükséges űrlapot az oldal alján találják. Kérjük, figyeljenek a támogatási igény leadásának határidejére, ugyanis ezt követően nem áll módunkban új igényt befogadni.</p>
             <p>Napi bontású részvételre idén sincs lehetőség: a program teljessége és a közösségi, nevelési célok miatt arra kérünk mindenkit, hogy a tábor teljes időtartama alatt legyen jelen.</p>
+            <p>Őrsvezetőink, operatív vezetőink és GH segítőink egész éves önkéntes munkáját azzal is szeretnénk meghálálni, hogy nekik csak a saját étkezéseik díját kell kifizetniük.</p>
+            <p><strong>Előtábor-kedvezmény:</strong> aki legalább 4 napot (4 éjszakát) részt vesz az előtáborban, 5 000 Ft kedvezményre jogosult a teljes tábordíjból. Ilyenkor a rá vonatkozó fizetendő összegből vonják le az 5 000 Ft-ot, és azt utalják el.</p>
           </div>
 
           <p class="fee-key">Táborba csak azok jöhetnek, akik a tábor kezdetéig rendezték a tagdíj első felét és a tábordíjat.</p>
 
           <ul class="price-grid">
-            <li><span class="price-name">Cserkész</span><span class="price-amount">55 000 Ft</span><span class="price-split">2 × 27 500 Ft</span></li>
-            <li><span class="price-name">Cserkészjelölt</span><span class="price-amount">45 000 Ft</span><span class="price-split">2 × 22 500 Ft</span></li>
+            <li><span class="price-name">10 nap</span><span class="price-amount">55 000 Ft</span><span class="price-split">2 × 27 500 Ft</span></li>
+            <li><span class="price-name">6 nap</span><span class="price-amount">45 000 Ft</span><span class="price-split">2 × 22 500 Ft</span></li>
             <li><span class="price-name">Vezető</span><span class="price-amount">40 000 Ft</span><span class="price-split">2 × 20 000 Ft</span></li>
             <li><span class="price-name">GH</span><span class="price-amount">30 000 Ft</span><span class="price-split">2 × 15 000 Ft</span></li>
           </ul>
 
           <div class="fee-rules">
-            <p><strong>Vezetők és GH segítők:</strong> őrsvezetőink, operatív vezetőink és GH segítőink egész éves önkéntes munkáját azzal (is) szeretnénk meghálálni, hogy nekik csak az étkezések díját kell kifizetniük, a lent töltött napok számával szorozva. Vezetőnek azok az őrsvezetők számítanak, akiknek őrse lesz a nagytáborban (a kiscserkész őrsvezetők nem tartoznak ide), operatív vezetőnek pedig azok, akik a tábor alatt aktív feladatot látnak el.</p>
+            <p><strong>10 napos tábordíj:</strong> minden táborozó, aki nem tartozik a 6 napos csoportba.</p>
+            <p><strong>6 napos tábordíj:</strong> a táborba érkező legfiatalabb raj, akik csak 6 napot vesznek részt a táborban.</p>
+            <p><strong>Vezető:</strong> minden olyan őrsvezető és rajparancsnok, akinek az őrse/raja lent lesz az idei táborban (tehát akik idén kiscserkésztáborba viszik az őrsüket, ők nem ide tartoznak).</p>
+            <p><strong>GH:</strong> minden olyan operatív vezető és segítő, aki a tábor lebonyolításában segít.</p>
           </div>
 
           <div class="fee-items">
@@ -295,7 +312,7 @@
               </p>
               <p class="fee-example">Példa a közleményre: <strong>Adomány AAAAAA-1</strong></p>
               <ul>
-                <li>Ha hiányzik az „Adomány” szó, a pénzt visszautaljuk, mert csak adományt fogadhatunk.</li>
+                <li>Ha hiányzik az „Adomány” szó, a pénzt visszautaljuk, mert csak adományt fogadhatunk el.</li>
                 <li>Ha az ECSET kód hiányzik vagy nem a megfelelő formában szerepel, a rendszer nem ismeri fel a befizetést, és a pénzt szintén visszautaljuk.</li>
                 <li>A visszautalás miatt mindkét esetben 1 000 Ft plusz költséget számolunk fel.</li>
               </ul>
@@ -314,17 +331,21 @@
             </div>
           </div>
 
-          <div class="fee-form">
+          <div class="fee-form" data-until="2026-09-30">
             <h3>Támogatás igénylése</h3>
-            <p>
-              A csapat minden évben támogatást oszt a tábordíjhoz és a tagdíjhoz az arra jelentkező
-              családoknak. Amennyiben a befizetés megterhelő Önöknek, kérjük, nyugodtan jelezzék
-              az alábbi űrlap kitöltésével.
-            </p>
-            <div class="fee-form-frame">
-              <iframe data-src="https://docs.google.com/forms/d/e/1FAIpQLSeM3oarAXJWU-QBWlYtX1CtuGWXPdtC0kvSM7cJJ61_z0Awsw/viewform?embedded=true" title="Támogatás igénylése (Google Űrlap)" loading="lazy">Betöltés…</iframe>
+            <div class="fee-form-open" hidden>
+              <p class="fee-form-deadline">Igénylési határidő: <strong>2026. szeptember 30.</strong></p>
+              <p>
+                A csapat minden évben támogatást oszt a tábordíjhoz és a tagdíjhoz az arra jelentkező
+                családoknak. Amennyiben a befizetés megterhelő Önöknek, kérjük, nyugodtan jelezzék
+                az alábbi űrlap kitöltésével.
+              </p>
+              <div class="fee-form-frame">
+                <iframe data-src="https://docs.google.com/forms/d/e/1FAIpQLSeM3oarAXJWU-QBWlYtX1CtuGWXPdtC0kvSM7cJJ61_z0Awsw/viewform?embedded=true" title="Támogatás igénylése (Google Űrlap)" loading="lazy">Betöltés…</iframe>
+              </div>
+              <p class="fee-form-link">Nem jelenik meg az űrlap? <a class="inline-link" href="https://docs.google.com/forms/d/e/1FAIpQLSeM3oarAXJWU-QBWlYtX1CtuGWXPdtC0kvSM7cJJ61_z0Awsw/viewform" target="_blank" rel="noopener noreferrer">Megnyitás új lapon</a></p>
             </div>
-            <p class="fee-form-link">Nem jelenik meg az űrlap? <a class="inline-link" href="https://docs.google.com/forms/d/e/1FAIpQLSeM3oarAXJWU-QBWlYtX1CtuGWXPdtC0kvSM7cJJ61_z0Awsw/viewform" target="_blank" rel="noopener noreferrer">Megnyitás új lapon</a></p>
+            <p class="fee-form-closed">A támogatási igények leadási határideje szeptember 30. volt, sajnos már nem áll lehetőségünkben támogatási igényeket befogadni.</p>
           </div>
         </div>
         <p class="fee-empty" hidden>Jelenleg nincs tábordíj befizetési időszak!</p>
@@ -340,27 +361,194 @@
 
       <!-- PENZUGY_KCSTABOR:END -->
 
-      <h3 class="home-contact-title fee-contact-title">Kérdése van a befizetésekkel kapcsolatban?</h3>
-      <p class="fee-contact-lead">Keresse bizalommal a pénzügyekért felelős csapatparancsnok-helyettest!</p>
-      <div class="home-contact">
-        <!-- VEZETOK_PENZUGY:START – a tools/sync_vezetok.py írja (a Csapatvezetés táblázatból az, akinek a szerepében a "Pénzügy" szó szerepel), kézzel ne szerkeszd -->
-        <div class="person-card has-bio">
-          <div class="person-photo" data-initials="CÁ">
-            <img src="images/webp/kozos/team/csiki-adam.webp" alt="Csiki Ádám" data-optional>
+      <!--
+        Kapcsolat a fül alján: a Tagdíj és a Nagytábordíj fülön a pénzügyi felelős (Csapatvezetés
+        táblázat), a Kcs tábordíj fülön a 4. osztályos raj rajparancsnokai (Rajok táblázat). Hogy melyik
+        raj a 4. osztályos, azt a script.js (updateKcsContact) számolja ki; ha nincs ilyen raj, a Kcs
+        fülön is a pénzügyi felelős látszik.
+      -->
+      <div class="fee-contact" data-for="tagdij nagytabor">
+        <h3 class="home-contact-title fee-contact-title">Kérdése van a befizetésekkel kapcsolatban?</h3>
+        <p class="fee-contact-lead">Keresse bizalommal a pénzügyekért felelős csapatparancsnok-helyettest!</p>
+        <div class="home-contact">
+          <!-- VEZETOK_PENZUGY:START – a tools/sync_vezetok.py írja (a Csapatvezetés táblázatból az, akinek a szerepében a "Pénzügy" szó szerepel), kézzel ne szerkeszd -->
+          <div class="person-card has-bio">
+            <div class="person-photo" data-initials="CÁ">
+              <img src="images/webp/kozos/team/csiki-adam.webp" alt="Csiki Ádám" data-optional>
+            </div>
+            <h3>Csiki Ádám</h3>
+            <p class="person-role">Pénzügyek</p>
+            <a class="person-email" href="mailto:cs.adam.b@gmail.com">cs.adam.b@<wbr>gmail.com</a>
+            <div class="person-bio" hidden>
+              <p class="person-bio-role">Pénzügyek</p>
+              <p class="person-bio-text">Tagdíj/tábordíj/VK támogatás<br>Raji pénz<br>Programszervezési költség<br>Hallottál egy jó pályázatról</p>
+              <ul class="person-bio-contact">
+                <li><a class="person-email" href="mailto:cs.adam.b@gmail.com">cs.adam.b@gmail.com</a></li>
+              </ul>
+            </div>
           </div>
-          <h3>Csiki Ádám</h3>
-          <p class="person-role">Pénzügyek</p>
-          <a class="person-email" href="mailto:cs.adam.b@gmail.com">cs.adam.b@<wbr>gmail.com</a>
-          <div class="person-bio" hidden>
-            <p class="person-bio-role">Pénzügyek</p>
-            <p class="person-bio-text">Tagdíj/tábordíj/VK támogatás<br>Raji pénz<br>Programszervezési költség<br>Hallottál egy jó pályázatról</p>
-            <ul class="person-bio-contact">
-              <li><a class="person-email" href="mailto:cs.adam.b@gmail.com">cs.adam.b@gmail.com</a></li>
-            </ul>
-          </div>
-        </div>
 
-        <!-- VEZETOK_PENZUGY:END -->
+          <!-- VEZETOK_PENZUGY:END -->
+        </div>
+      </div>
+
+      <div class="fee-contact" data-for="kcstabor" hidden>
+        <h3 class="home-contact-title fee-contact-title">Kérdése van a befizetéssel kapcsolatban?</h3>
+        <p class="fee-contact-lead">Keresse bizalommal a táborért felelős rajparancsnokokat!</p>
+        <div class="fee-raj-contact">
+          <!-- RAJOK_KCS:START – a tools/sync_rajok.py írja a Rajok táblázatból, kézzel ne szerkeszd -->
+          <div class="fee-raj" data-grade="4" data-school-year="2026">
+            <div class="person-card has-bio">
+              <div class="person-photo" data-initials="KG">
+              </div>
+              <h3>Korzenszky Gergely</h3>
+              <p class="person-role">Rajparancsnok</p>
+              <a class="person-email" href="mailto:korzenszky.gergely@gmail.com">korzenszky.gergely@<wbr>gmail.com</a>
+              <div class="person-bio" hidden>
+                <p class="person-bio-role">Rajparancsnok</p>
+                <ul class="person-bio-contact">
+                  <li><a class="person-email" href="mailto:korzenszky.gergely@gmail.com">korzenszky.gergely@gmail.com</a></li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="person-card has-bio">
+              <div class="person-photo" data-initials="PP">
+              </div>
+              <h3>Pálinkás Péter</h3>
+              <p class="person-role">Rajparancsnok</p>
+              <a class="person-email" href="mailto:palinkaspeter11@gmail.com">palinkaspeter11@<wbr>gmail.com</a>
+              <div class="person-bio" hidden>
+                <p class="person-bio-role">Rajparancsnok</p>
+                <ul class="person-bio-contact">
+                  <li><a class="person-email" href="mailto:palinkaspeter11@gmail.com">palinkaspeter11@gmail.com</a></li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <div class="fee-raj" data-grade="4" data-school-year="2025" hidden>
+            <div class="person-card has-bio">
+              <div class="person-photo" data-initials="KB">
+              </div>
+              <h3>Kis Botond</h3>
+              <p class="person-role">Rajparancsnok</p>
+              <a class="person-email" href="mailto:kbotond0726@gmail.com">kbotond0726@<wbr>gmail.com</a>
+              <div class="person-bio" hidden>
+                <p class="person-bio-role">Rajparancsnok</p>
+                <ul class="person-bio-contact">
+                  <li><a class="person-email" href="mailto:kbotond0726@gmail.com">kbotond0726@gmail.com</a></li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="person-card has-bio">
+              <div class="person-photo" data-initials="TÁ">
+              </div>
+              <h3>Tanka Ágoston Sándor</h3>
+              <p class="person-role">Rajparancsnok</p>
+              <a class="person-email" href="mailto:agoston.sandor.tanka@gmail.com">agoston.sandor.tanka@<wbr>gmail.com</a>
+              <div class="person-bio" hidden>
+                <p class="person-bio-role">Rajparancsnok</p>
+                <ul class="person-bio-contact">
+                  <li><a class="person-email" href="mailto:agoston.sandor.tanka@gmail.com">agoston.sandor.tanka@gmail.com</a></li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <div class="fee-raj" data-grade="4" data-school-year="2024" hidden>
+            <div class="person-card has-bio">
+              <div class="person-photo" data-initials="KF">
+              </div>
+              <h3>Kovács Franciska</h3>
+              <p class="person-role">Rajparancsnok</p>
+              <a class="person-email" href="mailto:kovacsfannie@gmail.com">kovacsfannie@<wbr>gmail.com</a>
+              <div class="person-bio" hidden>
+                <p class="person-bio-role">Rajparancsnok</p>
+                <ul class="person-bio-contact">
+                  <li><a class="person-email" href="mailto:kovacsfannie@gmail.com">kovacsfannie@gmail.com</a></li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="person-card has-bio">
+              <div class="person-photo" data-initials="PB">
+              </div>
+              <h3>Paulik Benjámin</h3>
+              <p class="person-role">Rajparancsnok</p>
+              <a class="person-email" href="mailto:paulikbeni@gmail.com">paulikbeni@<wbr>gmail.com</a>
+              <div class="person-bio" hidden>
+                <p class="person-bio-role">Rajparancsnok</p>
+                <ul class="person-bio-contact">
+                  <li><a class="person-email" href="mailto:paulikbeni@gmail.com">paulikbeni@gmail.com</a></li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <div class="fee-raj" data-grade="4" data-school-year="2023" hidden>
+            <div class="person-card has-bio">
+              <div class="person-photo" data-initials="MM">
+              </div>
+              <h3>Móricz Marcell</h3>
+              <p class="person-role">Rajparancsnok</p>
+              <a class="person-email" href="mailto:moricz.marcell@gmail.com">moricz.marcell@<wbr>gmail.com</a>
+              <div class="person-bio" hidden>
+                <p class="person-bio-role">Rajparancsnok</p>
+                <ul class="person-bio-contact">
+                  <li><a class="person-email" href="mailto:moricz.marcell@gmail.com">moricz.marcell@gmail.com</a></li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="person-card has-bio">
+              <div class="person-photo" data-initials="RP">
+              </div>
+              <h3>Rólik Péter</h3>
+              <p class="person-role">Rajparancsnok</p>
+              <a class="person-email" href="mailto:rolikpeti5@gmail.com">rolikpeti5@<wbr>gmail.com</a>
+              <div class="person-bio" hidden>
+                <p class="person-bio-role">Rajparancsnok</p>
+                <ul class="person-bio-contact">
+                  <li><a class="person-email" href="mailto:rolikpeti5@gmail.com">rolikpeti5@gmail.com</a></li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <div class="fee-raj" data-grade="4" data-school-year="2022" hidden>
+            <div class="person-card has-bio">
+              <div class="person-photo" data-initials="VV">
+              </div>
+              <h3>Vásárhelyi Viktória</h3>
+              <p class="person-role">Rajparancsnok</p>
+              <a class="person-email" href="mailto:avasarhelyi.victoria@gmail.com">avasarhelyi.victoria@<wbr>gmail.com</a>
+              <div class="person-bio" hidden>
+                <p class="person-bio-role">Rajparancsnok</p>
+                <ul class="person-bio-contact">
+                  <li><a class="person-email" href="mailto:avasarhelyi.victoria@gmail.com">avasarhelyi.victoria@gmail.com</a></li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="person-card has-bio">
+              <div class="person-photo" data-initials="HZ">
+              </div>
+              <h3>Hidvégi Zsombor</h3>
+              <p class="person-role">Rajparancsnok</p>
+              <a class="person-email" href="mailto:hidvegizsombor@gmail.com">hidvegizsombor@<wbr>gmail.com</a>
+              <div class="person-bio" hidden>
+                <p class="person-bio-role">Rajparancsnok</p>
+                <ul class="person-bio-contact">
+                  <li><a class="person-email" href="mailto:hidvegizsombor@gmail.com">hidvegizsombor@gmail.com</a></li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <!-- RAJOK_KCS:END -->
+        </div>
       </div>
     </div>
   </section>
@@ -379,6 +567,6 @@
     </div>
   </footer>
 
-  <script src="script.js?v=62"></script>
+  <script src="script.js?v=68"></script>
 </body>
 </html>

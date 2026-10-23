@@ -1264,20 +1264,31 @@ document.addEventListener('click', async event => {
     const blockCount = Math.max(1, Math.min(groups.length, Math.floor(images.length / 2), Math.round(images.length / 2.5)));
     const total = groups.reduce((sum, group) => sum + weight(group), 0);
 
-    // a szakaszokat összefüggő, hozzávetőleg egyenlő hosszú részekre osztjuk
     const chunks = [];
     let chunk = [];
-    let acc = 0;
-    groups.forEach((group, i) => {
-      chunk.push(group);
-      acc += weight(group);
-      const remaining = groups.length - i - 1;
-      const needed = blockCount - chunks.length - 1;
-      if ((chunks.length < blockCount - 1) && (acc >= (total / blockCount) * (chunks.length + 1) || remaining === needed)) {
-        chunks.push(chunk);
-        chunk = [];
-      }
-    });
+    if (groups.some(group => group[0].classList.contains('block-start'))) {
+      // kézi tördelés: a .block-start osztályú címnél kezdődik új blokk
+      groups.forEach(group => {
+        if (group[0].classList.contains('block-start') && chunk.length) {
+          chunks.push(chunk);
+          chunk = [];
+        }
+        chunk.push(group);
+      });
+    } else {
+      // a szakaszokat összefüggő, hozzávetőleg egyenlő hosszú részekre osztjuk
+      let acc = 0;
+      groups.forEach((group, i) => {
+        chunk.push(group);
+        acc += weight(group);
+        const remaining = groups.length - i - 1;
+        const needed = blockCount - chunks.length - 1;
+        if ((chunks.length < blockCount - 1) && (acc >= (total / blockCount) * (chunks.length + 1) || remaining === needed)) {
+          chunks.push(chunk);
+          chunk = [];
+        }
+      });
+    }
     if (chunk.length) chunks.push(chunk);
 
     const base = Math.floor(images.length / chunks.length);
@@ -1348,6 +1359,47 @@ function updateFees(now = new Date()) {
     if (content) content.hidden = !active;
     if (empty) empty.hidden = active;
   });
+  // A támogatás-igénylés: a határidő UTÁNI nap 23:59-kor az űrlap eltűnik (és ki is kerül az
+  // oldalból, így nem érhető el), a helyén a "határidő lejárt" üzenet jelenik meg.
+  document.querySelectorAll('.fee-form[data-until]').forEach(form => {
+    const closed = now >= feeFormCloseTime(form);
+    const open = form.querySelector('.fee-form-open');
+    const message = form.querySelector('.fee-form-closed');
+    if (open) open.hidden = closed;
+    if (message) message.hidden = !closed;
+    if (closed) form.querySelectorAll('iframe').forEach(frame => frame.remove());
+  });
+}
+
+// a határidő utáni nap 23:59
+function feeFormCloseTime(form) {
+  const close = new Date(`${form.dataset.until}T23:59:00`);
+  close.setDate(close.getDate() + 1);
+  return close;
+}
+
+// ha az oldal nyitva marad, a zárás pillanatában magától frissül
+(function scheduleFeeFormClose() {
+  const ends = [...document.querySelectorAll('.fee-form[data-until]')]
+    .map(form => feeFormCloseTime(form).getTime())
+    .filter(time => time > Date.now());
+  if (ends.length === 0) return;
+  const wait = Math.min(...ends) - Date.now() + 500;
+  if (wait < 2 ** 31) setTimeout(() => { updateFees(); scheduleFeeFormClose(); }, wait);
+})();
+
+// A Kcs tábordíj fül kapcsolata: a Rajok táblázat kártyái közül csak az látszik, amelyik raj
+// most 4. osztályos (ugyanaz a számítás, mint a Csatlakozom oldalon). Igazat ad vissza, ha
+// van ilyen raj; ha nincs, a fülön a pénzügyi felelős marad a kapcsolat.
+function updateKcsContact(now = new Date()) {
+  const schoolYear = now.getMonth() >= 8 ? now.getFullYear() : now.getFullYear() - 1;
+  let found = false;
+  document.querySelectorAll('.fee-raj-contact [data-school-year]').forEach(card => {
+    const grade = Number(card.dataset.grade) + (schoolYear - Number(card.dataset.schoolYear));
+    card.hidden = grade !== 4;
+    if (!card.hidden) found = true;
+  });
+  return found;
 }
 
 (function initFeeTabs() {
@@ -1364,10 +1416,15 @@ function updateFees(now = new Date()) {
     const label = panels.find(panel => panel.dataset.tab === name).dataset.label;
     if (banner && label) banner.textContent = label;
     if (label) document.title = `${label} – ${baseTitle}`;
+    // kapcsolat a fül alján; a Kcs fülön a 4. osztályos raj, ha nincs ilyen, a pénzügyi felelős
+    const contactFor = name === 'kcstabor' && !updateKcsContact() ? 'tagdij' : name;
+    document.querySelectorAll('.fee-contact[data-for]').forEach(contact => {
+      contact.hidden = !contact.dataset.for.split(' ').includes(contactFor);
+    });
     panels.forEach(panel => {
       panel.hidden = panel.dataset.tab !== name;
       // a beágyazott űrlap (Google) csak akkor töltődik be, ha a fülje látszik
-      if (!panel.hidden) panel.querySelectorAll('iframe[data-src]').forEach(frame => {
+      if (!panel.hidden) panel.querySelectorAll('.fee-form-open:not([hidden]) iframe[data-src]').forEach(frame => {
         frame.src = frame.dataset.src;
         frame.removeAttribute('data-src');
       });
@@ -1379,6 +1436,6 @@ function updateFees(now = new Date()) {
   }
 
   window.addEventListener('hashchange', () => select(location.hash.slice(1)));
+  updateFees();   // előbb az időszakok és a lejárt űrlapok, hogy lejárt űrlap be se töltődjön
   select(location.hash.slice(1));
-  updateFees();
 })();

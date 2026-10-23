@@ -5,7 +5,8 @@ fülenként egy-egy Google Táblázatból.
 Minden fülnek külön táblázata van, ugyanazokkal a lapokkal:
   Alapadatok   – két oszlop (Mező · Érték): Megjelenés kezdete, Megjelenés vége, Cím,
                  Bevezető szöveg, Kiemelt mondat, Alapüzenet, ECSET kódok linkje,
-                 Támogatás űrlap linkje, Költségek címe / bevezetője / megjegyzése
+                 Támogatás űrlap linkje, Támogatás igénylésének határideje,
+                 Költségek címe / bevezetője / megjegyzése
   Díjak        – Kategória · Összeg · Részletezés · Magyarázat címe · Magyarázat · Megjelenjen?
                  (a díjkártyák és alattuk a magyarázó bekezdések; egy sorban lehet díj és
                  magyarázat is, egymástól függetlenül. A magyarázat címe félkövéren a bekezdés elejére kerül.)
@@ -58,7 +59,7 @@ INDENT = ' ' * 6
 FIELDS = {
     'from': 'megjelenés kezdete', 'until': 'megjelenés vége', 'title': 'cím',
     'intro': 'bevezető', 'key': 'kiemelt', 'empty': 'alapüzenet',
-    'ecset': 'ecset', 'form': 'támogatás', 'costs_title': 'költségek címe',
+    'ecset': 'ecset', 'form': 'támogatás', 'form_deadline': 'támogatás igénylés', 'costs_title': 'költségek címe',
     'costs_intro': 'költségek bevezető', 'costs_note': 'költségek megjegyzés',
 }
 SHEETS = {
@@ -257,7 +258,7 @@ def render_pay(ecset_link):
               </p>
               <p class="fee-example">Példa a közleményre: <strong>Adomány AAAAAA-1</strong></p>
               <ul>
-                <li>Ha hiányzik az „Adomány” szó, a pénzt visszautaljuk, mert csak adományt fogadhatunk.</li>
+                <li>Ha hiányzik az „Adomány” szó, a pénzt visszautaljuk, mert csak adományt fogadhatunk el.</li>
                 <li>Ha az ECSET kód hiányzik vagy nem a megfelelő formában szerepel, a rendszer nem ismeri fel a befizetést, és a pénzt szintén visszautaljuk.</li>
                 <li>A visszautalás miatt mindkét esetben 1 000 Ft plusz költséget számolunk fel.</li>
               </ul>
@@ -266,21 +267,35 @@ def render_pay(ecset_link):
 '''
 
 
-def render_form(form_link):
-    """Támogatás igénylése: beágyazott űrlap; a src-t a script.js csak akkor tölti be, ha a fül látszik."""
+def render_form(form_link, deadline=''):
+    """Támogatás igénylése: beágyazott űrlap; a src-t a script.js csak akkor tölti be, ha a fül látszik.
+    A határidő UTÁNI nap 23:59-kor az űrlap (a határidővel és a linkkel együtt) eltűnik, és a helyén
+    a .fee-form-closed üzenet jelenik meg (script.js updateFees; a futás időpontja szerint itt is)."""
     base = re.sub(r'\?.*$', '', form_link)
     embed = base + '?embedded=true' if base.endswith('/viewform') else form_link
-    return f'''          <div class="fee-form">
+    day = parse_date(deadline)
+    until = f' data-until="{day.isoformat()}"' if day else ''
+    closed = bool(day) and datetime.datetime.now() >= datetime.datetime.combine(
+        day + datetime.timedelta(days=1), datetime.time(23, 59))
+    deadline_line = (f'              <p class="fee-form-deadline">Igénylési határidő: <strong>{esc(nice_date(deadline))}</strong></p>\n'
+                     if deadline else '')
+    closed_text = ''
+    if day:
+        closed_text = (f'\n            <p class="fee-form-closed"{"" if closed else " hidden"}>A támogatási igények leadási határideje '
+                       f'{MONTHS[day.month - 1]} {day.day}. volt, sajnos már nem áll lehetőségünkben támogatási igényeket befogadni.</p>')
+    return f'''          <div class="fee-form"{until}>
             <h3>Támogatás igénylése</h3>
-            <p>
-              A csapat minden évben támogatást oszt a tábordíjhoz és a tagdíjhoz az arra jelentkező
-              családoknak. Amennyiben a befizetés megterhelő Önöknek, kérjük, nyugodtan jelezzék
-              az alábbi űrlap kitöltésével.
-            </p>
-            <div class="fee-form-frame">
-              <iframe data-src="{esc(embed)}" title="Támogatás igénylése (Google Űrlap)" loading="lazy">Betöltés…</iframe>
-            </div>
-            <p class="fee-form-link">Nem jelenik meg az űrlap? <a class="inline-link" href="{esc(form_link)}" target="_blank" rel="noopener noreferrer">Megnyitás új lapon</a></p>
+            <div class="fee-form-open"{" hidden" if closed else ""}>
+{deadline_line}              <p>
+                A csapat minden évben támogatást oszt a tábordíjhoz és a tagdíjhoz az arra jelentkező
+                családoknak. Amennyiben a befizetés megterhelő Önöknek, kérjük, nyugodtan jelezzék
+                az alábbi űrlap kitöltésével.
+              </p>
+              <div class="fee-form-frame">
+                <iframe data-src="{esc(embed)}" title="Támogatás igénylése (Google Űrlap)" loading="lazy">Betöltés…</iframe>
+              </div>
+              <p class="fee-form-link">Nem jelenik meg az űrlap? <a class="inline-link" href="{esc(form_link)}" target="_blank" rel="noopener noreferrer">Megnyitás új lapon</a></p>
+            </div>{closed_text}
           </div>
 '''
 
@@ -370,7 +385,9 @@ def render_tab(key, data, today):
             out.append('          </div>\n')
         # 7. támogatás igénylése
         if f['form']:
-            out.append(render_form(f['form']))
+            if not f['form_deadline']:
+                common.warn(f'{key}: nincs megadva a támogatás igénylésének határideje.')
+            out.append(render_form(f['form'], f['form_deadline']))
         out[-1] = out[-1].rstrip('\n')
         out.append('        </div>')
     out.append(f'        <p class="fee-empty"' + (' hidden' if active else '') + f'>{esc(empty)}</p>')

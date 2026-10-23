@@ -1,16 +1,17 @@
 {
   "fields": {
     "from": "2026.09.01.",
-    "until": "2026.11.30.",
+    "until": "2026.12.31.",
     "title": "2026. évi tagdíj",
-    "intro": "Hogy a teher eloszoljon, a tagdíjat két részletben kérjük, de természetesen egy összegben is befizethető.",
+    "intro": "Kedves Szülők!\nA tagdíjat az eddigiekhez hasonlóan, kérjük, hogy az egyesület lent feltüntetett bankszámlájára utalják át. Az utalás közleményében kérjük, tüntessék fel az „Adomány” szót és gyermekük ECSET kódját. Mást ne írjanak a közleménybe! Az ECSET kódokat a lent található linken érik el.\nHogy enyhítsük a tagdíj terhét, azt két részletben kérjük, illetve továbbra is biztosítunk lehetőséget arra, hogy amelyik család számára megterhelő ez a befizetés, az támogatási kérelmet nyújtson be. Az ehhez szükséges űrlapot az oldal alján találják. Kérjük, figyeljenek a támogatási igény leadásának határidejére, ugyanis ezt követően nem áll módunkban új igényt befogadni.",
     "key": "",
     "empty": "Jelenleg nincs tagdíj befizetési időszak!",
     "ecset": "https://drive.google.com/file/d/1ckM3hP6Znzf8MvlFIYrhLcwbrmlWSiMf/view?usp=drive_link",
     "form": "https://docs.google.com/forms/d/e/1FAIpQLSeM3oarAXJWU-QBWlYtX1CtuGWXPdtC0kvSM7cJJ61_z0Awsw/viewform",
+    "form_deadline": "2026.11.15.",
     "costs_title": "Mire fordítjuk a tagdíjat?",
-    "costs_intro": "A tagdíjakból fedezzük a csapatotthon fenntartását és a csapat működését. A Bezsilla-villa üzemeltetése továbbra is nehézséget okoz. Igyekszünk takarékoskodni a gáz- és az áramfogyasztással is, de amíg nincs meg a megfelelő korszerűsítés, áttörő változást nem tudunk elérni.",
-    "costs_note": "A Cserkészszövetség tagdíjának terhe a nagy létszámunk miatt szerencsére jobban eloszlik. Az autó éves üzemeltetése így is olcsóbb, mintha nyáron bérelnénk."
+    "costs_intro": "A tagdíjakból fedezzük a csapatotthon fenntartását és a csapat működését. A Bezsilla-villa üzemeltetése, elsősorban rossz szigetelése miatt, továbbra is nehézséget okoz. Igyekszünk takarékoskodni a gáz- és az áramfogyasztással is, de amíg nem történik meg a megfelelő korszerűsítés, áttörő változást nem tudunk elérni. Ezen kívül a tagdíj jelentős részét az országos szervezetnek kell továbbítanunk, mellyel a Magyar Cserkészszövetség működését fedezik.",
+    "costs_note": ""
   },
   "prices": [
     {
@@ -26,6 +27,13 @@
     {
       "visible": "",
       "deadline": "2026.11.30.",
+      "note": "A tagdíjat van lehetőség egy összegben is befizetni. Kérjük, ilyenkor a teljes összeget az első részlet határidejéig utalják át!",
+      "amount": "15000",
+      "title": "1. részlet"
+    },
+    {
+      "visible": "",
+      "deadline": "2026.12.31.",
       "note": "Aki az 1. részlettel együtt már a teljes éves tagdíjat (30 000 Ft) befizette, az kérjük hagyja figyelmen kívül ezt a felhívást.",
       "amount": "15000",
       "title": "2. részlet"

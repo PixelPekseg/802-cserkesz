@@ -3,45 +3,46 @@
     "from": "2026.10.01.",
     "until": "2026.12.31.",
     "title": "2026. évi nagytábor díja",
-    "intro": "A tábor pénzügyeit idén is a Gödöllői Cserkészetért Egyesületen keresztül intézzük. Kérjük, figyelmesen olvassák el és tartsák be a pontos útmutatást.\nAz árak folyamatos drágulásával minden igyekezetünk ellenére is megnő a költségvetésünk a tavalyihoz képest. Ennek enyhítésére a tábordíjat két részletben kérjük, és már most jelezzük a pontos összeget, hogy a családoknak ne legyen megterhelő ez a kiadás.\n**Előtábor-kedvezmény:** aki legalább 4 napot (4 éjszakát) részt vesz az előtáborban, 5 000 Ft kedvezményre jogosult a teljes tábordíjból. Ilyenkor a rá vonatkozó fizetendő összegből vonják le az 5 000 Ft-ot, és azt utalják el.\nNapi bontású részvételre idén sincs lehetőség: a program teljessége és a közösségi, nevelési célok miatt arra kérünk mindenkit, hogy a tábor teljes időtartama alatt legyen jelen.",
+    "intro": "A tábor pénzügyeit idén is a Gödöllői Cserkészetért Egyesületen keresztül intézzük. Kérjük, figyelmesen olvassák el és tartsák be az útmutatást.\nAz árak folyamatos drágulásával minden igyekezetünk ellenére is megnő a költségvetésünk a tavalyihoz képest. Ennek enyhítésére a tábordíjat két részletben kérjük, illetve továbbra is biztosítunk lehetőséget arra, hogy amelyik család számára megterhelő ez a befizetés, az támogatási kérelmet nyújtson be. Az ehhez szükséges űrlapot az oldal alján találják. Kérjük, figyeljenek a támogatási igény leadásának határidejére, ugyanis ezt követően nem áll módunkban új igényt befogadni.\nNapi bontású részvételre idén sincs lehetőség: a program teljessége és a közösségi, nevelési célok miatt arra kérünk mindenkit, hogy a tábor teljes időtartama alatt legyen jelen.\nŐrsvezetőink, operatív vezetőink és GH segítőink egész éves önkéntes munkáját azzal is szeretnénk meghálálni, hogy nekik csak a saját étkezéseik díját kell kifizetniük.\n**Előtábor-kedvezmény:** aki legalább 4 napot (4 éjszakát) részt vesz az előtáborban, 5 000 Ft kedvezményre jogosult a teljes tábordíjból. Ilyenkor a rá vonatkozó fizetendő összegből vonják le az 5 000 Ft-ot, és azt utalják el.",
     "key": "Táborba csak azok jöhetnek, akik a tábor kezdetéig rendezték a tagdíj első felét és a tábordíjat.",
     "empty": "Jelenleg nincs tábordíj befizetési időszak!",
     "ecset": "https://drive.google.com/file/d/1ckM3hP6Znzf8MvlFIYrhLcwbrmlWSiMf/view?usp=drive_link",
     "form": "https://docs.google.com/forms/d/e/1FAIpQLSeM3oarAXJWU-QBWlYtX1CtuGWXPdtC0kvSM7cJJ61_z0Awsw/viewform",
+    "form_deadline": "2026.09.30.",
     "costs_title": "",
     "costs_intro": "",
     "costs_note": ""
   },
   "prices": [
     {
-      "rule_title": "Vezetők és GH segítők",
+      "rule_title": "10 napos tábordíj",
       "split": "2 × 27 500 Ft",
       "visible": "",
-      "rule_text": "őrsvezetőink, operatív vezetőink és GH segítőink egész éves önkéntes munkáját azzal (is) szeretnénk meghálálni, hogy nekik csak az étkezések díját kell kifizetniük, a lent töltött napok számával szorozva. Vezetőnek azok az őrsvezetők számítanak, akiknek őrse lesz a nagytáborban (a kiscserkész őrsvezetők nem tartoznak ide), operatív vezetőnek pedig azok, akik a tábor alatt aktív feladatot látnak el.",
-      "name": "Cserkész",
+      "rule_text": "minden táborozó, aki nem tartozik a 6 napos csoportba.",
+      "name": "10 nap",
       "amount": "55000"
     },
     {
-      "rule_title": "",
+      "rule_title": "6 napos tábordíj",
       "split": "2 × 22 500 Ft",
       "visible": "",
-      "rule_text": "",
-      "name": "Cserkészjelölt",
+      "rule_text": "a táborba érkező legfiatalabb raj, akik csak 6 napot vesznek részt a táborban.",
+      "name": "6 nap",
       "amount": "45000"
     },
     {
-      "rule_title": "",
+      "rule_title": "Vezető",
       "split": "2 × 20 000 Ft",
       "visible": "",
-      "rule_text": "",
+      "rule_text": "minden olyan őrsvezető és rajparancsnok, akinek az őrse/raja lent lesz az idei táborban (tehát akik idén kiscserkésztáborba viszik az őrsüket, ők nem ide tartoznak).",
       "name": "Vezető",
       "amount": "40000"
     },
     {
-      "rule_title": "",
+      "rule_title": "GH",
       "split": "2 × 15 000 Ft",
       "visible": "",
-      "rule_text": "",
+      "rule_text": "minden olyan operatív vezető és segítő, aki a tábor lebonyolításában segít.",
       "name": "GH",
       "amount": "30000"
     }
