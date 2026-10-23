@@ -129,7 +129,7 @@ def split_blocks(sheet):
     blocks, current = {}, None
     for row in sheet.iter_rows(values_only=True):
         cells = [cell_text(v) for v in row]
-        first = cells[0].strip().lower() if cells else ''
+        first = cells[0].strip().rstrip(':').strip().lower() if cells else ''   # "Alapadatok:" works too
         if first in BLOCK_TITLES and not any(cells[1:]):
             current = BLOCK_TITLES[first]
             blocks[current] = []
@@ -175,7 +175,7 @@ def read_rows(rows, block_name, columns):
         record = {key: (row[i] if i < len(row) else '') for key, i in index.items()}
         if not any(v for k, v in record.items() if k != 'visible'):
             continue
-        if record.get('visible', '').lower() == 'nem':
+        if common.is_hidden(record.get('visible', '')):
             continue
         result.append(record)
     return result
@@ -329,7 +329,12 @@ def render_tab(key, data, today):
         common.warn(f'{key}: a Megjelenés kezdete nem dátum ("{f["from"]}"), csak az alapüzenet jelenik meg.')
     if f['until'] and not end:
         common.warn(f'{key}: a Megjelenés vége nem dátum ("{f["until"]}"), nincs vége az időszaknak.')
-    has_content = bool(start and f['title'])
+    if start and end and end < start:
+        common.warn(f'{key}: a Megjelenés vége ({f["until"]}) korábbi, mint a kezdete ({f["from"]}), '
+                    'így a fül tartalma soha nem látszana; csak az alapüzenet jelenik meg.')
+    if start and not f['title']:
+        common.warn(f'{key}: nincs megadva a Cím, ezért csak az alapüzenet jelenik meg.')
+    has_content = bool(start and f['title'] and not (end and end < start))
     window = ''
     if has_content:
         window = f' data-from="{start.isoformat()}"' + (f' data-until="{end.isoformat()}"' if end else '')
@@ -408,6 +413,9 @@ def render_tab(key, data, today):
         if f['form']:
             if not f['form_deadline']:
                 common.warn(f'{key}: nincs megadva a támogatás igénylésének határideje.')
+            elif not parse_date(f['form_deadline']):
+                common.warn(f'{key}: a támogatás igénylésének határideje nem dátum ("{f["form_deadline"]}"), '
+                            'ezért az űrlap nem zárul le magától. Írd így: 2026.11.15.')
             out.append(render_form(f['form'], f['form_deadline']))
         out[-1] = out[-1].rstrip('\n')
         out.append('        </div>')

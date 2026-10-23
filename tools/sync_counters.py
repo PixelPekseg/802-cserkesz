@@ -52,12 +52,16 @@ def main():
 
     cards = []
     for line_number, row in table:
-        if row['visible'].lower() == 'nem':
+        if common.is_hidden(row['visible']):
             continue
         if not row['label']:
             common.warn(f'{line_number}. sor: nincs megadva a felirat, kihagyva.')
             continue
-        digits = re.sub(r'[\s .,]', '', row['number'])
+        raw = row['number'].strip()
+        # plain digits, or groups of three separated by space/dot/comma ("1 200", "1.200");
+        # "4.5" or "411 fő" is rejected instead of silently becoming 45
+        grouped = re.fullmatch(r'\d+|\d{1,3}(?:[\s.,\u00a0]\d{3})+', raw)
+        digits = re.sub(r'\D', '', raw) if grouped else ''
         if not digits.isdigit():
             common.warn(f'{line_number}. sor: a szám nem értelmezhető ("{row["number"]}"), kihagyva.')
             continue

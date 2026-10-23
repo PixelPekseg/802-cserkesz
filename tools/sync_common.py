@@ -206,6 +206,15 @@ def fetch(args, sheet, book_env=TEAM_SHEET_ENV):
     return text.replace('\r\n', '\n').replace('\r', '\n')
 
 
+# Values of the "Megjelenjen?" column that hide a row (case, spaces and a trailing dot ignored:
+# "nem", "Nem.", " NEM " …). Anything else – also an empty cell – shows the row.
+HIDDEN_VALUES = {'nem', 'no', 'n', 'false', 'hamis', '0'}
+
+
+def is_hidden(value):
+    return (value or '').strip().rstrip('.!').strip().lower() in HIDDEN_VALUES
+
+
 SHEET_ERRORS = ('#ERROR!', '#NAME?', '#REF!', '#VALUE!', '#N/A', '#DIV/0!', '#NUM!', '#NULL!')
 
 

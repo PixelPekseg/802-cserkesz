@@ -1630,6 +1630,33 @@ body:has(.main-nav.open) .upcoming-tab {
   }
 }
 
+/* On phones the tab is a card at the bottom of the screen instead of the top right, where it
+   covered the hero title; long lists scroll inside it */
+@media (max-width: 768px) {
+  .upcoming-tab {
+    top: auto;
+    right: 12px;
+    bottom: 12px;
+    left: 12px;
+    width: auto;
+    border-radius: 12px;
+    transform: translateY(calc(100% + 24px));
+  }
+
+  .upcoming-tab.is-visible {
+    transform: none;
+  }
+
+  body:has(.main-nav.open) .upcoming-tab {
+    transform: translateY(calc(100% + 24px));
+  }
+
+  .upcoming-list {
+    max-height: 32vh;
+    overflow-y: auto;
+  }
+}
+
 /* Highlight of the card arriving from the tab on the Programok page */
 .news-card {
   scroll-margin-top: 90px;

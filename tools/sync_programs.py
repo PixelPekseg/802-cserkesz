@@ -240,7 +240,7 @@ def parse_rows(csv_text):
         if not any(c.strip() for c in row):
             continue  # completely empty row
         label = f'{line_number}. sor ({cell(row, "name") or "név nélkül"})'
-        if cell(row, 'visible').lower() == 'nem':
+        if common.is_hidden(cell(row, 'visible')):
             continue
         if not cell(row, 'name'):
             warn(f'{label}: nincs megadva a program neve, kihagyva.')
@@ -257,8 +257,13 @@ def parse_rows(csv_text):
         end_time = parse_time(cell(row, 'end_time'))
         if cell(row, 'start_time') and not start_time:
             warn(f'{label}: hibás kezdő idő ("{cell(row, "start_time")}"), a program egész naposként jelenik meg.')
+        if cell(row, 'end_time') and not end_time:
+            warn(f'{label}: hibás befejező idő ("{cell(row, "end_time")}"), figyelmen kívül hagyva.')
         if end_time and not start_time:
             warn(f'{label}: van befejező idő, de nincs kezdő idő, a befejező idő figyelmen kívül marad.')
+            end_time = None
+        if start_time and end_time and end_time <= start_time and not end:
+            warn(f'{label}: a befejező idő ({end_time}) nem a kezdő idő ({start_time}) után van, figyelmen kívül hagyva.')
             end_time = None
         facebook = cell(row, 'facebook')
         if facebook and not common.safe_url(facebook, FACEBOOK_HOSTS):

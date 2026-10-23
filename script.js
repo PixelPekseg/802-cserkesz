@@ -296,9 +296,12 @@ async function initUpcomingTab(now = new Date()) {
 
   // The tab stays below the header even when a notice bar is shown above it
   // (after the bar is scrolled away it returns to its original CSS position).
+  // On phones the tab sits at the bottom of the screen (CSS), so it does not cover the hero title.
   const header = document.querySelector('.site-header');
+  const phone = window.matchMedia('(max-width: 768px)');
   const placeTab = () => {
-    if (header) tab.style.top = `${Math.max(90, header.getBoundingClientRect().bottom + 19)}px`;
+    if (phone.matches) tab.style.top = '';
+    else if (header) tab.style.top = `${Math.max(90, header.getBoundingClientRect().bottom + 19)}px`;
   };
   window.addEventListener('scroll', placeTab, { passive: true });
   window.addEventListener('resize', placeTab);
@@ -331,6 +334,7 @@ function updateGrades(now = new Date()) {
 
   grid.querySelectorAll('.grade-card[data-placeholder]').forEach(card => card.remove());
 
+  // one grade may have several troops (e.g. a boys' and a girls' troop started in the same year)
   const byGrade = new Map();
   grid.querySelectorAll('.grade-card[data-grade]').forEach(card => {
     const grade = Number(card.dataset.grade) + (schoolYear - Number(card.dataset.schoolYear));
@@ -338,7 +342,8 @@ function updateGrades(now = new Date()) {
     card.hidden = !visible;
     if (!visible) return;
     card.querySelector('h3').textContent = `${grade}. osztály`;
-    byGrade.set(grade, card);
+    if (!byGrade.has(grade)) byGrade.set(grade, []);
+    byGrade.get(grade).push(card);
   });
 
   for (let grade = firstGrade; grade <= lastGrade; grade++) {
@@ -352,10 +357,10 @@ function updateGrades(now = new Date()) {
     text.className = 'grade-squad';
     text.textContent = 'Hamarosan frissítjük!';
     card.append(title, text);
-    byGrade.set(grade, card);
+    byGrade.set(grade, [card]);
   }
 
-  [...byGrade.keys()].sort((a, b) => a - b).forEach(grade => grid.append(byGrade.get(grade)));
+  [...byGrade.keys()].sort((a, b) => a - b).forEach(grade => grid.append(...byGrade.get(grade)));
   // the card for older kids always stays at the end of the list
   grid.querySelectorAll('.grade-card-extra').forEach(card => grid.append(card));
 }
@@ -471,7 +476,10 @@ function initNewsCarousel(carouselId, trackId, prevId, nextId) {
 
   // If we arrived via a link to a specific card (e.g. from the home page tab),
   // scroll the row to that card.
-  const target = location.hash ? document.getElementById(decodeURIComponent(location.hash.slice(1))) : null;
+  let target = null;
+  try {   // a malformed hash (e.g. "#%zz") must not stop the script
+    target = location.hash ? document.getElementById(decodeURIComponent(location.hash.slice(1))) : null;
+  } catch (e) { /* ignore */ }
   if (target && track.contains(target) && !target.hidden) {
     track.scrollLeft += target.getBoundingClientRect().left - track.getBoundingClientRect().left;
   }
@@ -1437,7 +1445,12 @@ function updateCubCampContact(now = new Date()) {
     });
   }
 
-  window.addEventListener('hashchange', () => select(location.hash.slice(1)));
+  // switching tabs from the menu: show the new tab from its top (the hash points to no element,
+  // so the browser would keep the old scroll position, e.g. the middle of the previous tab)
+  window.addEventListener('hashchange', () => {
+    select(location.hash.slice(1));
+    window.scrollTo({ top: 0 });
+  });
   updateFees();   // first the periods and the expired forms, so an expired form never loads
   select(location.hash.slice(1));
 })();

@@ -72,12 +72,14 @@ def main():
 
     items = []
     for line_number, row in common.read_table(items_csv, ITEM_COLUMNS, required=['name', 'visible']):
-        if row['visible'].lower() == 'nem':
+        if common.is_hidden(row['visible']):
             continue
         if not row['name']:
             common.warn(f'Eszközök, {line_number}. sor: nincs megadva az eszköz neve, kihagyva.')
             continue
-        count = row.get('count', '').replace(' ', '')
+        count = row.get('count', '').strip()
+        match = re.fullmatch(r'(\d+)\s*(?:db\.?)?', count, re.I)   # "2", "2 db", "2db." all mean 2
+        count = match.group(1) if match else count
         if count and not count.isdigit():
             common.warn(f'Eszközök, {line_number}. sor: a darabszám nem egész szám ("{row["count"]}"), elhagyva.')
             count = ''
@@ -90,7 +92,7 @@ def main():
     photos = PhotoSync()
     contacts = []
     for line_number, row in common.read_table(contacts_csv, CONTACT_COLUMNS, required=['name', 'visible']):
-        if row['visible'].lower() == 'nem':
+        if common.is_hidden(row['visible']):
             continue
         if not row['name']:
             common.warn(f'Kapcsolattartó, {line_number}. sor: nincs megadva a név, kihagyva.')

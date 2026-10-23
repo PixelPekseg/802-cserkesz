@@ -50,7 +50,7 @@ def main():
 
     people = []
     for line_number, row in table:
-        if row['visible'].lower() == 'nem':
+        if common.is_hidden(row['visible']):
             continue
         if not row['name'] or not row['role']:
             common.warn(f'{line_number}. sor: hiányzik a név vagy a szerep, kihagyva.')

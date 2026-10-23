@@ -94,7 +94,7 @@ def main():
 
     cards = []
     for line_number, row in table:
-        if row['visible'].lower() == 'nem':
+        if common.is_hidden(row['visible']):
             continue
         if not row['name']:
             common.warn(f'{line_number}. sor: nincs megadva a raj neve, kihagyva.')

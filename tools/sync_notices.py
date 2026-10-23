@@ -92,7 +92,7 @@ def main():
 
     notices = []
     for line_number, row in table:
-        if row['visible'].lower() == 'nem':
+        if common.is_hidden(row['visible']):
             continue
         if not row['title'] and not row['message']:
             common.warn(f'{line_number}. sor: nincs se cím, se üzenet, kihagyva.')
@@ -101,6 +101,10 @@ def main():
         until = read_date(row, 'until', line_number, 'Meddig')
         deadline = read_date(row, 'deadline', line_number, 'Határidő')
         until = until or deadline
+        if start and until and start > until:
+            common.warn(f'{line_number}. sor ({row["title"] or "cím nélkül"}): a Mettől ({start:%Y.%m.%d.}) '
+                        f'későbbi, mint a Meddig/Határidő ({until:%Y.%m.%d.}), így soha nem jelenne meg; kihagyva.')
+            continue
         if until and until < today:
             continue  # already expired – not even written to the page
         notices.append(build_notice(row, start, until, deadline))
