@@ -17,7 +17,7 @@
     {
       "rule_title": "10 napos tábordíj",
       "split": "2 × 27 500 Ft",
-      "visible": "",
+      "visible": "igen",
       "rule_text": "minden táborozó, aki nem tartozik a 6 napos csoportba.",
       "name": "10 nap",
       "amount": "55000"
@@ -25,7 +25,7 @@
     {
       "rule_title": "6 napos tábordíj",
       "split": "2 × 22 500 Ft",
-      "visible": "",
+      "visible": "igen",
       "rule_text": "a táborba érkező legfiatalabb raj, akik csak 6 napot vesznek részt a táborban.",
       "name": "6 nap",
       "amount": "45000"
@@ -33,7 +33,7 @@
     {
       "rule_title": "Vezető",
       "split": "2 × 20 000 Ft",
-      "visible": "",
+      "visible": "igen",
       "rule_text": "minden olyan őrsvezető és rajparancsnok, akinek az őrse/raja lent lesz az idei táborban (tehát akik idén kiscserkésztáborba viszik az őrsüket, ők nem ide tartoznak).",
       "name": "Vezető",
       "amount": "40000"
@@ -41,7 +41,7 @@
     {
       "rule_title": "GH",
       "split": "2 × 15 000 Ft",
-      "visible": "",
+      "visible": "igen",
       "rule_text": "minden olyan operatív vezető és segítő, aki a tábor lebonyolításában segít.",
       "name": "GH",
       "amount": "30000"
@@ -49,14 +49,14 @@
   ],
   "items": [
     {
-      "visible": "",
+      "visible": "igen",
       "deadline": "2026.11.30.",
       "note": "Egy összegben is befizethető: ilyenkor ehhez a határidőhöz a teljes díjat utalja.",
       "amount": "a fent leírtak szerinti díj fele",
       "title": "1. részlet"
     },
     {
-      "visible": "",
+      "visible": "igen",
       "deadline": "2026.12.31.",
       "note": "Aki az 1. részlettel együtt már a teljes tábordíjat befizette, az kérjük hagyja figyelmen kívül ezt a felhívást.",
       "amount": "a fent leírtak szerinti díj fele",

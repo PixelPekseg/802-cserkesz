@@ -17,7 +17,7 @@
     {
       "rule_title": "",
       "split": "2 × 15 000 Ft (2 500 Ft/hó)",
-      "visible": "",
+      "visible": "igen",
       "rule_text": "",
       "name": "Tagdíj",
       "amount": "30 000 Ft/fő"
@@ -25,14 +25,14 @@
   ],
   "items": [
     {
-      "visible": "",
+      "visible": "igen",
       "deadline": "2026.11.30.",
       "note": "A tagdíjat van lehetőség egy összegben is befizetni. Kérjük, ilyenkor a teljes összeget az első részlet határidejéig utalják át!",
       "amount": "15000",
       "title": "1. részlet"
     },
     {
-      "visible": "",
+      "visible": "igen",
       "deadline": "2026.12.31.",
       "note": "Aki az 1. részlettel együtt már a teljes éves tagdíjat (30 000 Ft) befizette, az kérjük hagyja figyelmen kívül ezt a felhívást.",
       "amount": "15000",
@@ -41,17 +41,17 @@
   ],
   "costs": [
     {
-      "visible": "",
+      "visible": "igen",
       "amount": "4600000",
       "name": "Közművek (a Bezsilla-villa gáz-, áram- és egyéb költségei)"
     },
     {
-      "visible": "",
+      "visible": "igen",
       "amount": "4000000",
       "name": "A Cserkészszövetség tagdíja"
     },
     {
-      "visible": "",
+      "visible": "igen",
       "amount": "2400000",
       "name": "A csapat működtetése (rajok és rajportyák támogatása, a csapat felszerelése, az autó éves üzemeltetése)"
     }

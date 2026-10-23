@@ -1,19 +1,21 @@
 #!/usr/bin/env python3
 """A Pénzügyek oldal (penzugyek.html) Tagdíj / Nagytábordíj / Kcs tábordíj füleit frissíti
-fülenként egy-egy Google Táblázatból.
+egyetlen Google Táblázatból.
 
-Minden fülnek külön táblázata van, ugyanazokkal a lapokkal:
-  Alapadatok   – két oszlop (Mező · Érték): Megjelenés kezdete, Megjelenés vége, Cím,
-                 Bevezető szöveg, Kiemelt mondat, Alapüzenet, ECSET kódok linkje,
-                 Támogatás űrlap linkje, Támogatás igénylésének határideje,
-                 Költségek címe / bevezetője / megjegyzése
-  Díjak        – Kategória · Összeg · Részletezés · Magyarázat címe · Magyarázat · Megjelenjen?
-                 (a díjkártyák és alattuk a magyarázó bekezdések; egy sorban lehet díj és
-                 magyarázat is, egymástól függetlenül. A magyarázat címe félkövéren a bekezdés elejére kerül.)
-  Részletek    – Cím · Befizetési határidő · Összeg · Megjegyzés · Megjelenjen?
-  Költségek    – Tétel · Összeg (Ft) · Megjelenjen?   (üresen hagyva a rész nem jelenik meg)
-A táblázatot egészben, Microsoft Excel (.xlsx) formátumban kell közzétenni a weben, így
-fülenként egyetlen cím kell (PENZUGY_TAGDIJ_URL, PENZUGY_NAGYTABOR_URL, PENZUGY_KCSTABOR_URL).
+A táblázat lapjai: Leírás (útmutató, az oldal nem olvassa) · Tagdíj · Nagytábordíj · Kcs tábordíj.
+Minden fül-lapon egymás alatt négy blokk van; a blokkot az A oszlopba írt blokkcím kezdi
+(ALAPADATOK, DÍJAK, RÉSZLETEK, KÖLTSÉGEK), a táblázatos blokkoknál a következő sor a fejléc:
+  ALAPADATOK – két oszlop (Mező · Érték): Megjelenés kezdete, Megjelenés vége, Cím,
+               Bevezető szöveg, Kiemelt mondat, Alapüzenet, ECSET kódok linkje,
+               Támogatás űrlap linkje, Támogatás igénylésének határideje,
+               Költségek címe / bevezetője / megjegyzése
+  DÍJAK      – Kategória · Összeg · Részletezés · Magyarázat címe · Magyarázat · Megjelenjen?
+               (a díjkártyák és alattuk a magyarázó bekezdések; egy sorban lehet díj és
+               magyarázat is, egymástól függetlenül. A magyarázat címe félkövéren a bekezdés elejére kerül.)
+  RÉSZLETEK  – Cím · Befizetési határidő · Összeg · Megjegyzés · Megjelenjen?
+  KÖLTSÉGEK  – Tétel · Összeg (Ft) · Megjelenjen?   (üresen hagyva a rész nem jelenik meg)
+A táblázatot egészben, Microsoft Excel (.xlsx) formátumban kell közzétenni a weben, így egyetlen
+cím kell (PENZUGY_URL).
 
 A fül tartalma a Megjelenés kezdete és vége között látszik (a vég napja még beleszámít; üres
 vég = nincs vége); azon kívül, vagy ha nincs kezdet, csak az Alapüzenet. Az időszakot a
@@ -24,12 +26,12 @@ kódban rögzített (a számlaszámot szándékosan nem lehet a táblázatból �
 Szövegcellákban: új sor = új bekezdés, **szöveg** = félkövér.
 
 Használat:
-    python tools/sync_penzugyek.py                       # a három cím környezeti változókból
-    python tools/sync_penzugyek.py --tagdij-file t.xlsx  # helyi fájlból (ugyanígy --nagytabor-file, --kcstabor-file)
+    python tools/sync_penzugyek.py                 # a PENZUGY_URL környezeti változóból
+    python tools/sync_penzugyek.py --file p.xlsx   # helyi fájlból
 
-A penzugyek.html <!-- PENZUGY_<FÜL>:START/END --> közötti részét írja újra. Ha egy fülnek nincs
-címe, azt kihagyja (marad a régi). Hibás táblázatnál az adott fül változatlan marad, a többi
-frissül, a futás pedig hibával zárul.
+A penzugyek.html <!-- PENZUGY_<FÜL>:START/END --> közötti részét írja újra. Hiányzó cím esetén
+semmit nem módosít. Hibás fül-lapnál az a fül változatlan marad, a többi frissül, a futás
+pedig hibával zárul.
 """
 import argparse
 import datetime
@@ -46,23 +48,25 @@ import sync_common as common
 
 PAGE = os.path.join(common.ROOT, 'penzugyek.html')
 TABS = [
-    # (kulcs, környezeti változó, jelölő)
-    ('tagdij', 'PENZUGY_TAGDIJ_URL', 'PENZUGY_TAGDIJ'),
-    ('nagytabor', 'PENZUGY_NAGYTABOR_URL', 'PENZUGY_NAGYTABOR'),
-    ('kcstabor', 'PENZUGY_KCSTABOR_URL', 'PENZUGY_KCSTABOR'),
+    # (kulcs, a táblázat lapjának neve, jelölő)
+    ('tagdij', 'Tagdíj', 'PENZUGY_TAGDIJ'),
+    ('nagytabor', 'Nagytábordíj', 'PENZUGY_NAGYTABOR'),
+    ('kcstabor', 'Kcs tábordíj', 'PENZUGY_KCSTABOR'),
 ]
+ENV_NAME = 'PENZUGY_URL'
 # a fül neve a címsávban (a script.js a data-label-t írja a h1-be)
 LABELS = {'tagdij': 'Tagdíj', 'nagytabor': 'Nagytábordíj', 'kcstabor': 'Kcs tábordíj'}
 INDENT = ' ' * 6
 
-# Az Alapadatok lap mezői (a Mező oszlop ELEJE alapján, kisbetűsen)
+# Az ALAPADATOK blokk mezői (a Mező oszlop ELEJE alapján, kisbetűsen)
 FIELDS = {
     'from': 'megjelenés kezdete', 'until': 'megjelenés vége', 'title': 'cím',
     'intro': 'bevezető', 'key': 'kiemelt', 'empty': 'alapüzenet',
     'ecset': 'ecset', 'form': 'támogatás', 'form_deadline': 'támogatás igénylés', 'costs_title': 'költségek címe',
     'costs_intro': 'költségek bevezető', 'costs_note': 'költségek megjegyzés',
 }
-SHEETS = {
+# a táblázatos blokkok: kulcs -> (blokkcím, oszlopok a fejléc ELEJE alapján)
+BLOCKS = {
     'prices': ('Díjak', {'name': 'kategória', 'amount': 'összeg', 'split': 'részletezés',
                          'rule_title': 'magyarázat címe', 'rule_text': 'magyarázat', 'visible': 'megjelenjen'}),
     'items': ('Részletek', {'title': 'cím', 'deadline': 'befizetési', 'amount': 'összeg', 'note': 'megjegyzés',
@@ -117,16 +121,31 @@ def find_sheet(book, name):
     return None
 
 
-def read_fields(book):
-    sheet = find_sheet(book, 'Alapadatok')
-    if sheet is None:
-        raise SheetError('nincs "Alapadatok" lap.')
-    fields = {key: '' for key in FIELDS}
+BLOCK_TITLES = {'alapadatok': 'fields', 'díjak': 'prices', 'részletek': 'items', 'költségek': 'costs'}
+
+
+def split_blocks(sheet):
+    """A fül-lap sorait blokkokra bontja: {'fields': [sorok], 'prices': [fejléc, sorok…], …}."""
+    blocks, current = {}, None
     for row in sheet.iter_rows(values_only=True):
-        if not row or row[0] is None:
+        cells = [cell_text(v) for v in row]
+        first = cells[0].strip().lower() if cells else ''
+        if first in BLOCK_TITLES and not any(cells[1:]):
+            current = BLOCK_TITLES[first]
+            blocks[current] = []
             continue
-        label = cell_text(row[0]).lower()
-        value = cell_text(row[1]) if len(row) > 1 else ''
+        if current and any(cells):
+            blocks[current].append(cells)
+    return blocks
+
+
+def read_fields(rows):
+    if rows is None:
+        raise SheetError('nincs ALAPADATOK blokk (az A oszlopban kell lennie a címének).')
+    fields = {key: '' for key in FIELDS}
+    for cells in rows:
+        label = cells[0].lower()
+        value = cells[1] if len(cells) > 1 else ''
         # a hosszabb előtag nyer (pl. "költségek címe" ne a "cím"-hez kerüljön)
         matches = [key for key, prefix in FIELDS.items() if label.startswith(prefix)]
         if matches:
@@ -135,13 +154,9 @@ def read_fields(book):
     return fields
 
 
-def read_rows(book, sheet_name, columns):
-    """Egy lap sorai szótárként; a "Megjelenjen?" = nem sorokat kihagyja. Hiányzó lap = üres lista."""
-    sheet = find_sheet(book, sheet_name)
-    if sheet is None:
-        common.warn(f'Nincs "{sheet_name}" lap, ezt a részt kihagyom.')
-        return []
-    rows = [[cell_text(v) for v in row] for row in sheet.iter_rows(values_only=True)]
+def read_rows(rows, block_name, columns):
+    """Egy táblázatos blokk sorai szótárként; a "Megjelenjen?" = nem sorokat kihagyja.
+    Hiányzó vagy üres blokk = üres lista."""
     if not rows:
         return []
     header = [c.lower() for c in rows[0]]
@@ -154,7 +169,7 @@ def read_rows(book, sheet_name, columns):
                 break
     missing = [columns[k] for k in columns if k not in index and k != 'visible']
     if missing:
-        raise SheetError(f'a "{sheet_name}" lap fejlécéből hiányzik: {", ".join(missing)}.')
+        raise SheetError(f'a {block_name.upper()} blokk fejlécéből hiányzik: {", ".join(missing)}.')
     result = []
     for row in rows[1:]:
         record = {key: (row[i] if i < len(row) else '') for key, i in index.items()}
@@ -405,38 +420,44 @@ def fetch_bytes(url):
         raise SheetError(f'a letöltés nem sikerült: {error}')
 
 
-def read_tab(data):
-    book = load_workbook(data)
-    fields = read_fields(book)
+def read_tab(sheet):
+    blocks = split_blocks(sheet)
+    fields = read_fields(blocks.get('fields'))
     fields['ecset'] = check_link(fields['ecset'], 'ECSET kódok linkje')
     fields['form'] = check_link(fields['form'], 'támogatás űrlap linkje')
     result = {'fields': fields}
-    for key, (sheet, columns) in SHEETS.items():
-        result[key] = read_rows(book, sheet, columns)
+    for key, (block_name, columns) in BLOCKS.items():
+        result[key] = read_rows(blocks.get(key), block_name, columns)
     return result
 
 
 def main():
     parser = argparse.ArgumentParser()
-    for key, _, _ in TABS:
-        parser.add_argument(f'--{key}-file')
+    parser.add_argument('--file', help='helyi .xlsx fájl')
     parser.add_argument('--today', help='teszteléshez: ÉÉÉÉ-HH-NN')
     args = parser.parse_args()
     today = datetime.date.fromisoformat(args.today) if args.today else datetime.date.today()
 
+    url = os.environ.get(ENV_NAME)
+    if not args.file and not url:
+        common.warn(f'Nincs megadva a Pénzügyek táblázat címe ({ENV_NAME}), az oldal változatlan marad.')
+        return
+    try:
+        book = load_workbook(open(args.file, 'rb').read() if args.file else fetch_bytes(url))
+    except SheetError as error:
+        common.fail(f'A Pénzügyek táblázat nem olvasható, az oldal változatlan maradt – {error}')
+
     updated, errors = [], []
-    for key, env_name, marker in TABS:
-        path = getattr(args, f'{key}_file')
-        url = os.environ.get(env_name)
-        if not path and not url:
-            common.warn(f'Nincs megadva a(z) {key} táblázat címe ({env_name}), ezt a fület kihagyom.')
+    for key, sheet_name, marker in TABS:
+        sheet = find_sheet(book, sheet_name)
+        if sheet is None:
+            errors.append(f'nincs "{sheet_name}" lap')
             continue
         try:
-            raw = open(path, 'rb').read() if path else fetch_bytes(url)
-            data = read_tab(raw)
+            data = read_tab(sheet)
             body = render_tab(key, data, today)
         except SheetError as error:
-            errors.append(f'{key}: {error}')
+            errors.append(f'{sheet_name}: {error}')
             continue
         if common.replace_block(PAGE, marker, body, INDENT):
             updated.append(key)
