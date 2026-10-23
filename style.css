@@ -552,6 +552,18 @@ img {
   color: var(--color-accent);
 }
 
+/* telefonszám a személykártyán, az e-mail alatt */
+.person-phone {
+  display: inline-block;
+  margin-top: 6px;
+  font-size: 0.82rem;
+  border-bottom: 1px solid var(--color-highlight);
+}
+
+a.person-phone:hover {
+  color: var(--color-accent);
+}
+
 /* ==========================================================
    Közösségi oldalak (Facebook, Instagram): csak linkgombok
    ========================================================== */
@@ -2253,7 +2265,8 @@ body:has(.main-nav.open) .upcoming-tab {
     font-size: 0.75rem;
   }
 
-  .people-grid .person-email {
+  .people-grid .person-email,
+  .people-grid .person-phone {
     font-size: 0.72rem;
   }
 

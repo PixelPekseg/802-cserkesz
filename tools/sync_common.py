@@ -25,14 +25,96 @@ def fail(message):
     sys.exit(1)
 
 
+# Két közös táblázat, mindkettő egészben, Excel (.xlsx) formátumban közzétéve. Ha a címe meg van
+# adva, a szkriptek a saját lapjukat ebből olvassák, és a régi, lapokénti CSV-címeket nem használják.
+#   CSAPAT_TABLAZAT_URL  – "Csapat adatai" (szűk kör szerkeszti): Csapatvezetés, Rajok, Számlálók, Táborok
+#   VEZETOI_TABLAZAT_URL – "Vezetői táblázat" (minden vezető szerkeszti): Programok, Értesítők, Eszközök,
+#                          Eszközök kapcsolattartója
+CSAPAT_ENV = 'CSAPAT_TABLAZAT_URL'
+VEZETOI_ENV = 'VEZETOI_TABLAZAT_URL'
+
+
 def get_args(env_name):
     parser = argparse.ArgumentParser()
     parser.add_argument('--url')
     parser.add_argument('--file')
+    parser.add_argument('--xlsx', help='a közös táblázat helyi .xlsx fájlja')
     return parser.parse_args(), env_name
 
 
-def fetch(args, env_name):
+def _cell_csv(value):
+    import datetime
+    if value is None:
+        return ''
+    if isinstance(value, datetime.datetime):
+        if value.date() == datetime.date(1899, 12, 30):   # csak időpont (Excel-dátum nulla napja)
+            return value.strftime('%H:%M')
+        if value.time() != datetime.time(0, 0):
+            return value.strftime('%Y.%m.%d. %H:%M')
+        value = value.date()
+    if isinstance(value, datetime.time):
+        return value.strftime('%H:%M')
+    if isinstance(value, datetime.date):
+        return value.strftime('%Y.%m.%d.')
+    if isinstance(value, float) and value.is_integer():
+        value = int(value)
+    return str(value)
+
+
+def xlsx_sheet_as_csv(data, sheet_name):
+    """A közös táblázat egy lapját CSV-szöveggé alakítja (ugyanúgy, mint a lapokénti CSV-közzététel)."""
+    try:
+        import openpyxl
+    except ImportError:
+        fail('Hiányzik az openpyxl csomag (pip install openpyxl).')
+    try:
+        book = openpyxl.load_workbook(io.BytesIO(data), data_only=True, read_only=True)
+    except Exception as error:
+        fail(f'A közös táblázat nem olvasható Excel-fájlként ({error}). A TELJES dokumentum van közzétéve, '
+             'Microsoft Excel (.xlsx) formátumban?')
+    sheet = next((ws for ws in book.worksheets if ws.title.strip().lower() == sheet_name.lower()), None)
+    if sheet is None:
+        fail(f'A közös táblázatban nincs "{sheet_name}" lap. Valaki átnevezte vagy törölte?')
+    rows = [[_cell_csv(v) for v in row] for row in sheet.iter_rows(values_only=True)]
+    while rows and not any(cell.strip() for cell in rows[-1]):   # a végi üres sorok (mint a CSV-exportban)
+        rows.pop()
+    out = io.StringIO()
+    csv.writer(out, lineterminator='\n').writerows(rows)
+    return out.getvalue().rstrip('\n')
+
+
+_BOOKS = {}
+
+
+def shared_sheet_csv(args, sheet, book_env):
+    """A közös táblázat (--xlsx helyi fájl vagy a book_env címe) egy lapja CSV-szövegként, vagy
+    None, ha nincs megadva közös táblázat. A letöltött fájlt egy futáson belül újrahasználja."""
+    if getattr(args, 'file', None):
+        return None
+    path, url = getattr(args, 'xlsx', None), os.environ.get(book_env)
+    if not path and not url:
+        return None
+    key = path or url
+    if key not in _BOOKS:
+        if path:
+            with open(path, 'rb') as handle:
+                _BOOKS[key] = handle.read()
+        else:
+            try:
+                with urllib.request.urlopen(url, timeout=30) as response:
+                    _BOOKS[key] = response.read()
+            except Exception as error:
+                fail(f'A közös táblázat letöltése nem sikerült: {error}')
+    return xlsx_sheet_as_csv(_BOOKS[key], sheet)
+
+
+def fetch(args, env_name, sheet=None, book_env=CSAPAT_ENV):
+    """A lap tartalma CSV-szövegként. Sorrend: --file (CSV) · a közös táblázat (--xlsx vagy a
+    book_env címe, ha a szkript megadja a lapja nevét) · a régi, lapokénti CSV-cím."""
+    if sheet:
+        text = shared_sheet_csv(args, sheet, book_env)
+        if text is not None:
+            return text
     if args.file:
         with open(args.file, encoding='utf-8-sig') as handle:
             text = handle.read()

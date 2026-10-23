@@ -43,7 +43,7 @@ COLUMNS = {
 
 def main():
     args, env_name = common.get_args('VEZETOK_CSV_URL')
-    csv_text = common.fetch(args, env_name)
+    csv_text = common.fetch(args, env_name, sheet='Csapatvezetés')
     table = common.read_table(csv_text, COLUMNS, required=['name', 'role', 'visible'])
     photos = PhotoSync()
 

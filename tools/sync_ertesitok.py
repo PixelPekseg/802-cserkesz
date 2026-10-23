@@ -87,7 +87,7 @@ def build_notice(row, start, until, deadline):
 
 def main():
     args, env_name = common.get_args('ERTESITOK_CSV_URL')
-    csv_text = common.fetch(args, env_name)
+    csv_text = common.fetch(args, env_name, sheet='Értesítők', book_env=common.VEZETOI_ENV)
     table = common.read_table(csv_text, COLUMNS, required=['title', 'message', 'visible'])
     today = dt.date.today()
 

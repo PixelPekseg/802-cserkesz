@@ -75,6 +75,10 @@ def fail(message):
 
 
 def fetch(args):
+    # a közös "Vezetői táblázat" Programok lapja (--xlsx vagy VEZETOI_TABLAZAT_URL), ha meg van adva
+    if not args.file and (args.xlsx or os.environ.get('VEZETOI_TABLAZAT_URL')):
+        import sync_common
+        return sync_common.shared_sheet_csv(args, 'Programok', sync_common.VEZETOI_ENV)
     if args.file:
         with open(args.file, encoding='utf-8-sig') as handle:
             return handle.read()
@@ -321,6 +325,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument('--url')
     parser.add_argument('--file')
+    parser.add_argument('--xlsx', help='a közös Vezetői táblázat helyi .xlsx fájlja')
     args = parser.parse_args()
 
     csv_text = fetch(args).replace('\r\n', '\n').replace('\r', '\n')

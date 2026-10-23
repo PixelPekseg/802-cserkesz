@@ -21,6 +21,15 @@ concurrency:
 jobs:
   sync:
     runs-on: ubuntu-latest
+    env:
+      # A közös "Csapat adatai" táblázat (Csapatvezetés, Rajok, Számlálók, Táborok lap), egészben,
+      # Excel (.xlsx) formátumban közzétéve. Ha meg van adva, ez a négy lépés ebből olvas, és a
+      # lépéseknél lévő régi, lapokénti *_CSV_URL címeket figyelmen kívül hagyja.
+      CSAPAT_TABLAZAT_URL: https://docs.google.com/spreadsheets/d/e/2PACX-1vSNyNpdFavNXNehYPeRSQPIFVAoJvAnhYHvsccsap6jcOZuWMf_JlW2MbptfsoMhiPl4FPGKrzf5fjc/pub?output=xlsx
+      # A közös "Vezetői táblázat" (Programok, Értesítők, Eszközök, Eszközök kapcsolattartója lap), minden vezető
+      # szerkeszti; egészben, Excel (.xlsx) formátumban közzétéve. Ha meg van adva, a programok, az
+      # értesítők és az eszközök lépése ebből olvas, és a régi, lapokénti *_CSV_URL címeket figyelmen kívül hagyja.
+      VEZETOI_TABLAZAT_URL: https://docs.google.com/spreadsheets/d/e/2PACX-1vRP5XgBM0ai_DzoDBPQTH5-OgK9hiTGr7opLP4V0sr58ONPOaMQw3xPKiUwGaCTiSBMBtApZIo893Vk/pub?output=xlsx
     steps:
       - uses: actions/checkout@v4
 

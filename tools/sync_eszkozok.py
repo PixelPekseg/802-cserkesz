@@ -65,11 +65,13 @@ def main():
     parser.add_argument('--file')
     parser.add_argument('--contact-url')
     parser.add_argument('--contact-file')
+    parser.add_argument('--xlsx', help='a közös Vezetői táblázat helyi .xlsx fájlja')
     args = parser.parse_args()
 
-    items_csv = common.fetch(argparse.Namespace(url=args.url, file=args.file), 'ESZKOZOK_CSV_URL')
-    contacts_csv = common.fetch(argparse.Namespace(url=args.contact_url, file=args.contact_file),
-                                'ESZKOZ_KAPCSOLAT_CSV_URL')
+    items_csv = common.fetch(argparse.Namespace(url=args.url, file=args.file, xlsx=args.xlsx), 'ESZKOZOK_CSV_URL',
+                             sheet='Eszközök', book_env=common.VEZETOI_ENV)
+    contacts_csv = common.fetch(argparse.Namespace(url=args.contact_url, file=args.contact_file, xlsx=args.xlsx),
+                                'ESZKOZ_KAPCSOLAT_CSV_URL', sheet='Eszközök kapcsolattartója', book_env=common.VEZETOI_ENV)
 
     items = []
     for line_number, row in common.read_table(items_csv, ITEM_COLUMNS, required=['name', 'visible']):

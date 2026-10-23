@@ -87,7 +87,7 @@ def build_kcs_group(row, start_year, today):
 
 def main():
     args, env_name = common.get_args('RAJOK_CSV_URL')
-    csv_text = common.fetch(args, env_name)
+    csv_text = common.fetch(args, env_name, sheet='Rajok')
     table = common.read_table(csv_text, COLUMNS, required=['name', 'year', 'visible'])
     today = dt.date.today()
 
