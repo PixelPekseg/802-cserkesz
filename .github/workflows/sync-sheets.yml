@@ -1,0 +1,125 @@
+# Updates the generated parts of the site from the team's Google Sheets: program, camp and troop
+# cards, the notice bar on every page, the counters on the home and Rólunk pages, the equipment
+# page, the leader cards (with photos), the finance page and the gallery.
+# Runs hourly and can be started by hand (Actions tab -> "Oldal frissítése a táblázatból" -> Run workflow).
+# If a sheet is broken or unreachable, that step fails and the page keeps its last good state.
+# Once a month a tiny "keepalive" change is committed, because GitHub disables scheduled
+# workflows after 60 days without activity.
+# Step names and commit messages stay in Hungarian: the site's editors read them.
+name: Oldal frissítése a táblázatból
+
+on:
+  schedule:
+    - cron: '23 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sync-sheets
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    env:
+      # The shared "Csapat adatai" workbook (Csapatvezetés, Rajok, Számlálók, Táborok sheets), published
+      # as a whole in Excel (.xlsx) format. When set, these four steps read from it and ignore the
+      # old per-sheet *_CSV_URL addresses of the steps.
+      TEAM_SHEET_URL: https://docs.google.com/spreadsheets/d/e/2PACX-1vSNyNpdFavNXNehYPeRSQPIFVAoJvAnhYHvsccsap6jcOZuWMf_JlW2MbptfsoMhiPl4FPGKrzf5fjc/pub?output=xlsx
+      # The shared "Vezetői táblázat" workbook (Programok, Értesítők, Eszközök, Eszközök kapcsolattartója
+      # sheets), edited by every leader; published as a whole in Excel (.xlsx) format. When set, the
+      # programs, notices and equipment steps read from it and ignore the old per-sheet *_CSV_URL addresses.
+      LEADERS_SHEET_URL: https://docs.google.com/spreadsheets/d/e/2PACX-1vRP5XgBM0ai_DzoDBPQTH5-OgK9hiTGr7opLP4V0sr58ONPOaMQw3xPKiUwGaCTiSBMBtApZIo893Vk/pub?output=xlsx
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      # For processing the images from Drive (portraits, program images: WebP, iPhone HEIC) and the xlsx workbooks
+      - name: Képkezelő csomagok telepítése
+        run: pip install --quiet pillow pillow-heif openpyxl
+
+      - name: Programok (kártyák + képek a Drive-ról) frissítése
+        if: ${{ !cancelled() }}
+        env:
+          DRIVE_IMAGES_FOLDER_ID: 13jB-lTr4Eqt1WOImYwWhMahGHwDTLALA
+          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+          PROGRAMS_CSV_URL: https://docs.google.com/spreadsheets/d/e/2PACX-1vRxIhMKUiMXX41ujoCjIpmizaXDQwlRyBieMUQZSqZcFUF3ChIpqB1d5Q2Br608v88gWJOSxcu46zPV/pub?gid=659195366&single=true&output=csv
+        run: python tools/sync_programs.py
+
+      # The following steps run even if an earlier one failed (one broken sheet must not block the
+      # others); the run is still shown as failed on GitHub.
+      - name: Táborok letöltése és az oldal frissítése
+        if: ${{ !cancelled() }}
+        env:
+          CAMPS_CSV_URL: https://docs.google.com/spreadsheets/d/e/2PACX-1vSKJZCKF6eEgtepX6QnyK6d2cWgMlBenGM2il8-DDNytnpuUNoo1Eh37bdvaoroRgJrwyNfyTDIwzsy/pub?gid=1184983016&single=true&output=csv
+        run: python tools/sync_camps.py
+
+      - name: Rajok letöltése és az oldal frissítése
+        if: ${{ !cancelled() }}
+        env:
+          TROOPS_CSV_URL: https://docs.google.com/spreadsheets/d/e/2PACX-1vSo3ta8YoCSTVLeuRsM1CHEXhe2TKCUrlYM4wG6UENCMWkkMgbqnwLe-bvMzxjyKxk9IsfZ40NA4__Z/pub?gid=1082322737&single=true&output=csv
+        run: python tools/sync_troops.py
+
+      - name: Értesítők letöltése és az oldalak frissítése
+        if: ${{ !cancelled() }}
+        env:
+          NOTICES_CSV_URL: https://docs.google.com/spreadsheets/d/e/2PACX-1vSCFQEfDB5PGysGIga4CyQ7XH2KX09TWyreCDGbciXWjAP9a4PUgFuH6MbBRCjUZKOWaLA_BzbIuvXs/pub?gid=160520110&single=true&output=csv
+        run: python tools/sync_notices.py
+
+      - name: Számlálók letöltése és az oldalak frissítése
+        if: ${{ !cancelled() }}
+        env:
+          COUNTERS_CSV_URL: https://docs.google.com/spreadsheets/d/e/2PACX-1vQG9oKFwKR3SA_rogOVR9y6l_pefGSZKirDeMSxZU7_F-PdaYSleD8wkEQKg89VPK_ThCB2xQzJUWLA/pub?gid=1088990736&single=true&output=csv
+        run: python tools/sync_counters.py
+
+      - name: Csapatvezetés (kártyák + fotók a Drive-ról) frissítése
+        if: ${{ !cancelled() }}
+        env:
+          LEADERS_CSV_URL: https://docs.google.com/spreadsheets/d/e/2PACX-1vTZ5xTnj9CNorqCmaTuwwpy-EPoRpyBcjJTMWM5QPH5G1lccxpX-z1DA0uwvh3emtt-OLgib1zOfLHf/pub?gid=1268841503&single=true&output=csv
+          DRIVE_IMAGES_FOLDER_ID: 13jB-lTr4Eqt1WOImYwWhMahGHwDTLALA
+          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+        run: python tools/sync_leaders.py
+
+      - name: Eszközök letöltése és az oldal frissítése
+        if: ${{ !cancelled() }}
+        env:
+          DRIVE_IMAGES_FOLDER_ID: 13jB-lTr4Eqt1WOImYwWhMahGHwDTLALA
+          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+          EQUIPMENT_CSV_URL: https://docs.google.com/spreadsheets/d/e/2PACX-1vTawBNHKmmN8o2RHWIeLXtHikZ7oJTr19isdSULQXbp2sJte3a5TnaKpjeM_TA5UkxhjZ6OtOVCtMRD/pub?gid=263580124&single=true&output=csv
+          EQUIPMENT_CONTACT_CSV_URL: https://docs.google.com/spreadsheets/d/e/2PACX-1vTawBNHKmmN8o2RHWIeLXtHikZ7oJTr19isdSULQXbp2sJte3a5TnaKpjeM_TA5UkxhjZ6OtOVCtMRD/pub?gid=1765500368&single=true&output=csv
+        run: python tools/sync_equipment.py
+
+      # Finance page: one workbook (sheets: Leírás, Tagdíj, Nagytábordíj, Kcs tábordíj), the WHOLE
+      # document published in Excel (.xlsx) format. With an empty URL the page stays unchanged.
+      - name: Pénzügyek (tagdíj, tábordíjak) frissítése
+        if: ${{ !cancelled() }}
+        env:
+          FEES_SHEET_URL: https://docs.google.com/spreadsheets/d/e/2PACX-1vTmwEh1GFTMCfIMrSvbzqmpOvSVEzkmSHXjkG8UyG5B1xIrlfCnrqojRWDlFNdFPSyfdQYDSeInzSqX/pub?output=xlsx
+        run: python tools/sync_fees.py
+
+      # the gallery is built after the programs (and their images) are updated
+      - name: Galéria összeállítása
+        if: ${{ !cancelled() }}
+        run: python tools/sync_gallery.py
+
+      - name: Havi életjel
+        if: ${{ !cancelled() }}
+        run: date +%Y-%m > data/keepalive.txt
+
+      - name: Változások mentése
+        if: ${{ !cancelled() }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add *.html data/ images/webp/kozos/team/ images/webp/programok/
+          if git diff --cached --quiet; then
+            echo "Nincs változás."
+          else
+            git commit -m "Oldal frissítése a táblázatból"
+            git push
+          fi

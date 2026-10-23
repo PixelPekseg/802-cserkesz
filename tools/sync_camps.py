@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
-"""A közzétett Google Táblázat (Táborok lap, CSV) alapján frissíti a tabor.html tábor-kártyáit.
+"""Updates the camp cards on tabor.html from the Táborok sheet.
 
-Használat:
-    python tools/sync_taborok.py                # a TABOROK_CSV_URL környezeti változóból tölt
-    python tools/sync_taborok.py --url <link>
-    python tools/sync_taborok.py --file x.csv   # helyi fájlból (teszteléshez)
+Usage:
+    python tools/sync_camps.py                 # from TEAM_SHEET_URL (or the old CAMPS_CSV_URL)
+    python tools/sync_camps.py --xlsx t.xlsx   # from a local copy of the shared workbook
+    python tools/sync_camps.py --file x.csv    # from a local CSV file (for testing)
 
-A tabor.html <!-- TABOROK:START --> és <!-- TABOROK:END --> közötti részét írja újra.
-Hibás táblázat esetén hibával leáll, és semmit nem módosít.
+Rewrites the part of tabor.html between <!-- CAMPS:START --> and <!-- CAMPS:END -->.
+On a broken sheet it stops with an error and changes nothing.
 """
 import html
 import os
@@ -17,7 +17,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import sync_common as common
 
 PAGE = os.path.join(common.ROOT, 'tabor.html')
-SNAPSHOT = os.path.join(common.ROOT, 'data', 'taborok.csv')
+SNAPSHOT = os.path.join(common.ROOT, 'data', 'camps.csv')
 PLACEHOLDER = 'Hamarosan frissítjük!'
 
 COLUMNS = {
@@ -61,7 +61,7 @@ def build_card(row):
 
 
 def main():
-    args, env_name = common.get_args('TABOROK_CSV_URL')
+    args, env_name = common.get_args('CAMPS_CSV_URL')
     csv_text = common.fetch(args, env_name, sheet='Táborok')
     table = common.read_table(csv_text, COLUMNS, required=['name', 'visible'])
 
@@ -77,7 +77,7 @@ def main():
         common.fail('Egyetlen megjelenő tábor sincs a táblázatban, ezért nem írom felül az oldalt.')
 
     body = '\n\n'.join(build_card(row) for row in rows)
-    changed = common.replace_block(PAGE, 'TABOROK', body, ' ' * 8)
+    changed = common.replace_block(PAGE, 'CAMPS', body, ' ' * 8)
     common.save_snapshot(SNAPSHOT, csv_text)
     print(f'{len(rows)} tábor-kártya, tabor.html {"frissítve" if changed else "változatlan"}.')
 

@@ -1,21 +1,21 @@
 #!/usr/bin/env python3
-"""Összeállítja a galeria.html galériáját az oldal összes fotójából és videójából.
+"""Builds the gallery of galeria.html from every photo and video of the site.
 
-Használat:
-    python tools/sync_galeria.py
+Usage:
+    python tools/sync_gallery.py
 
-A galeria.html <!-- GALERIA:START --> és <!-- GALERIA:END --> közötti részét írja újra.
-Szakaszok:
-    Programjaink      a programok képei és videói (images/webp/programok/, a Drive-ról jönnek),
-                      mappánként, a program nevével, a legutóbbi program elöl
-                      (a data/programok.csv és a data/program_kepek.json alapján)
+Rewrites the part of galeria.html between <!-- GALLERY:START --> and <!-- GALLERY:END -->.
+Sections:
+    Programjaink      the programs' images and videos (images/webp/programok/, they come from Drive),
+                      per folder, with the program's name, the latest program first
+                      (based on data/programs.csv and data/program_images.json)
     Tábor             images/webp/tabor/
     Csapatotthonunk   images/webp/csapatotthon/
-    Csapatunk         images/webp/fooldal/ és images/webp/rolunk/
-Kimarad: a vezetők portréi (kozos/team), a logók, a piktogramok, a Támogass oldal plakátja és
-QR-kódja. A képek alt szövegét az oldalak <img> elemeiből veszi (ha van). Ahol van bélyegkép
-(thumb/), a galériában az látszik, a nagyítóban a nagy változat. A videókat a Drive lejátszója
-játssza le (kattintásra, a nagyítóban). Csak a Python standard könyvtárát használja.
+    Csapatunk         images/webp/fooldal/ and images/webp/rolunk/
+Left out: the leaders' portraits (kozos/team), logos, pictograms, the poster and QR code of the
+Támogass page. Alt texts come from the pages' <img> elements (when present). Where a thumbnail
+exists (thumb/), the gallery shows it and the lightbox shows the large version. Videos are played
+by the Drive player (on click, in the lightbox). Uses the Python standard library only.
 """
 import glob
 import html
@@ -26,7 +26,7 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import sync_common as common
-import sync_programok as programs
+import sync_programs as programs
 from program_images import STATE as PROGRAM_STATE, folder_parts, on_disk
 
 PAGE = os.path.join(common.ROOT, 'galeria.html')
@@ -39,7 +39,7 @@ STATIC_SECTIONS = [
 
 
 def alt_texts():
-    """{kép útvonala: alt szöveg} az oldalak <img> elemeiből, megjelenési sorrendben."""
+    """{image path: alt text} from the pages' <img> elements, in order of appearance."""
     alts = {}
     for page in sorted(glob.glob(os.path.join(common.ROOT, '*.html'))):
         if os.path.basename(page) == 'galeria.html':
@@ -65,7 +65,7 @@ def static_items(folders, title, alts):
     for folder in folders:
         files = sorted(glob.glob(os.path.join(common.ROOT, WEBP, folder, '*.webp')))
         rel = [f'{WEBP}/{folder}/{os.path.basename(f)}' for f in files]
-        # az oldalon való megjelenés sorrendje szerint, a többi utána
+        # in the order they appear on the pages, the rest after them
         rel.sort(key=lambda p: (order.index(p) if p in order else len(order), p))
         for full in rel:
             thumb = f'{WEBP}/{folder}/thumb/{os.path.basename(full)}'
@@ -79,8 +79,8 @@ def static_items(folders, title, alts):
 
 
 def program_groups():
-    """[(cím, dátum-szöveg, elemek)], a legutóbbi program elöl."""
-    snapshot = os.path.join(common.ROOT, 'data', 'programok.csv')
+    """[(title, date text, items)], the latest program first."""
+    snapshot = os.path.join(common.ROOT, 'data', 'programs.csv')
     if not os.path.exists(snapshot):
         return []
     try:
@@ -138,7 +138,7 @@ def build():
 
 def main():
     body = build()
-    changed = common.replace_block(PAGE, 'GALERIA', body, ' ' * 6)
+    changed = common.replace_block(PAGE, 'GALLERY', body, ' ' * 6)
     count = body.count('<img ')
     print(f'{count} kép/videó a galériában; galeria.html {"frissítve" if changed else "változatlan"}.')
 

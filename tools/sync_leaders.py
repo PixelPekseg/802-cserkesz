@@ -1,21 +1,22 @@
 #!/usr/bin/env python3
-"""A közzétett Google Táblázat (Csapatvezetés lap, CSV) alapján frissíti a csapatparancsnok
-és a helyettesek kártyáit a főoldal "Kapcsolat" részén, valamint a Bezsilla-felelős kártyáját
-a Csapatotthonunk oldalon, és a pénzügyi felelősét a Pénzügyek oldalon. Oszlopok: Név · Szerep · Bemutatkozás (rövid szöveg) · E-mail (egy) ·
-Telefon · Fotó (a Drive "Képek" mappájában lévő fájl neve; drive_photos.py) · Megjelenjen?
+"""Updates the leader cards (team leader and deputies) in the "Kapcsolat" section of the home
+page from the Csapatvezetés sheet, plus the house manager's card on the Csapatotthonunk page and
+the finance deputy's card on the Pénzügyek page. Columns: Név · Szerep · Bemutatkozás (short
+text) · E-mail (one) · Telefon · Fotó (file name in the Drive "Képek" folder; drive_photos.py) ·
+Megjelenjen?
 
-Használat:
-    python tools/sync_vezetok.py
-        # VEZETOK_CSV_URL, GOOGLE_API_KEY, DRIVE_KEPEK_FOLDER_ID környezeti változókból
-    python tools/sync_vezetok.py --file v.csv          # helyi CSV-ből
-    DRIVE_LOCAL_DIR=./kepek python tools/sync_vezetok.py --file v.csv   # Drive helyett helyi mappa
+Usage:
+    python tools/sync_leaders.py
+        # from TEAM_SHEET_URL (or the old LEADERS_CSV_URL), GOOGLE_API_KEY, DRIVE_IMAGES_FOLDER_ID
+    python tools/sync_leaders.py --xlsx t.xlsx      # from a local copy of the shared workbook
+    python tools/sync_leaders.py --file v.csv       # from a local CSV file
+    DRIVE_LOCAL_DIR=./kepek python tools/sync_leaders.py --file v.csv   # local folder instead of Drive
 
-Az index.html <!-- VEZETOK:START/END --> és a csapatotthon.html
-<!-- VEZETOK_BEZSILLA:START/END --> és a penzugyek.html <!-- VEZETOK_PENZUGY:START/END --> közötti
-részét írja újra. A Csapatotthonunk oldalra az kerül, akinek a szerepében szerepel a "csapatotthon"
-szó, a Pénzügyek oldalra az, akinek a szerepében a "pénzügy" szó. A kártyára kattintva a script.js
-felugró ablakban mutatja a rejtett .person-bio tartalmát.
-Hibás táblázat esetén hibával leáll, és semmit nem módosít.
+Rewrites index.html <!-- LEADERS:START/END -->, csapatotthon.html <!-- LEADERS_HOME:START/END -->
+and penzugyek.html <!-- LEADERS_FINANCE:START/END -->. The Csapatotthonunk page gets whoever has the
+word "csapatotthon" in their role, the Pénzügyek page whoever has "pénzügy". Clicking a card makes
+script.js show the hidden .person-bio content in a pop-up.
+On a broken sheet it stops with an error and changes nothing.
 """
 import os
 import re
@@ -28,11 +29,11 @@ from person_card import build_card
 
 INDEX = os.path.join(common.ROOT, 'index.html')
 HOME = os.path.join(common.ROOT, 'csapatotthon.html')
-SNAPSHOT = os.path.join(common.ROOT, 'data', 'vezetok.csv')
-# akinek a szerepében ez a szó szerepel, a Csapatotthonunk oldalra is bekerül
+SNAPSHOT = os.path.join(common.ROOT, 'data', 'leaders.csv')
+# whoever has this word in their role also appears on the Csapatotthonunk page
 HOME_ROLE_WORD = 'csapatotthon'
 FINANCE = os.path.join(common.ROOT, 'penzugyek.html')
-# akinek a szerepében ez a szó szerepel, a Pénzügyek oldalra is bekerül
+# whoever has this word in their role also appears on the Pénzügyek page
 FINANCE_ROLE_WORD = 'pénzügy'
 
 COLUMNS = {
@@ -42,7 +43,7 @@ COLUMNS = {
 
 
 def main():
-    args, env_name = common.get_args('VEZETOK_CSV_URL')
+    args, env_name = common.get_args('LEADERS_CSV_URL')
     csv_text = common.fetch(args, env_name, sheet='Csapatvezetés')
     table = common.read_table(csv_text, COLUMNS, required=['name', 'role', 'visible'])
     photos = PhotoSync()
@@ -69,12 +70,12 @@ def main():
         common.fail('Egyetlen megjelenő vezető sincs a táblázatban, ezért nem írom felül az oldalt.')
 
     index_body = '\n\n'.join(build_card(row, row['photo'], ' ' * 8) for row in people)
-    changed = [p for p, ok in [('index.html', common.replace_block(INDEX, 'VEZETOK', index_body, ' ' * 8))] if ok]
+    changed = [p for p, ok in [('index.html', common.replace_block(INDEX, 'LEADERS', index_body, ' ' * 8))] if ok]
 
     bezsilla = [row for row in people if HOME_ROLE_WORD in row['role'].lower()]
     if bezsilla:
         home_body = '\n\n'.join(build_card(row, row['photo'], ' ' * 8) for row in bezsilla)
-        if common.replace_block(HOME, 'VEZETOK_BEZSILLA', home_body, ' ' * 8):
+        if common.replace_block(HOME, 'LEADERS_HOME', home_body, ' ' * 8):
             changed.append('csapatotthon.html')
     else:
         common.warn('Senkinek a szerepében nincs "Csapatotthon", a Csapatotthonunk oldal kártyája változatlan marad.')
@@ -82,7 +83,7 @@ def main():
     finance = [row for row in people if FINANCE_ROLE_WORD in row['role'].lower()]
     if finance:
         finance_body = '\n\n'.join(build_card(row, row['photo'], ' ' * 8) for row in finance)
-        if common.replace_block(FINANCE, 'VEZETOK_PENZUGY', finance_body, ' ' * 8):
+        if common.replace_block(FINANCE, 'LEADERS_FINANCE', finance_body, ' ' * 8):
             changed.append('penzugyek.html')
     else:
         common.warn('Senkinek a szerepében nincs "Pénzügy", a Pénzügyek oldal kártyája változatlan marad.')

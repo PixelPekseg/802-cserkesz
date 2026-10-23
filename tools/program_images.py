@@ -1,22 +1,22 @@
-"""Programképek és -videók a Google Drive "Képek és videók/Program képek/<mappa>" mappáiból
-(a sync_programok.py használja).
+"""Program images and videos from the Google Drive "Képek és videók/Program képek/<folder>" folders
+(used by sync_programs.py).
 
-A programok táblázatának "Képek" oszlopában a program mappájának NEVE áll (pl. "csm"; a
-"Program képek/csm" alak is jó). A mappa minden képe és videója a program kártyájára kerül, név
-szerinti sorrendben (összesen legfeljebb MAX_ITEMS darab).
+The "Képek" column of the programs sheet holds the NAME of the program's folder (e.g. "csm"; the
+"Program képek/csm" form works too). Every image and video of the folder goes onto the program's
+card, sorted by name (at most MAX_ITEMS in total).
 
-Képek: két WebP készül (letöltve, kicsinyítve):
-    images/webp/programok/<mappa-slug>/<név>.webp        nagy (a nagyítóban / a felugró ablakban)
-    images/webp/programok/<mappa-slug>/thumb/<név>.webp  bélyegkép (a kártyán)
-Videók: NEM töltődnek le – a Drive saját lejátszója játssza le őket az oldalon (kattintásra, a
-felugró ablakban). Csak egy előnézeti kép készül a Drive automatikus bélyegképéből (a kártyán
-lévő kis változaton lejátszás ikonnal); ha a Drive még nem készítette el, egy zöld, lejátszás
-ikonos csempe áll a helyén, és a következő futások újra megpróbálják.
+Images: two WebP files are made (downloaded, scaled down):
+    images/webp/programok/<folder-slug>/<name>.webp        large (in the lightbox / the pop-up)
+    images/webp/programok/<folder-slug>/thumb/<name>.webp  thumbnail (on the card)
+Videos are NOT downloaded – Drive's own player plays them on the page (on click, in the pop-up).
+Only a preview image is made from Drive's automatic thumbnail (the small version on the card gets
+a play icon); if Drive has not made it yet, a green tile with a play icon stands in, and later
+runs try again.
 
-Ha több program ugyanazt a mappát használja, a fájlok csak egyszer tárolódnak. Csak a változott
-elemeket dolgozza fel (data/program_kepek.json). A már nem használt mappák fájljai törlődnek.
-Nem található mappa → nincs kép a kártyán (figyelmeztetés). Ha nincs API-kulcs, semmit nem
-frissít, a meglévők maradnak.
+If several programs use the same folder, its files are stored only once. Only changed items are
+processed (data/program_images.json). Files of folders no longer in use are deleted. Folder not
+found → no image on the card (with a warning). Without an API key nothing is updated, existing
+files stay.
 """
 import io
 import json
@@ -29,14 +29,14 @@ from drive_photos import Drive, is_image, is_program_folder, is_video, save_json
 
 DIR_REL = 'images/webp/programok'
 DIR = os.path.join(common.ROOT, *DIR_REL.split('/'))
-STATE = os.path.join(common.ROOT, 'data', 'program_kepek.json')
-FULL_LONG_SIDE = 1400   # a nagyítóban
-THUMB_LONG_SIDE = 480   # a kártyán
+STATE = os.path.join(common.ROOT, 'data', 'program_images.json')
+FULL_LONG_SIDE = 1400   # in the lightbox
+THUMB_LONG_SIDE = 480   # on the card
 MAX_ITEMS = 40
 
 
 def _play_overlay(webp_bytes):
-    """Lejátszás ikon (fehér háromszög sötét körben) a kép közepére."""
+    """Play icon (white triangle in a dark circle) in the middle of the image."""
     from PIL import Image, ImageDraw
     image = Image.open(io.BytesIO(webp_bytes)).convert('RGB')
     draw = ImageDraw.Draw(image, 'RGBA')
@@ -52,7 +52,7 @@ def _play_overlay(webp_bytes):
 
 
 def _placeholder(width):
-    """Zöld 3:2-es csempe (ha a Drive még nem készített előnézetet a videóhoz)."""
+    """Green 3:2 tile (when Drive has not made a preview for the video yet)."""
     from PIL import Image
     image = Image.new('RGB', (width, width * 2 // 3), (56, 102, 65))
     out = io.BytesIO()
@@ -61,7 +61,7 @@ def _placeholder(width):
 
 
 def folder_parts(folder_name):
-    """A táblázatba írt mappanév → (útvonal részei a Program… mappán belül, a tárolási mappa neve)."""
+    """Folder name from the sheet → (path parts inside the Program… folder, name of the storage folder)."""
     parts = [p.strip() for p in folder_name.strip().strip('/').split('/') if p.strip()]
     if len(parts) > 1 and is_program_folder({'mimeType': 'application/vnd.google-apps.folder', 'name': parts[0]}):
         parts = parts[1:]
@@ -69,7 +69,7 @@ def folder_parts(folder_name):
 
 
 def on_disk(state, slug):
-    """A tárolt mappa elemei az állapot alapján: [{'thumb', 'full', 'video'}, ...]."""
+    """Items of a stored folder, based on the state: [{'thumb', 'full', 'video'}, ...]."""
     entry = state.get(slug, {})
     files = entry.get('files', {})
     result = []
@@ -97,7 +97,7 @@ class ProgramImages:
         self.warned_disabled = False
 
     def images_for(self, folder_name, where):
-        """A mappa elemei: [{'thumb', 'full', 'video'}, ...] (a 'video' a Drive-azonosító vagy None)."""
+        """Items of the folder: [{'thumb', 'full', 'video'}, ...] ('video' is the Drive id or None)."""
         parts, slug = folder_parts(folder_name)
         if not slug:
             return []
@@ -107,7 +107,7 @@ class ProgramImages:
             if self.drive.enabled:
                 self._sync(parts, slug, where)
             elif not self.warned_disabled:
-                common.warn('Nincs GOOGLE_API_KEY / DRIVE_KEPEK_FOLDER_ID, a programképeket most nem frissítem.')
+                common.warn('Nincs GOOGLE_API_KEY / DRIVE_IMAGES_FOLDER_ID, a programképeket most nem frissítem.')
                 self.warned_disabled = True
         return self._on_disk(slug)
 
@@ -126,11 +126,11 @@ class ProgramImages:
         return folder
 
     def _poster(self, item):
-        """A videó Drive-os előnézeti képe (bájtok), vagy None, ha még nincs."""
+        """The video's Drive preview image (bytes), or None if there is none yet."""
         link = item.get('thumbnailLink')
         if not link:
             return None
-        link = link.replace('=s220', '=s1600')   # nagyobb változat
+        link = link.replace('=s220', '=s1600')   # larger version
         try:
             with urllib.request.urlopen(link, timeout=30) as response:
                 return response.read()
@@ -169,7 +169,7 @@ class ProgramImages:
                 stamp.update({'kind': 'video', 'id': item['id']})
             previous = old.get(name, {})
             unchanged = {k: v for k, v in previous.items() if k != 'poster'} == stamp
-            # videónál újrapróbáljuk, ha legutóbb még nem volt Drive-előnézet
+            # for videos, retry if Drive had no preview last time
             retry_poster = video and not previous.get('poster') and item.get('thumbnailLink')
             if unchanged and not retry_poster and os.path.exists(full_path) and os.path.exists(thumb_path):
                 files[name] = previous
@@ -195,7 +195,7 @@ class ProgramImages:
             except Exception as error:
                 common.warn(f'{where}: a(z) "{item["name"]}" most nem tölthető le ({error}).')
                 if previous and os.path.exists(full_path) and os.path.exists(thumb_path):
-                    files[name] = previous     # a régi változat marad
+                    files[name] = previous     # the old version stays
                     order.append(name)
                 continue
             os.makedirs(os.path.dirname(thumb_path), exist_ok=True)
@@ -206,7 +206,7 @@ class ProgramImages:
             order.append(name)
             self.updated.append(f'{slug}/{name}' + (' (videó)' if video else ''))
 
-        # a mappából törölt elemek
+        # items deleted from the folder
         for sub in (target, os.path.join(target, 'thumb')):
             if os.path.isdir(sub):
                 for entry in os.listdir(sub):
@@ -222,7 +222,7 @@ class ProgramImages:
         self.state.pop(slug, None)
 
     def finish(self):
-        """A már egyik program által sem használt mappák fájljainak törlése, állapot mentése."""
+        """Deletes the files of folders no program uses any more, and saves the state."""
         if self.drive.enabled:
             for slug in list(self.state):
                 if slug not in self.used:

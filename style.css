@@ -1,27 +1,27 @@
 /* ==========================================================
-   Alapbeállítások
+   Base settings
    ========================================================== */
 :root {
   /* ----------------------------------------------------------
-     A weboldal SZÍNSÉMÁJA — a megadott 3 zöld az alap:
-       - 386641 (sötétzöld)
-       - 6a994e (közepes zöld)
-       - a7c957 (világos, lime zöld)
-     Egyik megadott szín sem elég világos háttérnek, ezért a háttér-
-     és szegélyszínek az a7c957-ből lettek levezetve (fehérrel
-     kikeverve), a szövegszín pedig a 386641 sötétebb árnyalata.
-     Elég ezeket a változókat átírni, az egész oldal színe változik.
+     The site's COLOUR SCHEME — the 3 given greens are the base:
+       - 386641 (dark green)
+       - 6a994e (medium green)
+       - a7c957 (light, lime green)
+     None of the given colours is light enough for a background, so the
+     background and border colours are derived from a7c957 (mixed with
+     white), and the text colour is a darker shade of 386641.
+     Changing these variables recolours the whole site.
      ---------------------------------------------------------- */
-  --color-primary: #386641;        /* sötétzöld – gombok, linkek, címsorok, lábléc */
-  --color-primary-dark: #2a4d31;   /* sötétzöld sötétebb árnyalata – hover állapot */
-  --color-accent: #6a994e;         /* közepes zöld – díszítő vonalak, ikonok */
-  --color-highlight: #a7c957;      /* világos zöld – dátum-címkék, kiemelések */
-  --color-text: #233f2a;           /* levezetett sötétzöld – törzsszöveg */
+  --color-primary: #386641;        /* dark green – buttons, links, headings, footer */
+  --color-primary-dark: #2a4d31;   /* darker shade of dark green – hover state */
+  --color-accent: #6a994e;         /* medium green – decorative lines, icons */
+  --color-highlight: #a7c957;      /* light green – date labels, highlights */
+  --color-text: #233f2a;           /* derived dark green – body text */
   --color-text-muted: rgba(35, 63, 42, 0.72);
-  --color-bg: #f4f9eb;             /* levezetett – fő háttérszín */
-  --color-bg-alt: #e8f1d2;         /* levezetett – váltakozó szekció-háttér */
-  --color-border: #d3e4ab;         /* levezetett – szegélyek */
-  --color-alert: #b42318;          /* piros – értesítősáv (az oldal tetején) */
+  --color-bg: #f4f9eb;             /* derived – main background */
+  --color-bg-alt: #e8f1d2;         /* derived – alternating section background */
+  --color-border: #d3e4ab;         /* derived – borders */
+  --color-alert: #b42318;          /* red – notice bar (top of the page) */
 
   --font-heading: 'Georgia', 'Times New Roman', serif;
   --font-body: 'Segoe UI', Arial, sans-serif;
@@ -32,7 +32,7 @@
   box-sizing: border-box;
 }
 
-/* A hidden attribútum akkor is rejtsen, ha az elem saját display szabályt kap */
+/* The hidden attribute hides an element even if it has its own display rule */
 [hidden] {
   display: none !important;
 }
@@ -114,7 +114,7 @@ img {
   background: var(--color-primary-dark);
 }
 
-/* Világos gomb sötétzöld háttéren (pl. a Csapatunk szekcióban) */
+/* Light button on a dark green background (e.g. in the Csapatunk section) */
 .btn-light {
   background: #fff;
   color: var(--color-primary);
@@ -125,7 +125,7 @@ img {
 }
 
 /* ==========================================================
-   Fejléc / navigáció
+   Header / navigation
    ========================================================== */
 .site-header {
   position: sticky;
@@ -155,8 +155,8 @@ img {
   line-height: 1.2;
 }
 
-/* A logó fehér hátterű JPG: a multiply keverés a fehéret átlátszóvá teszi
-   a fejléc halvány háttere előtt, a fekete rész fekete marad */
+/* The logo is a JPG with a white background: multiply blending makes the white
+   transparent in front of the header's pale background, the black stays black */
 .logo-img {
   width: 64px;
   height: 64px;
@@ -191,7 +191,7 @@ img {
   border-bottom-color: var(--color-highlight);
 }
 
-/* A "Támogass minket" menüpont gombként jelenik meg */
+/* The "Támogass minket" menu item looks like a button */
 .main-nav a.nav-cta {
   padding: 8px 18px;
   border-bottom: none;
@@ -210,7 +210,7 @@ img {
   color: #fff;
 }
 
-/* A "Csatlakozom" is gomb, a "Támogass minket" mellett, világosabb zölddel */
+/* "Csatlakozom" is a button too, next to "Támogass minket", in a lighter green */
 .main-nav a.nav-cta-join {
   background: var(--color-highlight);
   color: var(--color-text);
@@ -226,7 +226,7 @@ img {
   color: #fff;
 }
 
-/* "Programok" lenyíló menü (Naptár, Tábor): kattintásra és – egérrel – rámutatásra nyílik */
+/* Dropdown menus (Események, Pénzügyek): open on click and – with a mouse – on hover */
 .has-sub {
   position: relative;
 }
@@ -248,7 +248,7 @@ img {
   transition: color 0.2s ease, border-color 0.2s ease;
 }
 
-/* lefelé mutató nyíl, nyitva felfelé fordul */
+/* downward arrow, turns upward when open */
 .nav-sub-toggle::after {
   content: '';
   width: 6px;
@@ -293,7 +293,7 @@ img {
   transform: translateX(-50%);
 }
 
-/* láthatatlan "híd" a menüpont és a lenyíló rész között, hogy rámutatáskor ne csukódjon be */
+/* invisible "bridge" between the menu item and the dropdown, so it does not close while hovering */
 .main-nav .sub-nav::before {
   content: '';
   position: absolute;
@@ -320,8 +320,8 @@ img {
   display: flex;
 }
 
-/* Egérrel használt széles képernyőn: csak rámutatásra nyílik (kattintásra nem történik semmi),
-   nyíl nélkül; billentyűzettel (Tab) a fókusz nyitja. Érintőképernyőn marad a kattintás + nyíl. */
+/* Wide screens used with a mouse: opens on hover only (clicking does nothing),
+   without an arrow; with the keyboard (Tab) focus opens it. Touch screens keep click + arrow. */
 @media (hover: hover) and (min-width: 1281px) {
   .has-sub:hover > .sub-nav,
   .has-sub:has(:focus-visible) > .sub-nav {
@@ -358,12 +358,12 @@ img {
 }
 
 /* ==========================================================
-   Hero (főoldal)
-   A borítókép TELJES EGÉSZÉBEN látszik, levágás és torzítás nélkül: a kép a
-   saját arányát megtartva tölti ki a szélességet, a magassága pedig ebből
-   adódik (nagy képernyőn a képernyőnél magasabb is lehet, ilyenkor görgetve
-   látszik az alja). A hiányzó csapatunk.jpg esetén (a script.js eltávolítja
-   a nem betöltődő képet) zöld színátmenet látszik.
+   Hero (home page)
+   The cover image is shown IN FULL, without cropping or distortion: the image
+   fills the width keeping its own ratio, and its height follows from that
+   (on a large screen it may be taller than the viewport; the bottom is then
+   reached by scrolling). If the image is missing (script.js removes an image
+   that fails to load), a green gradient shows.
    ========================================================== */
 .hero {
   position: relative;
@@ -379,15 +379,15 @@ img {
   height: auto;
 }
 
-/* A telefonos, 802-es képváltozat asztali nézeten rejtve van */
+/* The phone version of the image (the 802 aerial photo) is hidden on desktop */
 .hero-img-mobile {
   display: none;
 }
 
 .hero h1 {
   position: absolute;
-  /* alul 16% szabadon marad, így a cím a kép magasságának kb. 42%-ánál van
-     (a közepénél följebb); a nagyobb érték még följebb viszi */
+  /* 16% is left free at the bottom, so the title sits at about 42% of the image height
+     (above the middle); a larger value moves it higher */
   inset: 0 0 16% 0;
   z-index: 2;
   display: flex;
@@ -401,7 +401,7 @@ img {
   text-shadow: 0 2px 12px rgba(0, 0, 0, 0.45);
 }
 
-/* Aloldalak címsávja */
+/* Title banner of the subpages */
 .page-banner {
   padding: 56px 20px;
   text-align: center;
@@ -421,8 +421,8 @@ img {
 }
 
 /* ==========================================================
-   Csapatunk szekció: bal oldalon a kép (teljes egészében látszik, levágás
-   nélkül), jobb oldalon a szöveg sima zöld háttéren
+   Csapatunk section: the image on the left (shown in full, without
+   cropping), the text on the right on a plain green background
    ========================================================== */
 .team-split {
   display: grid;
@@ -466,7 +466,7 @@ img {
 }
 
 /* ==========================================================
-   Kapcsolat – személyek kártyái
+   Kapcsolat – people's cards
    ========================================================== */
 .contact {
   background: var(--color-bg-alt);
@@ -494,8 +494,8 @@ img {
   box-shadow: 0 12px 24px rgba(35, 63, 42, 0.12);
 }
 
-/* A fotó mögött monogram látszik, ha a kép még nincs feltöltve
-   (a script.js eltávolítja a nem betöltődő képet) */
+/* A monogram shows behind the photo while the image is not uploaded yet
+   (script.js removes an image that fails to load) */
 .person-photo {
   position: relative;
   width: 120px;
@@ -526,7 +526,7 @@ img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  /* az álló portréknál a kép teteje látszik, így a fej nem szorul a kör tetejére */
+  /* for portrait photos the top of the image shows, so the head is not squeezed against the top of the circle */
   object-position: center top;
 }
 
@@ -552,7 +552,7 @@ img {
   color: var(--color-accent);
 }
 
-/* telefonszám a személykártyán, az e-mail alatt */
+/* phone number on the person card, below the e-mail */
 .person-phone {
   display: inline-block;
   margin-top: 6px;
@@ -565,7 +565,7 @@ a.person-phone:hover {
 }
 
 /* ==========================================================
-   Közösségi oldalak (Facebook, Instagram): csak linkgombok
+   Social pages (Facebook, Instagram): link buttons only
    ========================================================== */
 .social-section {
   margin-top: 56px;
@@ -585,14 +585,14 @@ a.person-phone:hover {
 }
 
 /* ==========================================================
-   Rólunk – hosszabb szöveges oldal két ponttal
+   Rólunk – a longer text page with two sections
    ========================================================== */
-/* A fix fejléc ne takarja el a szekció címét, ha ugró linkkel érkezünk */
+/* The fixed header must not cover the section title when arriving through an anchor link */
 section[id] {
   scroll-margin-top: 70px;
 }
 
-/* Ugrólinkek a zöld címsávban, a cím alatt (Rólunk) */
+/* Anchor links in the green title banner, below the title (Rólunk) */
 .page-jump {
   display: flex;
   flex-wrap: wrap;
@@ -674,7 +674,7 @@ section[id] {
 }
 
 /* ==========================================================
-   Csatlakozom – osztályok és rajparancsnokok
+   Csatlakozom – grades and troop leaders
    ========================================================== */
 .grades-grid {
   display: grid;
@@ -764,7 +764,7 @@ section[id] {
   margin-bottom: 48px;
 }
 
-/* Szövegen belüli link (pl. telefonszám) */
+/* Link inside text (e.g. a phone number) */
 .inline-link {
   font-weight: 600;
   border-bottom: 2px solid var(--color-highlight);
@@ -796,19 +796,19 @@ section[id] {
 }
 
 /* ==========================================================
-   Programok – hírdobozok
+   Programs – news cards
    ========================================================== */
-/* Léptethető sor: egyszerre 3 kártya látszik, a nyilakkal lehet tekerni */
+/* Steppable row: 3 cards are visible at a time, scrolled with the arrows */
 .news-carousel {
   position: relative;
-  /* a nyilaknak fenntartott sáv a kártyák két oldalán */
+  /* strip reserved for the arrows on both sides of the cards */
   padding: 0 60px;
 }
 
 .news-grid {
   display: flex;
   gap: 24px;
-  /* felül/alul hely az emelkedő kártyának és az árnyéknak (az overflow levágná) */
+  /* room above/below for the lifting card and its shadow (overflow would clip it) */
   padding: 12px 0 24px;
   margin: -12px 0 -24px;
   overflow-x: auto;
@@ -848,7 +848,7 @@ section[id] {
   background: var(--color-primary-dark);
 }
 
-/* Ha arra már nem lehet lapozni, a nyíl elhalványul */
+/* If it cannot page further that way, the arrow fades */
 .carousel-btn:disabled {
   opacity: 0.25;
   box-shadow: none;
@@ -863,7 +863,7 @@ section[id] {
   right: 0;
 }
 
-/* Ha minden kártya elfér, nincs szükség nyilakra */
+/* If every card fits, no arrows are needed */
 .news-carousel.is-static .carousel-btn {
   display: none;
 }
@@ -875,7 +875,7 @@ section[id] {
 }
 
 @media (max-width: 640px) {
-  /* Mobilon a nyilak a kártya szélén ülnek, hogy a kártya elég széles maradjon */
+  /* On mobile the arrows sit on the card's edge so the card stays wide enough */
   .news-carousel {
     padding: 0;
   }
@@ -900,13 +900,13 @@ section[id] {
 }
 
 /* ==========================================================
-   Programok – naptár
+   Programs – calendar
    ========================================================== */
 .calendar-section {
   border-top: 1px solid var(--color-border);
 }
 
-/* Program Archívum: a lejárt programok külön sávban, a közelgők és a naptár között */
+/* Program Archívum: past programs in their own strip, between the upcoming ones and the calendar */
 .archive-section {
   background: var(--color-bg-alt);
   border-top: 1px solid var(--color-border);
@@ -916,11 +916,11 @@ section[id] {
   background: var(--color-bg);
 }
 
-/* Programképek a kártya alján: egyszerre 2 kép, két oldalt nyilakkal lapozható (script.js).
-   A képek vágás nélkül (teljes egészükben) látszanak egységes 3:2-es keretben; kattintásra nagyító. */
+/* Program images at the bottom of the card: 2 images at a time, paged with arrows on both sides (script.js).
+   The images show uncropped (in full) in a uniform 3:2 frame; clicking opens the lightbox. */
 .news-gallery {
   position: relative;
-  margin: auto 0 0;          /* a kártya aljára, közvetlenül a gombok fölé */
+  margin: auto 0 0;          /* at the bottom of the card, right above the buttons */
   padding-top: 12px;
 }
 
@@ -1063,7 +1063,7 @@ section[id] {
   text-align: left;
 }
 
-/* A szomszédos hónapok napjai halványabbak */
+/* Days of the neighbouring months are paler */
 .cal-day.other-month {
   opacity: 0.55;
 }
@@ -1078,7 +1078,7 @@ section[id] {
   font-weight: bold;
 }
 
-/* telefonon a hónap rövid neve ("okt.") nem fér el a cellában, ott csak a nap száma látszik */
+/* on phones the short month name ("okt.") does not fit in the cell, only the day number shows */
 @media (max-width: 600px) {
   .cal-mon {
     display: none;
@@ -1163,7 +1163,7 @@ section[id] {
     align-items: center;
   }
 
-  /* Keskeny képernyőn a program neve helyett csak egy pont jelzi */
+  /* On narrow screens a dot replaces the program name */
   .cal-chips {
     flex-direction: row;
     flex-wrap: wrap;
@@ -1211,7 +1211,7 @@ section[id] {
   color: var(--color-text);
 }
 
-/* Lejárt esemény: "Elmúlt" címke + halványabb megjelenés */
+/* Past event: "Elmúlt" label + paler look */
 .news-past-label {
   padding: 4px 12px;
   border-radius: 20px;
@@ -1299,7 +1299,7 @@ section[id] {
   font-weight: 600;
 }
 
-/* Az egyesület és a banki adatok kártyái egymás mellett, mobilon egymás alatt */
+/* The association's and the bank details cards side by side, stacked on mobile */
 .support-org-intro {
   margin-bottom: 20px;
 }
@@ -1317,7 +1317,7 @@ section[id] {
   margin: 0;
 }
 
-/* Egy kattintással kijelölhető számlaszám */
+/* Account number selectable with one click */
 .bank-number {
   font-family: 'Courier New', monospace;
   font-size: clamp(0.85rem, 3.6vw, 1.3rem);
@@ -1331,7 +1331,7 @@ section[id] {
   font-size: 0.95rem;
 }
 
-/* Az oldal felső része kompaktabb, hogy az 1%-os kép görgetés nélkül látszódjon */
+/* The top of the page is more compact, so the 1% image shows without scrolling */
 .support-page {
   padding-top: 40px;
 }
@@ -1340,7 +1340,7 @@ section[id] {
   margin-bottom: 28px;
 }
 
-/* Adó 1% felajánlás képe, közvetlenül a bevezető szöveg után */
+/* Image of the 1% tax offering, right after the introduction */
 .support-banner {
   max-width: 900px;
   margin: 0 auto 48px;
@@ -1354,7 +1354,7 @@ section[id] {
 }
 
 /* ==========================================================
-   Lábléc
+   Footer
    ========================================================== */
 .site-footer {
   padding: 36px 0 28px;
@@ -1386,10 +1386,10 @@ section[id] {
 }
 
 /* ==========================================================
-   Reszponzivitás
+   Responsiveness
    ========================================================== */
-/* A hosszú csapatnév + a menü (7 elem, ebből 2 lenyíló) kb. 1250px alatt már nem fér el egy sorban,
-   ezért itt vált a menü hamburgerre (új menüpontnál mérd újra!) */
+/* The long team name + the menu (7 items, 2 of them dropdowns) no longer fit in one row below about 1250px,
+   so the menu switches to the hamburger here (measure again when adding a menu item!) */
 @media (max-width: 1280px) {
   .nav-toggle {
     display: flex;
@@ -1437,7 +1437,7 @@ section[id] {
     text-align: center;
   }
 
-  /* a lenyíló menü telefonon/tableten a menüponton belül, behúzva nyílik le */
+  /* on phones/tablets the dropdown opens inside the menu item, indented */
   .nav-sub-toggle {
     display: flex;
     justify-content: space-between;
@@ -1490,9 +1490,9 @@ section[id] {
     padding: 40px 20px;
   }
 
-  /* Telefonon a csoportkép eltűnik, a 802-es légifotó a hero: a cím a kép alján, sötét
-     átmenettel (hogy a számok látszanak maradjanak). A Csapatunk szekcióból a kép kimarad,
-     mert már fent van. */
+  /* On phones the group photo disappears and the 802 aerial photo is the hero: the title at the bottom of the
+     image, with a dark gradient (so the numbers stay visible). The image is left out of the Csapatunk section,
+     because it is already at the top. */
   .hero {
     min-height: 0;
   }
@@ -1542,13 +1542,13 @@ section[id] {
 }
 
 /* ==========================================================
-   Közelgő program füle (főoldal, jobbról csúszik be)
+   Upcoming program tab (home page, slides in from the right)
    ========================================================== */
 .upcoming-tab {
   position: fixed;
   right: 0;
   top: 90px;
-  z-index: 150;                    /* a ragadós fejléc (100) fölött, a felugró ablakok (200+) alatt */
+  z-index: 150;                    /* above the sticky header (100), below the pop-ups (200+) */
   width: min(290px, calc(100vw - 24px));
   padding: 16px 40px 16px 18px;
   background: var(--color-primary);
@@ -1563,7 +1563,7 @@ section[id] {
   transform: translateX(0);
 }
 
-/* nyitott mobilmenünél a fül kicsúszik, hogy ne takarja a menüt */
+/* with the mobile menu open the tab slides out, so it does not cover the menu */
 body:has(.main-nav.open) .upcoming-tab {
   transform: translateX(110%);
 }
@@ -1638,7 +1638,7 @@ body:has(.main-nav.open) .upcoming-tab {
   }
 }
 
-/* A Programok oldalon a fülről érkező hír kiemelése */
+/* Highlight of the card arriving from the tab on the Programok page */
 .news-card {
   scroll-margin-top: 90px;
 }
@@ -1649,7 +1649,7 @@ body:has(.main-nav.open) .upcoming-tab {
 }
 
 
-/* Másolás gomb (Támogass minket: adószám, számlaszám): kis ikon az érték mellett */
+/* Copy button (Támogass minket: tax number, account number): a small icon next to the value */
 .bank-copy {
   display: flex;
   align-items: center;
@@ -1707,7 +1707,7 @@ body:has(.main-nav.open) .upcoming-tab {
   color: #fff;
 }
 
-/* E-mail cím + másolás gomb egy sorban (a gombot a script.js adja a mailto linkek mellé) */
+/* E-mail address + copy button in one row (script.js adds the button next to mailto links) */
 .email-copy {
   display: inline-flex;
   align-items: center;
@@ -1726,13 +1726,13 @@ body:has(.main-nav.open) .upcoming-tab {
   justify-content: center;
 }
 
-/* A keskeny személykártyákon nem fér el az e-mail és a gomb egy sorban, ezért a gomb alá kerül */
+/* On the narrow person cards the e-mail and the button do not fit in one row, so the button goes below */
 .person-card .email-copy {
   flex-direction: column;
   gap: 6px;
 }
 
-/* Palackvisszaváltás: szöveg + QR-kód egymás mellett, mobilon egymás alatt */
+/* Bottle return: text + QR code side by side, stacked on mobile */
 .support-bottle {
   display: grid;
   grid-template-columns: 1fr auto;
@@ -1779,7 +1779,7 @@ body:has(.main-nav.open) .upcoming-tab {
   }
 }
 
-/* A fejléc a teljes szélességet kihasználja: a logó balra, a menü jobbra, nem középre zsúfolva */
+/* The header uses the full width: logo on the left, menu on the right, not crammed into the middle */
 .site-header .container {
   max-width: none;
   padding: 0 clamp(20px, 3vw, 48px);
@@ -1788,7 +1788,7 @@ body:has(.main-nav.open) .upcoming-tab {
 /* ==========================================================
    Tábor
    ========================================================== */
-/* Címsáv a bevezető szöveggel együtt */
+/* Title banner together with the introduction */
 .camp-banner {
   padding: 56px 20px 64px;
 }
@@ -1833,7 +1833,7 @@ body:has(.main-nav.open) .upcoming-tab {
   font-weight: 600;
 }
 
-/* Általános információk: váltakozva bal/jobb oldali kép + szöveg */
+/* General information: image + text alternating left/right */
 .camp-info {
   border-top: 1px solid var(--color-border);
 }
@@ -1858,9 +1858,9 @@ body:has(.main-nav.open) .upcoming-tab {
   order: 2;
 }
 
-/* Összeállított képcsokor: két, eltérő szélességű oszlop, kissé egymásba
-   csúsztatva és lejjebb tolva. A képek a saját arányukban látszanak
-   (nincs levágás), lekerekített sarokkal; kattintásra nagyban megnyílnak. */
+/* Composed image bunch: two columns of different width, slightly overlapping
+   and shifted down. The images keep their own ratio
+   (no cropping), with rounded corners; clicking opens them large. */
 .camp-media {
   display: flex;
   align-items: flex-start;
@@ -1935,13 +1935,13 @@ body:has(.main-nav.open) .upcoming-tab {
     margin-bottom: 56px;
   }
 
-  /* mobilon mindig a kép van elöl, a szöveg alatta */
+  /* on mobile the image always comes first, the text below */
   .camp-block-reverse .camp-media {
     order: 0;
   }
 }
 
-/* Nagyítás (lightbox): kattintásra a kép teljes méretben jelenik meg */
+/* Lightbox: clicking shows the image at full size */
 .lightbox {
   position: fixed;
   inset: 0;
@@ -2024,7 +2024,7 @@ body:has(.main-nav.open) .upcoming-tab {
   }
 }
 
-/* Csatlakozom: bevezető szöveg és a belépési nyilatkozatok letöltése */
+/* Csatlakozom: introduction and download of the membership forms */
 .join-lead {
   max-width: 760px;
   margin-bottom: 24px;
@@ -2039,7 +2039,7 @@ body:has(.main-nav.open) .upcoming-tab {
   margin-bottom: 48px;
 }
 
-/* Lábléc: adatkezelési tájékoztató linkje */
+/* Footer: privacy notice link */
 .footer-privacy {
   text-decoration: underline;
 }
@@ -2048,7 +2048,7 @@ body:has(.main-nav.open) .upcoming-tab {
   color: var(--color-highlight);
 }
 
-/* 404: gombsor */
+/* 404: button row */
 .error-links {
   display: flex;
   flex-wrap: wrap;
@@ -2056,7 +2056,7 @@ body:has(.main-nav.open) .upcoming-tab {
   gap: 12px;
 }
 
-/* "Üzenet másolása" gomb a programok kártyáin */
+/* "Üzenet másolása" (copy message) button on the program cards */
 .news-actions {
   display: flex;
   flex-wrap: wrap;
@@ -2104,7 +2104,7 @@ body:has(.main-nav.open) .upcoming-tab {
   stroke-linejoin: round;
 }
 
-/* Dokumentumok oldal */
+/* Dokumentumok page */
 .doc-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -2142,7 +2142,7 @@ body:has(.main-nav.open) .upcoming-tab {
   margin-top: auto;
 }
 
-/* A "Google Naptárba" gomb zöld, hogy kiemelkedjen az "Üzenet másolása" mellől */
+/* The "Google Naptárba" button is green so it stands out next to "Üzenet másolása" */
 .calendar-btn {
   border-color: var(--color-primary);
   background: var(--color-primary);
@@ -2155,8 +2155,8 @@ body:has(.main-nav.open) .upcoming-tab {
   color: #fff;
 }
 
-/* Csapatunk szekció asztali nézeten: a kép lekerekített, árnyékos kártya a zöld háttéren,
-   mellette a szöveg. Telefonon (768 px alatt) nem érvényes, ott marad a korábbi elrendezés. */
+/* Csapatunk section on desktop: the image is a rounded card with a shadow on the green background,
+   the text next to it. Not applied on phones (below 768 px), the earlier layout stays there. */
 @media (min-width: 769px) {
   .team-split {
     align-items: center;
@@ -2182,7 +2182,7 @@ body:has(.main-nav.open) .upcoming-tab {
   }
 }
 
-/* Csapatotthon: a Bezsilla története és a cserkészek története, hosszabb szöveg */
+/* Csapatotthon: the history of the Bezsilla villa and of the scouts, longer text */
 .home-story {
   max-width: none;
   text-align: left;
@@ -2220,7 +2220,7 @@ body:has(.main-nav.open) .upcoming-tab {
   text-align: center;
 }
 
-/* Több kapcsolati adat egy személynél (e-mail és telefon külön sorban) */
+/* Several contact details for one person (e-mail and phone on separate lines) */
 .leader-line {
   margin-top: 2px;
 }
@@ -2229,7 +2229,7 @@ body:has(.main-nav.open) .upcoming-tab {
   margin-bottom: 10px;
 }
 
-/* Telefonon a kapcsolati kártyák 2 oszlopban, kisebb méretben; az utolsó, páratlan kártya középen */
+/* On phones the contact cards are in 2 columns, smaller; the last, odd card is centred */
 @media (max-width: 640px) {
   .people-grid {
     display: grid;
@@ -2276,7 +2276,7 @@ body:has(.main-nav.open) .upcoming-tab {
   }
 }
 
-/* Személyek: kattintható kártya + bemutatkozó ablak */
+/* People: clickable card + introduction pop-up */
 .person-card.has-bio {
   cursor: pointer;
 }
@@ -2399,9 +2399,9 @@ body:has(.main-nav.open) .upcoming-tab {
   overflow-wrap: anywhere;
 }
 
-/* Rólunk / Csapatotthonunk: a szöveg és a fotók váltakozó blokkokban, mint a Tábor oldalon (.camp-block).
-   A blokkokat a script.js építi a .side-photos fotóiból és a szöveg szakaszaiból; JS nélkül a fotók a
-   szöveg alatt, kétoszlopos rácsban látszanak. */
+/* Rólunk / Csapatotthonunk: the text and the photos in alternating blocks, as on the Tábor page (.camp-block).
+   script.js builds the blocks from the .side-photos photos and the text sections; without JS the photos
+   show below the text, in a two-column grid. */
 .side-photos {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -2448,15 +2448,15 @@ body:has(.main-nav.open) .upcoming-tab {
   max-width: 1100px;
 }
 
-/* A Csapatotthon oldal többi eleme (elérhetőség, térkép) maradjon keskeny, középre igazított oszlopban */
+/* The other elements of the Csapatotthon page (contact, map) stay in a narrow, centred column */
 .home-center.split-layout > :not(.home-story) {
   max-width: 800px;
   margin-left: auto;
   margin-right: auto;
 }
 
-/* 3 képes blokk: lépcsőzetes, kissé egymásra csúszó képek egy oszlopban (balra - jobbra - balra);
-   a jobb oldali (fordított) blokkokban tükrözve. */
+/* 3-image block: staggered, slightly overlapping images in one column (left - right - left);
+   mirrored in the right-hand (reversed) blocks. */
 .camp-media-3 {
   display: block;
   position: relative;
@@ -2512,9 +2512,9 @@ body:has(.main-nav.open) .upcoming-tab {
 }
 
 /* ==========================================================
-   Értesítősáv (minden oldal tetején, a Google Táblázat "Értesítők" lapjából)
-   Az értesítők alapból rejtettek; a script.js (updateNotices) mutatja
-   az éppen érvényeseket. Több értesítő egymás alatt jelenik meg.
+   Notice bar (top of every page, from the "Értesítők" sheet of the Google Sheet)
+   Notices are hidden by default; script.js (updateNotices) shows
+   the currently valid ones. Several notices appear below each other.
    ========================================================== */
 .notice {
   background: var(--color-alert);
@@ -2570,7 +2570,7 @@ body:has(.main-nav.open) .upcoming-tab {
   padding: 0 0 2px;
   border: 0;
   border-radius: 50%;
-  background: #fff;                  /* fehér kör piros ×-szel: jól elüt a piros sávtól */
+  background: #fff;                  /* white circle with a red ×: stands out well from the red bar */
   color: var(--color-alert);
   font-size: 1.5rem;
   font-weight: bold;
@@ -2591,7 +2591,7 @@ body:has(.main-nav.open) .upcoming-tab {
     font-size: 0.875rem;
   }
 
-  /* telefonon az üzenet a határidő után új sorban kezdődik */
+  /* on phones the message starts on a new line after the deadline */
   .notice-message {
     display: block;
     margin-top: 6px;
@@ -2599,8 +2599,8 @@ body:has(.main-nav.open) .upcoming-tab {
 }
 
 /* ==========================================================
-   Számlálók (főoldal "Csapatunk" szekció és Rólunk oldal;
-   a Google Táblázat "Számlálók" lapjából, a script.js pörgeti fel)
+   Counters (home page "Csapatunk" section and Rólunk page;
+   from the "Számlálók" sheet of the Google Sheet, rolled up by script.js)
    ========================================================== */
 .stats {
   display: grid;
@@ -2624,12 +2624,12 @@ body:has(.main-nav.open) .upcoming-tab {
 }
 
 .stat-number {
-  /* egyforma magas (lining) számjegyek: a Georgia "régies" számai gördülés közben ugrálnának */
+  /* equal-height (lining) digits: Georgia's "old-style" figures would jump while rolling */
   font-family: 'Times New Roman', 'Noto Serif', serif;
   font-size: 2.5rem;
   font-weight: bold;
   line-height: 1.3;
-  --odo-h: 1.3em;                  /* egy számjegy-cella magassága (a script.js is ezzel tol) */
+  --odo-h: 1.3em;                  /* height of one digit cell (script.js shifts by this too) */
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
@@ -2643,7 +2643,7 @@ body:has(.main-nav.open) .upcoming-tab {
   text-transform: uppercase;
 }
 
-/* "Kilométeróra" számjegyek: a script.js cseréli a számot gördülő szalagokra */
+/* "Odometer" digits: script.js replaces the number with rolling strips */
 .odo-digit {
   display: inline-block;
   height: var(--odo-h);
@@ -2668,7 +2668,7 @@ body:has(.main-nav.open) .upcoming-tab {
   vertical-align: top;
 }
 
-/* Rólunk: a "Csapatunkról" cím alatt */
+/* Rólunk: below the "Csapatunkról" heading */
 .stats-band {
   padding: 4px 0 28px;
 }
@@ -2702,8 +2702,8 @@ body:has(.main-nav.open) .upcoming-tab {
 }
 
 /* ==========================================================
-   Eszközbérlés (eszkozok.html; a lista és a kapcsolattartó a
-   Google Táblázat "Eszközök" és "Kapcsolattartó" lapjából)
+   Eszközbérlés (eszkozok.html; the list and the contact come from the
+   "Eszközök" and "Eszközök kapcsolattartója" sheets of the Google Sheet)
    ========================================================== */
 .gear-intro {
   margin-bottom: 36px;
@@ -2779,7 +2779,7 @@ body:has(.main-nav.open) .upcoming-tab {
   font-size: 1.3rem;
 }
 
-/* a kapcsolattartó(k) a főoldaliakhoz hasonló személykártyán (kattintásra bemutatkozó ablak) */
+/* the contact(s) on a person card like on the home page (click for the introduction pop-up) */
 .gear-contact-cards {
   display: flex;
   flex-wrap: wrap;
@@ -2803,9 +2803,9 @@ body:has(.main-nav.open) .upcoming-tab {
 }
 
 /* ==========================================================
-   Programkártya nagyítva (felugró ablak, script.js: initProgramModal)
-   Bal oldalt a kártya szövegei, a fő helyen a képek több oszlopos,
-   fel-le görgethető galériában, vágás nélkül; telefonon egymás alatt.
+   Program card enlarged (pop-up, script.js: initProgramModal)
+   The card's texts on the left, the images in the main area in a multi-column,
+   vertically scrolling gallery, uncropped; stacked on phones.
    ========================================================== */
 #newsGrid .news-card,
 #archiveGrid .news-card,
@@ -2816,7 +2816,7 @@ body:has(.main-nav.open) .upcoming-tab {
 .program-modal {
   position: fixed;
   inset: 0;
-  z-index: 180;                /* a fejléc és a közelgő-programok fül fölött, a nagyító (200) alatt */
+  z-index: 180;                /* above the header and the upcoming-programs tab, below the lightbox (200) */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2840,7 +2840,7 @@ body:has(.main-nav.open) .upcoming-tab {
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45);
 }
 
-/* képek nélkül csak a szöveg, keskenyebb ablakban */
+/* without images only the text, in a narrower window */
 .program-modal-card.no-images {
   grid-template-columns: 1fr;
   width: min(560px, 100%);
@@ -2861,7 +2861,7 @@ body:has(.main-nav.open) .upcoming-tab {
   height: 38px;
   border: 0;
   border-radius: 50%;
-  background: var(--color-primary);   /* sötétzöld, fehér ×: a világos háttéren is jól látszik */
+  background: var(--color-primary);   /* dark green, white ×: clearly visible on the light background too */
   color: #fff;
   font-size: 1.7rem;
   line-height: 1;
@@ -2874,7 +2874,7 @@ body:has(.main-nav.open) .upcoming-tab {
   background: var(--color-primary-dark);
 }
 
-/* a szöveges rész a kártya elemeit használja, de keret és hover-hatás nélkül */
+/* the text part uses the card's elements, but without border and hover effect */
 .program-modal .program-modal-text {
   overflow-y: auto;
   padding: 28px 24px;
@@ -2899,8 +2899,8 @@ body:has(.main-nav.open) .upcoming-tab {
   column-gap: 12px;
 }
 
-/* asztali nézetben a bezáró gomb saját sávot kap a képek fölött, hogy ne lógjon rájuk:
-   a galéria egy keretben görget, a gomb sávja fölötte fix */
+/* on desktop the close button gets its own strip above the images, so it does not overlap them:
+   the gallery scrolls inside a frame, the button strip above it stays fixed */
 @media (min-width: 769px) {
   .program-modal-card:not(.no-images) {
     grid-template-rows: 100%;
@@ -2925,7 +2925,7 @@ body:has(.main-nav.open) .upcoming-tab {
   cursor: zoom-in;
 }
 
-/* videó a galériában: előnézet lejátszás ikonnal; kattintásra a nagyító nyílik (ott indítható) */
+/* video in the gallery: preview with a play icon; clicking opens the lightbox (it can be started there) */
 .program-modal-video {
   position: relative;
   margin: 0 0 12px;
@@ -2959,7 +2959,7 @@ body:has(.main-nav.open) .upcoming-tab {
   background-color: rgba(56, 102, 65, 0.9);
 }
 
-/* videó a nagyítóban: előnézet + lejátszás gomb, kattintásra a Drive lejátszója (16:9) */
+/* video in the lightbox: preview + play button, on click the Drive player (16:9) */
 .lightbox-video {
   position: relative;
   width: min(1100px, 88vw);
@@ -3018,7 +3018,7 @@ body:has(.main-nav.open) .upcoming-tab {
     padding: 0;
   }
 
-  /* telefonon az egész ablak görög: felül a szöveg, alatta két oszlopban a képek */
+  /* on phones the whole window scrolls: the text on top, the images below in two columns */
   .program-modal-card,
   .program-modal-card.no-images {
     display: block;
@@ -3054,9 +3054,9 @@ body:has(.main-nav.open) .upcoming-tab {
 }
 
 /* ==========================================================
-   Galéria (galeria.html; a tools/sync_galeria.py állítja össze)
-   Szakaszonként többoszlopos, vágás nélküli képrács; kattintásra nagyító,
-   amely az egész galérián végiglapoz. A videók előnézetén lejátszás ikon van.
+   Galéria (galeria.html; built by tools/sync_gallery.py)
+   A multi-column, uncropped image grid per section; clicking opens the lightbox,
+   which pages through the whole gallery. Video previews have a play icon.
    ========================================================== */
 .gallery-section + .gallery-section {
   margin-top: 56px;
@@ -3125,7 +3125,7 @@ body:has(.main-nav.open) .upcoming-tab {
 }
 
 /* ==========================================================
-   Pénzügyek (penzugyek.html): fülek, befizetési tételek, költségek
+   Pénzügyek (penzugyek.html): tabs, payment items, costs
    ========================================================== */
 .finance-page {
   padding-top: 40px;
@@ -3142,7 +3142,7 @@ body:has(.main-nav.open) .upcoming-tab {
   text-align: center;
 }
 
-/* a részletek (határidő + összeg) egymás alatt, a banki kártyákkal azonos szélességben */
+/* the instalments (deadline + amount) below each other, as wide as the bank cards */
 .fee-items {
   display: grid;
   gap: 16px;
@@ -3190,7 +3190,7 @@ body:has(.main-nav.open) .upcoming-tab {
   font-size: 0.95rem;
 }
 
-/* banki adatok + ECSET kód + egyedi támogatás */
+/* bank details + ECSET code + support request */
 .fee-pay {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -3203,7 +3203,7 @@ body:has(.main-nav.open) .upcoming-tab {
   margin: 0;
 }
 
-/* ECSET doboz a két kártya alatt, teljes szélességben: szöveg balra, gomb jobbra */
+/* ECSET box below the two cards, full width: text on the left, button on the right */
 .fee-ecset {
   grid-column: 1 / -1;
   display: flex;
@@ -3246,7 +3246,7 @@ body:has(.main-nav.open) .upcoming-tab {
   margin-top: 4px;
 }
 
-/* Mire fordítjuk? – arányos sávok az éves kiadásokról */
+/* Mire fordítjuk? – proportional bars of the yearly expenses */
 .fee-costs {
   max-width: 760px;
   margin: 0 auto;
@@ -3297,8 +3297,8 @@ body:has(.main-nav.open) .upcoming-tab {
   color: var(--color-text-muted);
 }
 
-/* Tábordíj: kategóriák díja */
-/* a kártyák középre igazítva: egy (tagdíj) és négy (tábordíj) kártyával is jól néz ki */
+/* Camp fees: the categories' fees */
+/* the cards centred: looks right with one (membership fee) and four (camp fee) cards alike */
 .price-grid {
   display: flex;
   flex-wrap: wrap;
@@ -3364,7 +3364,7 @@ body:has(.main-nav.open) .upcoming-tab {
   border-radius: 8px;
 }
 
-/* figyelmeztetés a közleményről */
+/* warning about the payment reference */
 .fee-warning {
   background: #fff6e5;
   border-color: #f0d49a;
@@ -3386,7 +3386,7 @@ body:has(.main-nav.open) .upcoming-tab {
   margin-bottom: 6px;
 }
 
-/* beágyazott Google Űrlap */
+/* embedded Google Form */
 .fee-form {
   max-width: 760px;
   margin: 0 auto 40px;
@@ -3407,7 +3407,7 @@ body:has(.main-nav.open) .upcoming-tab {
 .fee-form-frame iframe {
   display: block;
   width: 100%;
-  height: 720px; /* hosszabb űrlapnál növeld; a kereten belül görgethető */
+  height: 720px; /* increase for a longer form; it scrolls inside the frame */
   border: 0;
 }
 
@@ -3460,14 +3460,14 @@ body:has(.main-nav.open) .upcoming-tab {
   margin: 56px 0 6px;
 }
 
-/* Kcs tábordíj: a 4. osztályos raj rajparancsnokai személykártyán, középen */
-.fee-raj-contact {
+/* Kcs tábordíj (cub camp fee): the 4th-grade troop's leaders on person cards, centred */
+.fee-troop-contact {
   display: flex;
   justify-content: center;
   margin-bottom: 48px;
 }
 
-.fee-raj {
+.fee-troop {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;

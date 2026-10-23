@@ -1,18 +1,18 @@
 #!/usr/bin/env python3
-"""A közzétett Google Táblázat két lapja (Eszközök, Kapcsolattartó; CSV) alapján frissíti
-az eszkozok.html (Eszközbérlés) eszközlistáját és kapcsolattartó-kártyáját.
+"""Updates the equipment list and the contact card of eszkozok.html (Eszközbérlés) from two
+sheets (Eszközök, Eszközök kapcsolattartója).
 
-Használat:
-    python tools/sync_eszkozok.py      # az ESZKOZOK_CSV_URL és ESZKOZ_KAPCSOLAT_CSV_URL változókból tölt
-    python tools/sync_eszkozok.py --url <eszközök link> --contact-url <kapcsolattartó link>
-    python tools/sync_eszkozok.py --file e.csv --contact-file k.csv   # helyi fájlokból (teszteléshez)
+Usage:
+    python tools/sync_equipment.py                 # from LEADERS_SHEET_URL (or the old
+                                                   # EQUIPMENT_CSV_URL and EQUIPMENT_CONTACT_CSV_URL)
+    python tools/sync_equipment.py --xlsx v.xlsx   # from a local copy of the shared workbook
+    python tools/sync_equipment.py --file e.csv --contact-file k.csv   # from local CSV files (for testing)
 
-Az eszkozok.html <!-- ESZKOZOK:START/END --> és <!-- ESZKOZ_KAPCSOLAT:START/END -->
-közötti részét írja újra. Ha nincs megjelenő kapcsolattartó, a csapat közös e-mail címe
-kerül az oldalra. Minden kapcsolattartó a főoldalihoz hasonló személykártyát kap (person_card.py);
-a fotó a Kapcsolattartó lap "Fájlnév" oszlopa alapján a Drive "Képek" mappájából jön
-(drive_photos.py), ha nincs, monogram látszik.
-Hibás táblázat esetén hibával leáll, és semmit nem módosít.
+Rewrites the parts of eszkozok.html between <!-- EQUIPMENT:START/END --> and
+<!-- EQUIPMENT_CONTACT:START/END -->. Without a visible contact, the team's shared e-mail address
+is used. Every contact gets a person card like on the home page (person_card.py); the photo comes
+from the Drive "Képek" folder by the "Fájlnév" column (drive_photos.py), otherwise a monogram is shown.
+On a broken sheet it stops with an error and changes nothing.
 """
 import argparse
 import html
@@ -26,8 +26,8 @@ from drive_photos import PhotoSync
 from person_card import build_card
 
 PAGE = os.path.join(common.ROOT, 'eszkozok.html')
-SNAPSHOTS = (os.path.join(common.ROOT, 'data', 'eszkozok.csv'),
-             os.path.join(common.ROOT, 'data', 'eszkoz_kapcsolat.csv'))
+SNAPSHOTS = (os.path.join(common.ROOT, 'data', 'equipment.csv'),
+             os.path.join(common.ROOT, 'data', 'equipment_contacts.csv'))
 FALLBACK_EMAIL = '802@cserkesz.hu'
 
 ITEM_COLUMNS = {'name': 'eszköz', 'count': 'darabszám', 'note': 'megjegyzés', 'visible': 'megjelenjen'}
@@ -50,7 +50,7 @@ def build_items(rows):
 
 
 def build_contacts(rows):
-    """Minden kapcsolattartó egy személykártya (mint a főoldalon); ha nincs, a csapat közös címe."""
+    """Every contact is a person card (as on the home page); without one, the team's shared address."""
     if not rows:
         common.warn('Nincs megjelenő kapcsolattartó, a csapat közös e-mail címe kerül az oldalra.')
         safe = html.escape(FALLBACK_EMAIL, quote=True)
@@ -65,13 +65,13 @@ def main():
     parser.add_argument('--file')
     parser.add_argument('--contact-url')
     parser.add_argument('--contact-file')
-    parser.add_argument('--xlsx', help='a közös Vezetői táblázat helyi .xlsx fájlja')
+    parser.add_argument('--xlsx', help='local .xlsx copy of the shared leaders workbook')
     args = parser.parse_args()
 
-    items_csv = common.fetch(argparse.Namespace(url=args.url, file=args.file, xlsx=args.xlsx), 'ESZKOZOK_CSV_URL',
-                             sheet='Eszközök', book_env=common.VEZETOI_ENV)
+    items_csv = common.fetch(argparse.Namespace(url=args.url, file=args.file, xlsx=args.xlsx), 'EQUIPMENT_CSV_URL',
+                             sheet='Eszközök', book_env=common.LEADERS_SHEET_ENV)
     contacts_csv = common.fetch(argparse.Namespace(url=args.contact_url, file=args.contact_file, xlsx=args.xlsx),
-                                'ESZKOZ_KAPCSOLAT_CSV_URL', sheet='Eszközök kapcsolattartója', book_env=common.VEZETOI_ENV)
+                                'EQUIPMENT_CONTACT_CSV_URL', sheet='Eszközök kapcsolattartója', book_env=common.LEADERS_SHEET_ENV)
 
     items = []
     for line_number, row in common.read_table(items_csv, ITEM_COLUMNS, required=['name', 'visible']):
@@ -108,8 +108,8 @@ def main():
         row['photo'] = photos.photo_for(row['name'], row['filename'], f'Kapcsolattartó, {line_number}. sor ({row["name"]})')
         contacts.append(row)
 
-    changed = common.replace_block(PAGE, 'ESZKOZOK', build_items(items), ' ' * 8)
-    changed = common.replace_block(PAGE, 'ESZKOZ_KAPCSOLAT', build_contacts(contacts), ' ' * 10) or changed
+    changed = common.replace_block(PAGE, 'EQUIPMENT', build_items(items), ' ' * 8)
+    changed = common.replace_block(PAGE, 'EQUIPMENT_CONTACT', build_contacts(contacts), ' ' * 10) or changed
     photos.save_state()
     common.save_snapshot(SNAPSHOTS[0], items_csv)
     common.save_snapshot(SNAPSHOTS[1], contacts_csv)

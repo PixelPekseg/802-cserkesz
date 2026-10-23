@@ -1,18 +1,19 @@
 #!/usr/bin/env python3
-"""A közzétett Google Táblázat (Rajok lap, CSV) alapján frissíti a csatlakozom.html raj-kártyáit.
+"""Updates the troop (raj) cards on csatlakozom.html from the Rajok sheet.
 
-Használat:
-    python tools/sync_rajok.py                  # a RAJOK_CSV_URL környezeti változóból tölt
-    python tools/sync_rajok.py --url <link>
-    python tools/sync_rajok.py --file x.csv     # helyi fájlból (teszteléshez)
+Usage:
+    python tools/sync_troops.py                 # from TEAM_SHEET_URL (or the old TROOPS_CSV_URL)
+    python tools/sync_troops.py --xlsx t.xlsx   # from a local copy of the shared workbook
+    python tools/sync_troops.py --file x.csv    # from a local CSV file (for testing)
 
-A csatlakozom.html <!-- RAJOK:START --> és <!-- RAJOK:END --> közötti részét írja újra, valamint a
-penzugyek.html <!-- RAJOK_KCS:START/END --> részét: ott a Kcs tábordíj fül kapcsolata a 4. osztályos
-raj rajparancsnokai, a vezetőkéhez hasonló személykártyákon (fotó nincs, a monogram látszik); minden
-raj kártyái bekerülnek, de csak a most 4. osztályos rajé látszik (a script.js updateKcsContact).
-Minden kártya data-grade="4" és data-school-year="<indulás éve>" attribútumot kap; az osztályt
-(4. osztály = az indulás éve tanévében) a script.js számolja ki a megnyitáskor, így a szeptember
-1-jei léptetés a táblázat változása nélkül is megtörténik.
+Rewrites the part of csatlakozom.html between <!-- TROOPS:START --> and <!-- TROOPS:END -->, and
+the <!-- CUB_CAMP_CONTACTS:START/END --> part of penzugyek.html: there the contact of the
+"Kcs tábordíj" (cub camp fee) tab is the troop leaders of the current 4th-grade troop, on person
+cards (no photo, the monogram is shown). Every troop's cards are written, but only the current
+4th-grade troop is visible (script.js updateCubCampContact).
+Every card gets data-grade="4" and data-school-year="<start year>"; script.js computes the grade
+(4th grade = in the school year of the start year) on page load, so the September 1 step-up
+happens without changing the sheet.
 """
 import datetime as dt
 import html
@@ -26,7 +27,7 @@ from person_card import build_card as person_card
 
 PAGE = os.path.join(common.ROOT, 'csatlakozom.html')
 FINANCE = os.path.join(common.ROOT, 'penzugyek.html')
-SNAPSHOT = os.path.join(common.ROOT, 'data', 'rajok.csv')
+SNAPSHOT = os.path.join(common.ROOT, 'data', 'troops.csv')
 
 COLUMNS = {
     'name': 'raj neve', 'year': 'indulás éve',
@@ -70,8 +71,8 @@ def build_card(row, start_year, today):
     return '\n'.join(lines)
 
 
-def build_kcs_group(row, start_year, today):
-    """A Pénzügyek oldal Kcs tábordíj fülének kapcsolata: a raj rajparancsnokai személykártyán."""
+def build_cub_camp_group(row, start_year, today):
+    """Contact of the cub camp fee tab on the finance page: the troop's leaders on person cards."""
     grade = 4 + school_year(today) - start_year
     hidden = '' if grade == 4 else ' hidden'
     cards = []
@@ -81,12 +82,12 @@ def build_kcs_group(row, start_year, today):
         email = row[f'e{i}'] if '@' in row[f'e{i}'] else ''
         cards.append(person_card({'name': row[f'n{i}'], 'role': 'Rajparancsnok', 'email': email,
                                   'phone': common.fix_phone(row[f't{i}'])}, None, ' ' * 12))
-    return (f'          <div class="fee-raj" data-grade="4" data-school-year="{start_year}"{hidden}>\n'
+    return (f'          <div class="fee-troop" data-grade="4" data-school-year="{start_year}"{hidden}>\n'
             + '\n\n'.join(cards) + '\n          </div>')
 
 
 def main():
-    args, env_name = common.get_args('RAJOK_CSV_URL')
+    args, env_name = common.get_args('TROOPS_CSV_URL')
     csv_text = common.fetch(args, env_name, sheet='Rajok')
     table = common.read_table(csv_text, COLUMNS, required=['name', 'year', 'visible'])
     today = dt.date.today()
@@ -103,15 +104,15 @@ def main():
             common.warn(f'{line_number}. sor ({row["name"]}): hibás indulási év ("{row["year"]}"), kihagyva.')
             continue
         start = int(match.group())
-        cards.append((start, build_card(row, start, today), build_kcs_group(row, start, today)))
+        cards.append((start, build_card(row, start, today), build_cub_camp_group(row, start, today)))
     if not cards and not os.environ.get('ALLOW_EMPTY'):
         common.fail('Egyetlen érvényes, megjelenő raj sincs a táblázatban, ezért nem írom felül az oldalt.')
 
-    cards.sort(key=lambda item: -item[0])  # a legfiatalabb (legalacsonyabb osztály) elöl
+    cards.sort(key=lambda item: -item[0])  # the youngest (lowest grade) first
     body = '\n\n'.join(card for _, card, _ in cards)
-    changed = common.replace_block(PAGE, 'RAJOK', body, ' ' * 8)
+    changed = common.replace_block(PAGE, 'TROOPS', body, ' ' * 8)
     finance_body = '\n\n'.join(card for _, _, card in cards)
-    finance_changed = common.replace_block(FINANCE, 'RAJOK_KCS', finance_body, ' ' * 10)
+    finance_changed = common.replace_block(FINANCE, 'CUB_CAMP_CONTACTS', finance_body, ' ' * 10)
     common.save_snapshot(SNAPSHOT, csv_text)
     print(f'{len(cards)} raj, csatlakozom.html {"frissítve" if changed else "változatlan"}, '
           f'penzugyek.html {"frissítve" if finance_changed else "változatlan"}.')

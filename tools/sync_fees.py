@@ -1,37 +1,37 @@
 #!/usr/bin/env python3
-"""A Pénzügyek oldal (penzugyek.html) Tagdíj / Nagytábordíj / Kcs tábordíj füleit frissíti
-egyetlen Google Táblázatból.
+"""Updates the Tagdíj / Nagytábordíj / Kcs tábordíj (membership fee / summer camp fee / cub camp
+fee) tabs of the Pénzügyek page (penzugyek.html) from one Google Sheet.
 
-A táblázat lapjai: Leírás (útmutató, az oldal nem olvassa) · Tagdíj · Nagytábordíj · Kcs tábordíj.
-Minden fül-lapon egymás alatt négy blokk van; a blokkot az A oszlopba írt blokkcím kezdi
-(ALAPADATOK, DÍJAK, RÉSZLETEK, KÖLTSÉGEK), a táblázatos blokkoknál a következő sor a fejléc:
-  ALAPADATOK – két oszlop (Mező · Érték): Megjelenés kezdete, Megjelenés vége, Cím,
+Sheets of the workbook: Leírás (guide, not read by the site) · Tagdíj · Nagytábordíj · Kcs tábordíj.
+Each tab sheet holds four blocks below each other; a block starts with its title in column A
+(ALAPADATOK, DÍJAK, RÉSZLETEK, KÖLTSÉGEK); for the table blocks the next row is the header:
+  ALAPADATOK – two columns (Mező · Érték): Megjelenés kezdete, Megjelenés vége, Cím,
                Bevezető szöveg, Kiemelt mondat, Alapüzenet, ECSET kódok linkje,
                Támogatás űrlap linkje, Támogatás igénylésének határideje,
                Költségek címe / bevezetője / megjegyzése
   DÍJAK      – Kategória · Összeg · Részletezés · Magyarázat címe · Magyarázat · Megjelenjen?
-               (a díjkártyák és alattuk a magyarázó bekezdések; egy sorban lehet díj és
-               magyarázat is, egymástól függetlenül. A magyarázat címe félkövéren a bekezdés elejére kerül.)
+               (the fee cards and the explanatory paragraphs below them; a row may hold a fee and
+               an explanation, independently. The explanation title goes in bold at the start.)
   RÉSZLETEK  – Cím · Befizetési határidő · Összeg · Megjegyzés · Megjelenjen?
-  KÖLTSÉGEK  – Tétel · Összeg (Ft) · Megjelenjen?   (üresen hagyva a rész nem jelenik meg)
-A táblázatot egészben, Microsoft Excel (.xlsx) formátumban kell közzétenni a weben, így egyetlen
-cím kell (PENZUGY_URL).
+  KÖLTSÉGEK  – Tétel · Összeg (Ft) · Megjelenjen?   (left empty, the section is not shown)
+The workbook must be published as a whole in Microsoft Excel (.xlsx) format, so a single URL
+is needed (FEES_SHEET_URL).
 
-A fül tartalma a Megjelenés kezdete és vége között látszik (a vég napja még beleszámít; üres
-vég = nincs vége); azon kívül, vagy ha nincs kezdet, csak az Alapüzenet. Az időszakot a
-script.js (updateFees) minden megnyitáskor újra ellenőrzi, így nem kell hozzá újabb futás.
-A banki adatok, a közlemény-figyelmeztetés és az ECSET doboz szövege minden fülön azonos, a
-kódban rögzített (a számlaszámot szándékosan nem lehet a táblázatból átírni).
+A tab's content is shown between "Megjelenés kezdete" and "Megjelenés vége" (the end day still
+counts; empty end = no end); outside that, or without a start, only the Alapüzenet (default
+message). script.js (updateFees) re-checks the period on every page load, so no new run is needed.
+The bank details, the payment-reference warning and the ECSET box text are the same on every tab
+and fixed in the code (the account number deliberately cannot be changed from the sheet).
 
-Szövegcellákban: új sor = új bekezdés, **szöveg** = félkövér.
+In text cells: new line = new paragraph, **text** = bold.
 
-Használat:
-    python tools/sync_penzugyek.py                 # a PENZUGY_URL környezeti változóból
-    python tools/sync_penzugyek.py --file p.xlsx   # helyi fájlból
+Usage:
+    python tools/sync_fees.py                 # from the FEES_SHEET_URL environment variable
+    python tools/sync_fees.py --file p.xlsx   # from a local file
 
-A penzugyek.html <!-- PENZUGY_<FÜL>:START/END --> közötti részét írja újra. Hiányzó cím esetén
-semmit nem módosít. Hibás fül-lapnál az a fül változatlan marad, a többi frissül, a futás
-pedig hibával zárul.
+Rewrites the part of penzugyek.html between <!-- FEES_<TAB>:START/END -->. Without a URL it
+changes nothing. A broken tab sheet leaves that tab unchanged, the others are still updated, and
+the run ends with an error.
 """
 import argparse
 import datetime
@@ -48,24 +48,25 @@ import sync_common as common
 
 PAGE = os.path.join(common.ROOT, 'penzugyek.html')
 TABS = [
-    # (kulcs, a táblázat lapjának neve, jelölő)
-    ('tagdij', 'Tagdíj', 'PENZUGY_TAGDIJ'),
-    ('nagytabor', 'Nagytábordíj', 'PENZUGY_NAGYTABOR'),
-    ('kcstabor', 'Kcs tábordíj', 'PENZUGY_KCSTABOR'),
+    # (key, name of the sheet, marker)
+    ('tagdij', 'Tagdíj', 'FEES_MEMBERSHIP'),
+    ('nagytabor', 'Nagytábordíj', 'FEES_SUMMER_CAMP'),
+    ('kcstabor', 'Kcs tábordíj', 'FEES_CUB_CAMP'),
 ]
-ENV_NAME = 'PENZUGY_URL'
-# a fül neve a címsávban (a script.js a data-label-t írja a h1-be)
+ENV_NAME = 'FEES_SHEET_URL'
+SNAPSHOT_NAMES = {'tagdij': 'fees_membership', 'nagytabor': 'fees_summer_camp', 'kcstabor': 'fees_cub_camp'}
+# the tab's name in the title banner (script.js writes data-label into the h1)
 LABELS = {'tagdij': 'Tagdíj', 'nagytabor': 'Nagytábordíj', 'kcstabor': 'Kcs tábordíj'}
 INDENT = ' ' * 6
 
-# Az ALAPADATOK blokk mezői (a Mező oszlop ELEJE alapján, kisbetűsen)
+# Fields of the ALAPADATOK block (by the START of the Mező column, lowercased)
 FIELDS = {
     'from': 'megjelenés kezdete', 'until': 'megjelenés vége', 'title': 'cím',
     'intro': 'bevezető', 'key': 'kiemelt', 'empty': 'alapüzenet',
     'ecset': 'ecset', 'form': 'támogatás', 'form_deadline': 'támogatás igénylés', 'costs_title': 'költségek címe',
     'costs_intro': 'költségek bevezető', 'costs_note': 'költségek megjegyzés',
 }
-# a táblázatos blokkok: kulcs -> (blokkcím, oszlopok a fejléc ELEJE alapján)
+# the table blocks: key -> (block title, columns by the START of the header)
 BLOCKS = {
     'prices': ('Díjak', {'name': 'kategória', 'amount': 'összeg', 'split': 'részletezés',
                          'rule_title': 'magyarázat címe', 'rule_text': 'magyarázat', 'visible': 'megjelenjen'}),
@@ -86,10 +87,10 @@ class SheetError(Exception):
     pass
 
 
-# ---------- beolvasás ----------
+# ---------- reading ----------
 
 def cell_text(value):
-    """Cellaérték szövegként (a dátumokat ÉÉÉÉ.HH.NN. alakra, az egész számokat tizedes nélkül)."""
+    """Cell value as text (dates as YYYY.MM.DD., whole numbers without decimals)."""
     if value is None:
         return ''
     if isinstance(value, datetime.datetime):
@@ -125,7 +126,7 @@ BLOCK_TITLES = {'alapadatok': 'fields', 'díjak': 'prices', 'részletek': 'items
 
 
 def split_blocks(sheet):
-    """A fül-lap sorait blokkokra bontja: {'fields': [sorok], 'prices': [fejléc, sorok…], …}."""
+    """Splits a tab sheet's rows into blocks: {'fields': [rows], 'prices': [header, rows…], …}."""
     blocks, current = {}, None
     for row in sheet.iter_rows(values_only=True):
         cells = [cell_text(v) for v in row]
@@ -146,7 +147,7 @@ def read_fields(rows):
     for cells in rows:
         label = cells[0].lower()
         value = cells[1] if len(cells) > 1 else ''
-        # a hosszabb előtag nyer (pl. "költségek címe" ne a "cím"-hez kerüljön)
+        # the longer prefix wins (e.g. "költségek címe" must not match "cím")
         matches = [key for key, prefix in FIELDS.items() if label.startswith(prefix)]
         if matches:
             key = max(matches, key=lambda k: len(FIELDS[k]))
@@ -155,13 +156,13 @@ def read_fields(rows):
 
 
 def read_rows(rows, block_name, columns):
-    """Egy táblázatos blokk sorai szótárként; a "Megjelenjen?" = nem sorokat kihagyja.
-    Hiányzó vagy üres blokk = üres lista."""
+    """Rows of a table block as dicts; rows with "Megjelenjen?" = nem are skipped.
+    A missing or empty block = empty list."""
     if not rows:
         return []
     header = [c.lower() for c in rows[0]]
     index = {}
-    # a hosszabb előtag előbb választ (pl. "magyarázat címe" ne a "magyarázat"-hoz kerüljön)
+    # the longer prefix picks first (e.g. "magyarázat címe" must not match "magyarázat")
     for key, prefix in sorted(columns.items(), key=lambda item: -len(item[1])):
         for i, cell in enumerate(header):
             if cell.startswith(prefix) and i not in index.values():
@@ -192,13 +193,13 @@ def parse_date(text):
 
 
 def nice_date(text):
-    """2026.11.30. -> 2026. november 30. (ha nem dátum, változatlanul hagyja)."""
+    """2026.11.30. -> 2026. november 30. (returns the input unchanged if it is not a date)."""
     day = parse_date(text)
     return f'{day.year}. {MONTHS[day.month - 1]} {day.day}.' if day else text
 
 
 def money(text):
-    """Puszta szám -> "15 000 Ft"; minden más beírás marad."""
+    """Bare number -> "15 000 Ft"; any other input stays as it is."""
     digits = text.replace(' ', '').replace(' ', '')
     if re.fullmatch(r'\d+', digits):
         return f'{int(digits):,}'.replace(',', ' ') + ' Ft'
@@ -219,7 +220,7 @@ def esc(text):
 
 
 def rich(text):
-    """Escape-elt szöveg, **félkövér** jelöléssel."""
+    """Escaped text, with **bold** markup."""
     return re.sub(r'\*\*(.+?)\*\*', r'<strong>\1</strong>', esc(text))
 
 
@@ -239,7 +240,7 @@ def copy_value(label, value, copy, mono=False, aria=None):
 
 
 def render_pay(ecset_link):
-    """Banki adatok + közlemény-figyelmeztetés + ECSET doboz: minden fülön azonos."""
+    """Bank details + payment-reference warning + ECSET box: the same on every tab."""
     ecset = ''
     if ecset_link:
         ecset = f'''
@@ -283,9 +284,9 @@ def render_pay(ecset_link):
 
 
 def render_form(form_link, deadline=''):
-    """Támogatás igénylése: beágyazott űrlap; a src-t a script.js csak akkor tölti be, ha a fül látszik.
-    A határidő UTÁNI nap 23:59-kor az űrlap (a határidővel és a linkkel együtt) eltűnik, és a helyén
-    a .fee-form-closed üzenet jelenik meg (script.js updateFees; a futás időpontja szerint itt is)."""
+    """Support request: embedded form; script.js only loads its src when the tab is visible.
+    At 23:59 on the day AFTER the deadline the form (with the deadline and the link) disappears and
+    the .fee-form-closed message takes its place (script.js updateFees; here too, by the run time)."""
     base = re.sub(r'\?.*$', '', form_link)
     embed = base + '?embedded=true' if base.endswith('/viewform') else form_link
     day = parse_date(deadline)
@@ -334,14 +335,14 @@ def render_tab(key, data, today):
         out.append('        <div class="fee-content" hidden></div>')
     else:
         out.append('        <div class="fee-content"' + ('' if active else ' hidden') + '>')
-        # 1. cím, bevezető, kiemelt mondat
+        # 1. title, introduction, highlighted sentence
         out.append('          <div class="fee-intro">')
         out.append(f'            <h2>{esc(f["title"])}</h2>')
         out += [f'            <p>{p}</p>' for p in paragraphs(f['intro'])]
         out.append('          </div>\n')
         if f['key']:
             out.append(f'          <p class="fee-key">{rich(f["key"])}</p>\n')
-        # 2. díjkártyák
+        # 2. fee cards
         prices = [row for row in data['prices'] if row.get('name')]
         rules = [row for row in data['prices'] if row.get('rule_text')]
         if prices:
@@ -351,7 +352,7 @@ def render_tab(key, data, today):
                 out.append(f'            <li><span class="price-name">{esc(row["name"])}</span>'
                            f'<span class="price-amount">{esc(money(row["amount"]))}</span>{split}</li>')
             out.append('          </ul>\n')
-        # 3. díjkártya-magyarázatok
+        # 3. fee card explanations
         if rules:
             out.append('          <div class="fee-rules">')
             for row in rules:
@@ -359,7 +360,7 @@ def render_tab(key, data, today):
                     title = f'<strong>{esc(row["rule_title"].rstrip(":"))}:</strong> ' if row.get('rule_title') and i == 0 else ''
                     out.append(f'            <p>{title}{p}</p>')
             out.append('          </div>\n')
-        # 4. részletek
+        # 4. instalments
         if data['items']:
             out.append('          <div class="fee-items">')
             for row in data['items']:
@@ -372,9 +373,9 @@ def render_tab(key, data, today):
               </dl>{note}
             </div>''')
             out.append('          </div>\n')
-        # 5. fix kártyák
+        # 5. fixed cards
         out.append(render_pay(f['ecset']))
-        # 6. költségek
+        # 6. costs
         costs = []
         for row in data['costs']:
             digits = row['amount'].replace(' ', '').replace(' ', '').removesuffix('Ft')
@@ -398,7 +399,7 @@ def render_tab(key, data, today):
             out.append(f'            <p class="cost-total">Összesen évente: <strong>{money(str(total))}</strong></p>')
             out += [f'            <p class="cost-note">{p}</p>' for p in paragraphs(f['costs_note'])]
             out.append('          </div>\n')
-        # 7. támogatás igénylése
+        # 7. support request
         if f['form']:
             if not f['form_deadline']:
                 common.warn(f'{key}: nincs megadva a támogatás igénylésének határideje.')
@@ -410,7 +411,7 @@ def render_tab(key, data, today):
     return INDENT + '\n'.join(out)
 
 
-# ---------- futtatás ----------
+# ---------- running ----------
 
 def fetch_bytes(url):
     try:
@@ -433,8 +434,8 @@ def read_tab(sheet):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--file', help='helyi .xlsx fájl')
-    parser.add_argument('--today', help='teszteléshez: ÉÉÉÉ-HH-NN')
+    parser.add_argument('--file', help='local .xlsx file')
+    parser.add_argument('--today', help='for testing: YYYY-MM-DD')
     args = parser.parse_args()
     today = datetime.date.fromisoformat(args.today) if args.today else datetime.date.today()
 
@@ -461,7 +462,7 @@ def main():
             continue
         if common.replace_block(PAGE, marker, body, INDENT):
             updated.append(key)
-        common.save_snapshot(os.path.join(common.ROOT, 'data', f'penzugy_{key}.json'),
+        common.save_snapshot(os.path.join(common.ROOT, 'data', f'{SNAPSHOT_NAMES[key]}.json'),
                              json.dumps(data, ensure_ascii=False, indent=2) + '\n')
 
     print(f'Frissített fülek: {", ".join(updated) or "nincs"}.')

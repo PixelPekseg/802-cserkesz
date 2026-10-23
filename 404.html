@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <!--
-    A GitHub Pages ezt az oldalt bármilyen nem létező címen megjeleníti (akár
-    mélyebb útvonalon is), ezért a relatív hivatkozások alapját az oldal gyökerére
-    állítjuk: saját domainen "/", github.io alatt "/repo-neve/".
+    GitHub Pages shows this page at any non-existent address (even at a
+    deeper path), so the base of relative links is set to the site root:
+    "/" on a custom domain, "/repo-name/" under github.io.
   -->
   <script>
     (function () {
@@ -21,17 +21,17 @@
   <title>Az oldal nem található – 802. sz. Szent Korona Cserkészcsapat</title>
   <meta name="description" content="Az oldal nem található.">
 
-  <!-- FONTOS: a "https://www.YOUR-DOMAIN-HERE.com" placeholdert cseréld le a valódi domainre (lásd index.html) -->
+  <!-- IMPORTANT: replace the "https://www.YOUR-DOMAIN-HERE.com" placeholder with the real domain (see index.html) -->
 
 
   <link rel="icon" type="image/jpeg" href="images/webp/kozos/logo_green.jpg?v=1">
   <link rel="apple-touch-icon" href="images/webp/kozos/logo_green.jpg?v=1">
-  <link rel="stylesheet" href="style.css?v=113">
+  <link rel="stylesheet" href="style.css?v=114">
 </head>
 <body>
 
-  <!-- Értesítősáv (piros, az oldal tetején) -->
-  <!-- ERTESITOK:START – a tools/sync_ertesitok.py írja a Google Táblázatból, kézzel ne szerkeszd -->
+  <!-- Notice bar (red, top of the page) -->
+  <!-- NOTICES:START – written by tools/sync_notices.py from the Google Sheet, do not edit by hand -->
   <div class="notice-bar" id="noticeBar">
     <div class="notice" data-id="4f63410636" data-from="2027-03-01" data-until="2027-05-31" hidden>
       <div class="container notice-inner">
@@ -45,9 +45,9 @@
     </div>
   </div>
 
-  <!-- ERTESITOK:END -->
+  <!-- NOTICES:END -->
 
-  <!-- Fejléc / navigáció -->
+  <!-- Header / navigation -->
   <header class="site-header">
     <div class="container header-inner">
       <a href="index.html" class="logo">
@@ -55,7 +55,7 @@
         <span class="logo-text">802. sz. Szent Korona Cserkészcsapat</span>
       </a>
 
-      <!-- Hamburger gomb mobil nézethez -->
+      <!-- Hamburger button for the mobile view -->
       <button class="nav-toggle" id="navToggle" type="button" aria-label="Menü megnyitása" aria-expanded="false" aria-controls="mainNav">
         <span></span>
         <span></span>
@@ -91,7 +91,7 @@
     </div>
   </header>
 
-  <!-- Címsáv -->
+  <!-- Title banner -->
   <section class="page-banner">
     <h1>404 – Az oldal nem található</h1>
     <p>Sajnos a keresett oldal nem létezik, vagy időközben áthelyeztük. Innen tovább tudsz lépni:</p>
@@ -106,7 +106,7 @@
     </div>
   </section>
 
-  <!-- Lábléc -->
+  <!-- Footer -->
   <footer class="site-footer">
     <div class="container">
       <div class="footer-links">
@@ -120,6 +120,6 @@
     </div>
   </footer>
 
-  <script src="script.js?v=69"></script>
+  <script src="script.js?v=70"></script>
 </body>
 </html>

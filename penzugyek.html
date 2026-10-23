@@ -6,7 +6,7 @@
   <title>Pénzügyek – 802. sz. Szent Korona Cserkészcsapat</title>
   <meta name="description" content="Tagdíj, nagytábordíj és kiscserkésztábor díja: befizetési határidők, összegek és banki adatok a 802. sz. Szent Korona Cserkészcsapat tagjainak.">
 
-  <!-- FONTOS: a "https://www.YOUR-DOMAIN-HERE.com" placeholdert cseréld le a valódi domainre (lásd index.html) -->
+  <!-- IMPORTANT: replace the "https://www.YOUR-DOMAIN-HERE.com" placeholder with the real domain (see index.html) -->
   <link rel="canonical" href="https://www.YOUR-DOMAIN-HERE.com/penzugyek.html">
 
   <meta property="og:type" content="website">
@@ -23,12 +23,12 @@
 
   <link rel="icon" type="image/jpeg" href="images/webp/kozos/logo_green.jpg?v=1">
   <link rel="apple-touch-icon" href="images/webp/kozos/logo_green.jpg?v=1">
-  <link rel="stylesheet" href="style.css?v=113">
+  <link rel="stylesheet" href="style.css?v=114">
 </head>
 <body>
 
-  <!-- Értesítősáv (piros, az oldal tetején) -->
-  <!-- ERTESITOK:START – a tools/sync_ertesitok.py írja a Google Táblázatból, kézzel ne szerkeszd -->
+  <!-- Notice bar (red, top of the page) -->
+  <!-- NOTICES:START – written by tools/sync_notices.py from the Google Sheet, do not edit by hand -->
   <div class="notice-bar" id="noticeBar">
     <div class="notice" data-id="4f63410636" data-from="2027-03-01" data-until="2027-05-31" hidden>
       <div class="container notice-inner">
@@ -42,9 +42,9 @@
     </div>
   </div>
 
-  <!-- ERTESITOK:END -->
+  <!-- NOTICES:END -->
 
-  <!-- Fejléc / navigáció -->
+  <!-- Header / navigation -->
   <header class="site-header">
     <div class="container header-inner">
       <a href="index.html" class="logo">
@@ -52,7 +52,7 @@
         <span class="logo-text">802. sz. Szent Korona Cserkészcsapat</span>
       </a>
 
-      <!-- Hamburger gomb mobil nézethez -->
+      <!-- Hamburger button for the mobile view -->
       <button class="nav-toggle" id="navToggle" type="button" aria-label="Menü megnyitása" aria-expanded="false" aria-controls="mainNav">
         <span></span>
         <span></span>
@@ -88,27 +88,27 @@
     </div>
   </header>
 
-  <!-- Címsáv -->
+  <!-- Title banner -->
   <section class="page-banner">
     <h1>Pénzügyek</h1>
   </section>
 
   <!--
-    Fülek: Tagdíj / Nagytábordíj / Kcs tábordíj. Fülsáv nincs: a menü Pénzügyek lenyílójából
-    (penzugyek.html#tagdij, #nagytabor, #kcstabor) nyílik az adott fül; cím nélkül a Tagdíj
-    (script.js initFeeTabs).
-    Minden fül ugyanabból a blokksorból áll (később Google Táblázatból generáljuk):
-      1. cím + bevezető (.fee-intro)        2. díjak kártyái (.price-grid)
-      3. szabályok, opcionális (.fee-rules)  4. részletek egymás alatt (.fee-item, időablakkal)
-      5. banki adatok + közlemény + ECSET (.fee-pay, minden fülön azonos)
-      6. költségek, opcionális (.fee-costs) 7. támogatás igénylése, beágyazott űrlap (.fee-form)
-    Időablak: minden .fee-item data-from / data-until (ÉÉÉÉ-HH-NN, a Meddig napja még
-    beleszámít); a fül tartalma (.fee-content) csak akkor látszik, ha legalább egy tétele épp
-    érvényes, különben a .fee-empty üzenet (script.js updateFees). JS nélkül minden látszik.
+    Tabs: Tagdíj / Nagytábordíj / Kcs tábordíj (membership fee / summer camp fee / cub camp fee).
+    There is no tab bar: the tab opens from the Pénzügyek dropdown of the menu
+    (penzugyek.html#tagdij, #nagytabor, #kcstabor); without a hash, Tagdíj (script.js initFeeTabs).
+    Each tab is built by tools/sync_fees.py from the "Pénzügyek" Google Sheet, in the same order:
+      1. title + introduction (.fee-intro)   2. highlighted sentence (.fee-key)
+      3. fee cards (.price-grid)              4. their explanations (.fee-rules)
+      5. instalments below each other (.fee-items)
+      6. bank details + payment reference + ECSET (.fee-pay, the same on every tab)
+      7. costs, optional (.fee-costs)         8. support request, embedded form (.fee-form)
+    Period: the panel's data-from / data-until (YYYY-MM-DD, the end day still counts); inside it the
+    content (.fee-content) is shown, outside it the .fee-empty default message (script.js updateFees).
   -->
   <section class="section finance-page">
     <div class="container">
-      <!-- PENZUGY_TAGDIJ:START – a tools/sync_penzugyek.py írja a(z) „Pénzügyek – Tagdíj” Google Táblázatból, kézzel ne szerkeszd -->
+      <!-- FEES_MEMBERSHIP:START – written by tools/sync_fees.py from the „Pénzügyek” Google Sheet (Tagdíj sheet), do not edit by hand -->
       <div class="fee-panel" id="panel-tagdij" data-tab="tagdij" data-label="Tagdíj" data-from="2026-09-01" data-until="2026-12-31">
         <div class="fee-content">
           <div class="fee-intro">
@@ -233,9 +233,9 @@
         <p class="fee-empty" hidden>Jelenleg nincs tagdíj befizetési időszak!</p>
       </div>
 
-      <!-- PENZUGY_TAGDIJ:END -->
+      <!-- FEES_MEMBERSHIP:END -->
 
-      <!-- PENZUGY_NAGYTABOR:START – a tools/sync_penzugyek.py írja a(z) „Pénzügyek – Nagytábordíj” Google Táblázatból, kézzel ne szerkeszd -->
+      <!-- FEES_SUMMER_CAMP:START – written by tools/sync_fees.py from the „Pénzügyek” Google Sheet (Nagytábordíj sheet), do not edit by hand -->
       <div class="fee-panel" id="panel-nagytabor" data-tab="nagytabor" data-label="Nagytábordíj" data-from="2026-10-01" data-until="2026-12-31">
         <div class="fee-content">
           <div class="fee-intro">
@@ -351,27 +351,27 @@
         <p class="fee-empty" hidden>Jelenleg nincs tábordíj befizetési időszak!</p>
       </div>
 
-      <!-- PENZUGY_NAGYTABOR:END -->
+      <!-- FEES_SUMMER_CAMP:END -->
 
-      <!-- PENZUGY_KCSTABOR:START – a tools/sync_penzugyek.py írja a(z) „Pénzügyek – Kiscserkésztábor díja” Google Táblázatból, kézzel ne szerkeszd -->
+      <!-- FEES_CUB_CAMP:START – written by tools/sync_fees.py from the „Pénzügyek” Google Sheet (Kcs tábordíj sheet), do not edit by hand -->
       <div class="fee-panel" id="panel-kcstabor" data-tab="kcstabor" data-label="Kcs tábordíj">
         <div class="fee-content" hidden></div>
         <p class="fee-empty">Jelenleg nincs tábordíj befizetési időszak!</p>
       </div>
 
-      <!-- PENZUGY_KCSTABOR:END -->
+      <!-- FEES_CUB_CAMP:END -->
 
       <!--
-        Kapcsolat a fül alján: a Tagdíj és a Nagytábordíj fülön a pénzügyi felelős (Csapatvezetés
-        táblázat), a Kcs tábordíj fülön a 4. osztályos raj rajparancsnokai (Rajok táblázat). Hogy melyik
-        raj a 4. osztályos, azt a script.js (updateKcsContact) számolja ki; ha nincs ilyen raj, a Kcs
-        fülön is a pénzügyi felelős látszik.
+        Contact at the bottom of the tab: on the Tagdíj and Nagytábordíj tabs the finance deputy (Csapatvezetés
+        sheet), on the Kcs tábordíj tab the troop leaders of the 4th-grade troop (Rajok sheet). Which troop
+        is in 4th grade is computed by script.js (updateCubCampContact); without such a troop the Kcs tab
+        shows the finance deputy as well.
       -->
       <div class="fee-contact" data-for="tagdij nagytabor">
         <h3 class="home-contact-title fee-contact-title">Kérdése van a befizetésekkel kapcsolatban?</h3>
         <p class="fee-contact-lead">Keresse bizalommal a pénzügyekért felelős csapatparancsnok-helyettest!</p>
         <div class="home-contact">
-          <!-- VEZETOK_PENZUGY:START – a tools/sync_vezetok.py írja (a Csapatvezetés táblázatból az, akinek a szerepében a "Pénzügy" szó szerepel), kézzel ne szerkeszd -->
+          <!-- LEADERS_FINANCE:START – written by tools/sync_leaders.py (from the Csapatvezetés sheet: whoever has the word "Pénzügy" in their role), do not edit by hand -->
         <div class="person-card has-bio">
           <div class="person-photo" data-initials="CÁ">
             <img src="images/webp/kozos/team/csiki-adam.webp" alt="Csiki Ádám" data-optional>
@@ -388,16 +388,16 @@
           </div>
         </div>
 
-        <!-- VEZETOK_PENZUGY:END -->
+        <!-- LEADERS_FINANCE:END -->
         </div>
       </div>
 
       <div class="fee-contact" data-for="kcstabor" hidden>
         <h3 class="home-contact-title fee-contact-title">Kérdése van a befizetéssel kapcsolatban?</h3>
         <p class="fee-contact-lead">Keresse bizalommal a táborért felelős rajparancsnokokat!</p>
-        <div class="fee-raj-contact">
-          <!-- RAJOK_KCS:START – a tools/sync_rajok.py írja a Rajok táblázatból, kézzel ne szerkeszd -->
-          <div class="fee-raj" data-grade="4" data-school-year="2026">
+        <div class="fee-troop-contact">
+          <!-- CUB_CAMP_CONTACTS:START – written by tools/sync_troops.py from the Rajok sheet, do not edit by hand -->
+          <div class="fee-troop" data-grade="4" data-school-year="2026">
             <div class="person-card has-bio">
               <div class="person-photo" data-initials="KG">
               </div>
@@ -427,7 +427,7 @@
             </div>
           </div>
 
-          <div class="fee-raj" data-grade="4" data-school-year="2025" hidden>
+          <div class="fee-troop" data-grade="4" data-school-year="2025" hidden>
             <div class="person-card has-bio">
               <div class="person-photo" data-initials="KB">
               </div>
@@ -457,7 +457,7 @@
             </div>
           </div>
 
-          <div class="fee-raj" data-grade="4" data-school-year="2024" hidden>
+          <div class="fee-troop" data-grade="4" data-school-year="2024" hidden>
             <div class="person-card has-bio">
               <div class="person-photo" data-initials="KF">
               </div>
@@ -487,7 +487,7 @@
             </div>
           </div>
 
-          <div class="fee-raj" data-grade="4" data-school-year="2023" hidden>
+          <div class="fee-troop" data-grade="4" data-school-year="2023" hidden>
             <div class="person-card has-bio">
               <div class="person-photo" data-initials="MM">
               </div>
@@ -517,7 +517,7 @@
             </div>
           </div>
 
-          <div class="fee-raj" data-grade="4" data-school-year="2022" hidden>
+          <div class="fee-troop" data-grade="4" data-school-year="2022" hidden>
             <div class="person-card has-bio">
               <div class="person-photo" data-initials="VV">
               </div>
@@ -547,13 +547,13 @@
             </div>
           </div>
 
-          <!-- RAJOK_KCS:END -->
+          <!-- CUB_CAMP_CONTACTS:END -->
         </div>
       </div>
     </div>
   </section>
 
-  <!-- Lábléc -->
+  <!-- Footer -->
   <footer class="site-footer">
     <div class="container">
       <div class="footer-links">
@@ -567,6 +567,6 @@
     </div>
   </footer>
 
-  <script src="script.js?v=69"></script>
+  <script src="script.js?v=70"></script>
 </body>
 </html>

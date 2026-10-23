@@ -1,5 +1,5 @@
 // ==========================================================
-// Mobil navigáció (hamburger menü)
+// Mobile navigation (hamburger menu)
 // ==========================================================
 const navToggle = document.getElementById('navToggle');
 const mainNav = document.getElementById('mainNav');
@@ -9,7 +9,7 @@ navToggle.addEventListener('click', () => {
   navToggle.setAttribute('aria-expanded', String(isOpen));
 });
 
-// Menü bezárása, ha egy linkre kattintunk (mobil nézetben)
+// Close the menu when a link is clicked (mobile view)
 mainNav.querySelectorAll('a').forEach(link => {
   link.addEventListener('click', () => {
     mainNav.classList.remove('open');
@@ -18,10 +18,10 @@ mainNav.querySelectorAll('a').forEach(link => {
 });
 
 // ==========================================================
-// Lenyíló almenü (Programok → Naptár, Tábor)
-// Egérrel használt széles képernyőn csak rámutatásra nyílik (ezt a CSS
-// intézi), ott a kattintás nem csinál semmit. Telefonon/tableten (hamburger
-// menü, érintés) kattintásra nyílik/csukódik; kívül kattintás vagy Esc bezárja.
+// Dropdown submenu (Események → Programok, Naptár, Tábor; Pénzügyek → fee tabs, Eszközbérlés)
+// On wide screens used with a mouse it opens on hover only (handled by
+// the CSS), and clicking does nothing there. On phones/tablets (hamburger
+// menu, touch) a click opens/closes it; a click outside or Esc closes it.
 // ==========================================================
 const subMenus = [...document.querySelectorAll('.has-sub')];
 const hoverMenu = window.matchMedia('(hover: hover) and (min-width: 1281px)');
@@ -53,25 +53,25 @@ document.addEventListener('keydown', event => {
 });
 
 // ==========================================================
-// Aktuális év a láblécben
+// Current year in the footer
 // ==========================================================
 document.getElementById('year').textContent = new Date().getFullYear();
 
 // ==========================================================
-// Bezárások megjegyzése (értesítősáv, főoldali "Közelgő programok" fül)
-// A bezárás az oldalon belüli lapozás (és a vissza gomb) alatt megmarad, de
-// újratöltéskor, illetve a böngészőlap bezárása és újbóli megnyitása után az
-// elem újra megjelenik. Ehhez a böngészőlaphoz kötött sessionStorage-ot
-// használjuk, és újratöltéskor kiürítjük.
+// Remembering dismissals (notice bar, home page "Közelgő programok" tab)
+// A dismissal survives navigation within the site (and the back button), but
+// after a reload, or after closing and reopening the browser tab, the item
+// shows up again. This uses the tab-bound sessionStorage, which is cleared
+// on reload.
 // ==========================================================
 const DISMISS_KEYS = ['closedNotices', 'upcomingTabClosed'];
 
 (function resetDismissalsOnReload() {
   const navigation = performance.getEntriesByType?.('navigation')[0];
   try {
-    localStorage.removeItem('closedNotices');   // a korábbi, tartós megjegyzés maradványa
+    localStorage.removeItem('closedNotices');   // leftover of the earlier, persistent storage
     if (navigation?.type === 'reload') DISMISS_KEYS.forEach(key => sessionStorage.removeItem(key));
-  } catch (e) { /* a tárolás nem elérhető – minden megjelenik */ }
+  } catch (e) { /* storage not available – everything is shown */ }
 })();
 
 function readDismissed(key) {
@@ -83,19 +83,19 @@ function readDismissed(key) {
 }
 
 function addDismissed(key, id, keepOnly) {
-  // csak a még létező elemek azonosítóit tartjuk meg, hogy a lista ne nőjön
+  // keep only the ids of items that still exist, so the list does not grow
   const list = readDismissed(key).filter(item => !keepOnly || keepOnly.includes(item));
   if (!list.includes(id)) list.push(id);
-  try { sessionStorage.setItem(key, JSON.stringify(list)); } catch (e) { /* nem baj */ }
+  try { sessionStorage.setItem(key, JSON.stringify(list)); } catch (e) { /* never mind */ }
 }
 
 // ==========================================================
-// Értesítősáv (minden oldal tetején, a Táblázat "Értesítők" lapjából)
-// Minden .notice alapból rejtett; akkor látszik, ha a mai nap a
-// data-from és data-until közé esik (mindkettő opcionális, a data-until
-// napja még beleszámít), és a látogató nem zárta be (a bezárás a fenti
-// szabály szerint csak újratöltésig / a böngészőlap bezárásáig érvényes).
-// Az updateNotices(now) tetszőleges időponttal újrafuttatható (tesztelés).
+// Notice bar (top of every page, from the "Értesítők" sheet)
+// Every .notice is hidden by default; it is shown when today falls between
+// data-from and data-until (both optional, the data-until day still
+// counts) and the visitor has not dismissed it (a dismissal lasts only until
+// a reload / closing the browser tab, as described above).
+// updateNotices(now) can be re-run with any date (for testing).
 // ==========================================================
 function updateNotices(now = new Date()) {
   const closed = readDismissed('closedNotices');
@@ -119,12 +119,12 @@ document.querySelectorAll('.notice-close').forEach(button => {
 updateNotices();
 
 // ==========================================================
-// Még nem feltöltött képek (logó, személyek fotói) kezelése
-// A data-optional attribútumú képet eltávolítjuk, ha nem töltődik be,
-// így nem törött kép ikon látszik, hanem a mögötte lévő monogram
-// (személyeknél), illetve egyszerűen csak a szöveg (logónál).
-// Ha a hiba még azelőtt megtörtént, hogy a szkript lefutott, a
-// complete + naturalWidth ellenőrzés kezeli le.
+// Images not uploaded yet (logo, portraits)
+// An image with the data-optional attribute is removed if it fails to load,
+// so instead of a broken image icon the monogram behind it shows
+// (for people), or simply the text (for the logo).
+// If the error happened before the script ran, the
+// complete + naturalWidth check handles it.
 // ==========================================================
 document.querySelectorAll('img[data-optional]').forEach(img => {
   const removeImage = () => img.remove();
@@ -136,16 +136,16 @@ document.querySelectorAll('img[data-optional]').forEach(img => {
 });
 
 // ==========================================================
-// Programok – a lejárt események automatikus kezelése
-// Minden .news-card a data-date (és opcionálisan data-end-date) attribútuma
-// alapján "közelgő" vagy "lejárt". A közelgők a #newsGrid-ben maradnak dátum
-// szerint növekvő sorrendben; a lejártak (az esemény napja után) átkerülnek a
-// "Program Archívum" sávba (#archiveGrid), a legfrissebb elöl, és ott a leírás
-// helyett a beszámoló (.news-report) látszik, ha van (a Facebook-link pedig
-// egyáltalán nem). Ha nincs lejárt
-// program, az archívum sáv rejtve marad; ha nincs közelgő, üres-állapot üzenet
-// jelenik meg. A data-date nélküli hír mindig a közelgők között marad.
-// Az updateNews(now) tetszőleges időponttal újrafuttatható (tesztelés).
+// Programs – automatic handling of past events
+// Every .news-card is "upcoming" or "past" based on its data-date (and optional
+// data-end-date) attribute. Upcoming ones stay in #newsGrid in ascending date
+// order; past ones (after the event day) move to the "Program Archívum"
+// strip (#archiveGrid), the most recent first, where the report (.news-report)
+// is shown instead of the description, if there is one (and the Facebook link
+// not at all). Without past
+// programs the archive strip stays hidden; without upcoming ones an empty-state
+// message appears. A card without data-date always stays among the upcoming ones.
+// updateNews(now) can be re-run with any date (for testing).
 // ==========================================================
 function isPastCard(card, now = new Date()) {
   const endDate = card.dataset.endDate || card.dataset.date;
@@ -153,7 +153,7 @@ function isPastCard(card, now = new Date()) {
   return Boolean(eventEnd && !Number.isNaN(eventEnd.getTime()) && now > eventEnd);
 }
 
-// lejárt programnál a leírás helyett a beszámoló (ha van), és nincs Facebook-link
+// for a past program: the report instead of the description (if any), and no Facebook link
 function applyPastState(card, isPast) {
   const report = card.querySelector('.news-report');
   const description = card.querySelector('.news-desc');
@@ -164,13 +164,13 @@ function applyPastState(card, isPast) {
 
 function updateNews(now = new Date()) {
   const grid = document.getElementById('newsGrid') || document.getElementById('calendarSource');
-  const onCalendarPage = grid?.id === 'calendarSource';   // naptar.html: rejtett kártyák, nincs rendezés
+  const onCalendarPage = grid?.id === 'calendarSource';   // naptar.html: hidden cards, no sorting
   const archive = onCalendarPage ? null : document.getElementById('archiveGrid');
   const archiveSection = document.getElementById('archivum');
   const emptyMessage = document.getElementById('newsEmpty');
   if (!grid) return;
 
-  // Az eredeti (HTML-beli) sorrendet megjegyezzük, hogy többször is lefuttatható legyen
+  // Remember the original (HTML) order so it can be run more than once
   const cards = [...grid.querySelectorAll('.news-card'), ...(archive ? archive.querySelectorAll('.news-card') : [])];
   cards.forEach((card, index) => {
     if (!card.dataset.order) card.dataset.order = String(index);
@@ -187,9 +187,9 @@ function updateNews(now = new Date()) {
     ((isPast && archive) ? past : upcoming).push(card);
   });
 
-  // Alapértelmezett kapcsolattartó: ha egy hírnél nincs megadva "Kérdés esetén
-  // keresd" sor, a programokért felelős csapatparancsnok-helyettes kerül oda
-  // (neve és címe a rács data-default-contact-* attribútumaiban van).
+  // Default contact: if a card has no "Kérdés esetén
+  // keresd" line, the deputy team leader responsible for programs is used
+  // (their name and address are in the grid's data-default-contact-* attributes).
   const defaultName = grid.dataset.defaultContactName;
   const defaultEmail = grid.dataset.defaultContactEmail;
   if (defaultName && defaultEmail) {
@@ -215,7 +215,7 @@ function updateNews(now = new Date()) {
     Number(a.dataset.order) - Number(b.dataset.order);
   if (onCalendarPage) return;
   upcoming.sort(byDate);
-  past.sort((a, b) => byDate(b, a));   // archívum: a legutóbbi elöl
+  past.sort((a, b) => byDate(b, a));   // archive: the most recent first
   upcoming.forEach(card => grid.append(card));
   past.forEach(card => archive.append(card));
 
@@ -228,13 +228,13 @@ function updateNews(now = new Date()) {
 updateNews();
 
 // ==========================================================
-// Főoldal – a következő 7 nap programjainak füle
-// A programokat az programok.html hírdobozaiból olvassa ki (data-date /
-// data-end-date), így nincs külön adatot karbantartani. Ha nincs közelgő
-// program, vagy az programok.html nem olvasható (pl. fájlból megnyitva),
-// a fül nem jelenik meg. A ma és a következő 7 napban kezdődő (vagy épp tartó)
-// programokat mutatja. A bezárás az oldalon belüli lapozás alatt megmarad,
-// újratöltéskor vagy a böngészőlap újbóli megnyitásakor a fül újra megjelenik.
+// Home page – tab with the programs of the next 7 days
+// Reads the programs from the cards of programok.html (data-date /
+// data-end-date), so there is no separate data to maintain. Without upcoming
+// programs, or if programok.html cannot be read (e.g. opened from a file),
+// the tab does not appear. It shows the programs starting (or running) today
+// and in the next 7 days. A dismissal survives navigation within the site;
+// after a reload or reopening the browser tab, the tab shows up again.
 // ==========================================================
 async function initUpcomingTab(now = new Date()) {
   const tab = document.getElementById('upcomingTab');
@@ -268,7 +268,7 @@ async function initUpcomingTab(now = new Date()) {
         date: card.querySelector('.news-date')?.textContent.trim() ?? ''
       };
     })
-    // még nem ért véget, és a következő 7 napon belül kezdődik (vagy már tart)
+    // not over yet, and starts within the next 7 days (or is already running)
     .filter(event => !Number.isNaN(event.start.getTime()) && event.name &&
                      event.end >= now && event.start < windowEnd)
     .sort((a, b) => a.start - b.start);
@@ -295,8 +295,8 @@ async function initUpcomingTab(now = new Date()) {
     addDismissed('upcomingTabClosed', 'closed');
   });
 
-  // A fül a fejléc alatt marad akkor is, ha fölötte értesítősáv látszik
-  // (a sáv elgörgetése után visszaáll az eredeti, CSS-beli helyére).
+  // The tab stays below the header even when a notice bar is shown above it
+  // (after the bar is scrolled away it returns to its original CSS position).
   const header = document.querySelector('.site-header');
   const placeTab = () => {
     if (header) tab.style.top = `${Math.max(90, header.getBoundingClientRect().bottom + 19)}px`;
@@ -307,20 +307,20 @@ async function initUpcomingTab(now = new Date()) {
   placeTab();
 
   tab.hidden = false;
-  // rövid késleltetés, hogy a becsúszás látszódjon
+  // short delay so the slide-in is visible
   setTimeout(() => tab.classList.add('is-visible'), 300);
 }
 
 initUpcomingTab();
 
 // ==========================================================
-// Csatlakozom – a rajok automatikus léptetése szeptember 1-jén
-// Minden .grade-card data-grade (osztály) és data-school-year (a tanév
-// kezdő éve) attribútuma alapján kiszámolja, hogy a raj az adott pillanatban
-// hányadik osztályba jár: grade + (aktuális tanév kezdő éve - school-year).
-// A tanév szeptember 1-jén kezdődik. A 4–8. osztály látszik, sorrendben;
-// ha egy osztályhoz nincs raj, "hamarosan" kártya jelenik meg.
-// Az updateGrades(now) tetszőleges időponttal újrafuttatható (tesztelés).
+// Csatlakozom – automatic step-up of the troops on September 1
+// From every .grade-card's data-grade (grade) and data-school-year (first
+// year of the school year) attributes it computes which grade the troop is in
+// right now: grade + (first year of the current school year - school-year).
+// The school year starts on September 1. Grades 4–8 are shown, in order;
+// for a grade without a troop a "coming soon" card appears.
+// updateGrades(now) can be re-run with any date (for testing).
 // ==========================================================
 function updateGrades(now = new Date()) {
   const grid = document.getElementById('gradesGrid');
@@ -357,27 +357,27 @@ function updateGrades(now = new Date()) {
   }
 
   [...byGrade.keys()].sort((a, b) => a - b).forEach(grade => grid.append(byGrade.get(grade)));
-  // az idősebbeknek szóló kártya mindig a lista végén marad
+  // the card for older kids always stays at the end of the list
   grid.querySelectorAll('.grade-card-extra').forEach(card => grid.append(card));
 }
 
 updateGrades();
 
 // ==========================================================
-// Számlálók – odagörgetéskor "feltekerődnek", mint egy kilométeróra
-// Minden .stat-number data-count attribútuma a végső érték (a HTML-ben
-// is ez áll, így JS nélkül is helyes). A szkript minden számjegyet egy
-// 0–9 számokat tartalmazó, függőlegesen gördülő szalagra cserél; ha a
-// kártyák láthatóvá válnak, a szalagok a helyes számjegyig tekerednek
-// (jobbról balra egyre később állnak meg). Csak egyszer fut le.
-// Csökkentett mozgás beállításnál, illetve régi böngészőben nincs animáció.
+// Counters – they "roll up" when scrolled into view, like an odometer
+// Every .stat-number's data-count attribute is the final value (the HTML
+// holds it too, so it is correct without JS). The script replaces every digit
+// with a vertically rolling strip of the digits 0–9; when the
+// cards become visible, the strips roll to the right digit
+// (stopping later and later from right to left). Runs only once.
+// No animation with reduced motion enabled, or in old browsers.
 // ==========================================================
 function initCounters() {
   const numbers = [...document.querySelectorAll('.stat-number[data-count]')];
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   if (numbers.length === 0 || reduceMotion || !('IntersectionObserver' in window)) return;
 
-  const turns = 2; // ennyi teljes kört tesz meg a szalag a megállás előtt
+  const turns = 2; // full turns the strip makes before stopping
 
   numbers.forEach(element => {
     const text = (Number.parseInt(element.dataset.count, 10) || 0).toLocaleString('hu-HU');
@@ -412,7 +412,7 @@ function initCounters() {
     stats.querySelectorAll('.stat-number').forEach(number => {
       const strips = [...number.querySelectorAll('.odo-strip')];
       strips.forEach((strip, index) => {
-        // a bal oldali számjegyek állnak meg előbb, a jobb szélső utoljára
+        // the left digits stop first, the rightmost one last
         strip.style.transitionDelay = `${index * 0.12}s`;
         strip.style.transform = `translateY(calc(-${strip.dataset.stop} * var(--odo-h)))`;
       });
@@ -433,10 +433,10 @@ function initCounters() {
 initCounters();
 
 // ==========================================================
-// Programok – a kártyasor léptetése nyilakkal
-// Egyszerre 3 kártya látszik (keskenyebb képernyőn 2, illetve 1); a nyilak
-// egy kártyányit lépnek. Ha minden kártya elfér, a nyilak elrejtődnek,
-// az első/utolsó helyen a megfelelő nyíl inaktív.
+// Programs – stepping the card row with arrows
+// 3 cards are visible at a time (2 or 1 on narrower screens); the arrows
+// step by one card. If every card fits, the arrows are hidden;
+// at the first/last position the matching arrow is disabled.
 // ==========================================================
 function initNewsCarousel(carouselId, trackId, prevId, nextId) {
   const carousel = document.getElementById(carouselId);
@@ -470,8 +470,8 @@ function initNewsCarousel(carouselId, trackId, prevId, nextId) {
   window.addEventListener('resize', updateButtons);
   document.addEventListener('newsupdated', updateButtons);
 
-  // Ha egy konkrét hírre mutató linkkel érkeztünk (pl. a főoldali fülről),
-  // a sort arra a kártyára léptetjük.
+  // If we arrived via a link to a specific card (e.g. from the home page tab),
+  // scroll the row to that card.
   const target = location.hash ? document.getElementById(decodeURIComponent(location.hash.slice(1))) : null;
   if (target && track.contains(target) && !target.hidden) {
     track.scrollLeft += target.getBoundingClientRect().left - track.getBoundingClientRect().left;
@@ -484,9 +484,9 @@ initNewsCarousel('newsCarousel', 'newsGrid', 'newsPrev', 'newsNext');
 initNewsCarousel('archiveCarousel', 'archiveGrid', 'archivePrev', 'archiveNext');
 
 // ==========================================================
-// Programképek a kártyán: egyszerre 2 kép látszik, a két oldali nyíllal
-// képenként lehet lépni (mint a programkártyák között). Eseménydelegálással
-// működik, így a naptárban megnyitott (másolt) kártyákon is.
+// Program images on the card: 2 images are visible at a time, the arrows on
+// both sides step one image at a time (like between the program cards). Uses event
+// delegation, so it also works on the (copied) cards opened in the calendar.
 // ==========================================================
 function updateGalleryButtons(gallery) {
   const track = gallery.querySelector('.news-gallery-track');
@@ -504,20 +504,20 @@ document.addEventListener('click', event => {
   const track = button.closest('.news-gallery')?.querySelector('.news-gallery-track');
   const image = track?.querySelector('img');
   if (!image) return;
-  // képindex szerint lépünk (mindig egy kép elejére), így a gyors egymás utáni kattintás sem csúszik el
+  // step by image index (always to the start of an image), so fast repeated clicks do not drift
   const step = image.getBoundingClientRect().width + (parseFloat(getComputedStyle(track).columnGap) || 0);
   const current = Math.round(track.scrollLeft / step);
   const target = Math.max(0, current + (button.classList.contains('gallery-prev') ? -1 : 1));
   const left = Math.min(target * step, track.scrollWidth - track.clientWidth);
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   track.scrollTo({ left, behavior: reducedMotion ? 'auto' : 'smooth' });
-  // a nyilak állapota azonnal a cél szerint (nem várjuk meg a görgetés végét)
+  // update the arrows right away for the target (do not wait for the scroll to end)
   const gallery = button.closest('.news-gallery');
   gallery.querySelector('.gallery-prev').disabled = left <= 2;
   gallery.querySelector('.gallery-next').disabled = left >= track.scrollWidth - track.clientWidth - 2;
 });
 
-// a görgetés nem buborékol, ezért a dokumentumon "elkapva" figyeljük
+// scroll events do not bubble, so we "catch" them on the document
 document.addEventListener('scroll', event => {
   if (event.target.classList?.contains('news-gallery-track')) updateGalleryButtons(event.target.closest('.news-gallery'));
 }, true);
@@ -525,10 +525,10 @@ window.addEventListener('resize', () => document.querySelectorAll('.news-gallery
 document.querySelectorAll('.news-gallery').forEach(updateGalleryButtons);
 
 // ==========================================================
-// Programok – naptár
-// A lap kártyáiból (data-date, opcionálisan data-end-date) építi fel a
-// havi naptárat. A lejárt, a listából már elrejtett programok is benne
-// maradnak. A jelölt napra kattintva a nap programjai jelennek meg alatta.
+// Programs – calendar
+// Builds the monthly calendar from the page's cards (data-date, optionally
+// data-end-date). Past programs already hidden from the list stay in it.
+// Clicking a marked day shows that day's programs below.
 // ==========================================================
 function initCalendar() {
   const root = document.getElementById('calendar');
@@ -595,7 +595,7 @@ function initCalendar() {
       copy.hidden = false;
       copy.classList.remove('news-card-past');
       copy.querySelectorAll('.news-past-label').forEach(label => label.remove());
-      // a másolás gomb szövegét visszaállítjuk (ha éppen a visszajelzés látszott)
+      // restore the copy button's text (if the confirmation was showing)
       copy.querySelectorAll('.share-btn').forEach(btn => {
         btn.classList.remove('is-copied');
         const span = btn.querySelector('span');
@@ -626,10 +626,10 @@ function initCalendar() {
     const weekdayRow = element('div', 'calendar-weekdays');
     weekdays.forEach(name => weekdayRow.append(element('span', '', name)));
 
-    // Mindig 6 hetet mutat (42 nap), így a naptár magassága nem változik;
-    // a hónap elején/végén a szomszédos hónapok napjai is látszanak.
+    // Always shows 6 weeks (42 days), so the calendar height does not change;
+    // days of the neighbouring months show at the start/end of the month.
     const days = element('div', 'calendar-days');
-    const offset = (new Date(year, month, 1).getDay() + 6) % 7; // hétfővel kezdődik a hét
+    const offset = (new Date(year, month, 1).getDay() + 6) % 7; // the week starts on Monday
     for (let i = 0; i < 42; i++) {
       const date = new Date(year, month, 1 - offset + i);
       const day = date.getDate();
@@ -638,8 +638,8 @@ function initCalendar() {
       const cell = element(dayEvents.length ? 'button' : 'div', 'cal-day');
       if (date.getMonth() !== month) cell.classList.add('other-month');
       if (key === todayKey) cell.classList.add('today');
-      // a hónap első napja mellett a hónap rövid neve is látszik (pl. "nov. 1"); telefonon a
-      // keskeny cellában ez elrejtődik (.cal-mon), ott csak a szám áll
+      // the first day of the month also shows the short month name (e.g. "nov. 1"); on phones
+      // it is hidden in the narrow cell (.cal-mon), only the number stays
       const num = element('span', 'cal-num');
       if (day === 1) num.append(element('span', 'cal-mon', `${monthNames[date.getMonth()].slice(0, 3)}. `));
       num.append(String(day));
@@ -673,11 +673,11 @@ function initCalendar() {
 initCalendar();
 
 // ==========================================================
-// Másolás gombok (data-copy attribútum): a megadott szöveget a vágólapra
-// teszi, és két másodpercre pipára cseréli az ikont. Ha a böngésző nem
-// engedi a vágólap használatát, az ikon a hibát jelzi a címkében, az érték
-// pedig kézzel kijelölhető marad. Egy közös (delegált) eseménykezelő
-// dolgozik, így a később létrehozott gombokkal (pl. a naptár részletei) is működik.
+// Copy buttons (data-copy attribute): puts the given text on the clipboard
+// and swaps the icon for a check mark for two seconds. If the browser does not
+// allow clipboard access, the icon signals the error in its label, and the value
+// stays selectable by hand. One shared (delegated) event handler
+// does the work, so it also works with buttons created later (e.g. calendar details).
 // ==========================================================
 const copyTimers = new WeakMap();
 
@@ -686,7 +686,7 @@ async function copyToClipboard(value) {
     await navigator.clipboard.writeText(value);
     return true;
   } catch (e) {
-    // régebbi böngésző / nem biztonságos környezet: ideiglenes beviteli mező
+    // older browser / insecure context: temporary input field
     const field = document.createElement('textarea');
     field.value = value;
     field.setAttribute('readonly', '');
@@ -721,8 +721,8 @@ document.addEventListener('click', async event => {
 });
 
 // ==========================================================
-// Minden e-mail cím (mailto link) mellé másolás gombot tesz (a láblécben és a programok kártyáin nem).
-// Az oldal végén fut, hogy a korábban létrehozott elemeket is elérje.
+// Adds a copy button next to every e-mail address (mailto link) (not in the footer or on program cards).
+// Runs at the end of the page so it reaches the elements created earlier.
 // ==========================================================
 document.querySelectorAll('a[href^="mailto:"]').forEach(link => {
   const address = link.getAttribute('href').slice('mailto:'.length).split('?')[0];
@@ -747,14 +747,14 @@ document.querySelectorAll('a[href^="mailto:"]').forEach(link => {
 });
 
 // ==========================================================
-// Programkártya nagyítva: a kártyára kattintva felugró ablak nyílik. Bal
-// oldalt (telefonon felül) a kártya szövegei és gombjai, a fő helyen a
-// program képei és videói több oszlopos, fel-le görgethető galériában (vágás
-// nélkül); a képre vagy videóra kattintva a nagyító nyílik (a videó ott,
-// a lejátszás gombra kattintva indul a Drive lejátszójával). A kártyán lévő linkek, gombok és
-// lapozónyilak a megszokott módon működnek; a kártya bélyegképére kattintva
-// az ablak annál a képnél nyílik meg. Bezárás: ×, háttérre kattintás, Esc.
-// A naptár alatt megjelenő (másolt) kártyákon is működik.
+// Program card enlarged: clicking the card opens a pop-up. On the left
+// (on top on phones) the card's texts and buttons, in the main area the
+// program's images and videos in a multi-column, vertically scrolling gallery (without
+// cropping); clicking an image or video opens the lightbox (the video starts there
+// when its play button is clicked, in the Drive player). Links, buttons and
+// paging arrows on the card work as usual; clicking a card thumbnail
+// opens the pop-up at that image. Closing: ×, clicking the backdrop, Esc.
+// Also works on the (copied) cards shown below the calendar.
 // ==========================================================
 (function initProgramModal() {
   if (!document.getElementById('newsGrid') && !document.getElementById('calendarSource')) return;
@@ -781,7 +781,7 @@ document.querySelectorAll('a[href^="mailto:"]').forEach(link => {
 
   function open(card, imageIndex = -1) {
     opener = card;
-    // a szövegek és gombok (a kártya képsávja nélkül); a megosztás gomb a .news-card-ból dolgozik
+    // the texts and buttons (without the card's image strip); the share button works from the .news-card
     text.replaceChildren(...[...card.children]
       .filter(child => !child.classList.contains('news-gallery'))
       .map(child => child.cloneNode(true)));
@@ -795,7 +795,7 @@ document.querySelectorAll('a[href^="mailto:"]').forEach(link => {
     gallery.replaceChildren(...images.map(source => {
       if (source.dataset.video) return videoTile(source);
       const img = document.createElement('img');
-      img.src = source.dataset.full || source.src;   // itt a nagy változat
+      img.src = source.dataset.full || source.src;   // the large version here
       img.dataset.full = source.dataset.full || source.src;
       img.alt = source.alt;
       img.loading = 'lazy';
@@ -818,8 +818,8 @@ document.querySelectorAll('a[href^="mailto:"]').forEach(link => {
     closeButton.focus();
   }
 
-  // Videó: előnézeti kép lejátszás ikonnal; kattintásra (mint a képeknél) a nagyító nyílik,
-  // ott indítható a Drive lejátszója
+  // Video: preview image with a play icon; on click (as with images) the lightbox opens,
+  // where the Drive player can be started
   function videoTile(source) {
     const tile = document.createElement('div');
     tile.className = 'program-modal-video';
@@ -846,7 +846,7 @@ document.querySelectorAll('a[href^="mailto:"]').forEach(link => {
   document.addEventListener('click', event => {
     const card = event.target.closest(CARDS);
     if (!card || overlay.contains(card)) return;
-    if (event.target.closest('a, button')) return;   // linkek, gombok, lapozónyilak
+    if (event.target.closest('a, button')) return;   // links, buttons, paging arrows
     const thumb = event.target.closest('.news-gallery img');
     const index = thumb ? [...card.querySelectorAll('.news-gallery img')].indexOf(thumb) : -1;
     open(card, index);
@@ -854,7 +854,7 @@ document.querySelectorAll('a[href^="mailto:"]').forEach(link => {
 
   document.addEventListener('keydown', event => {
     if (!overlay.hidden) {
-      // ha fölötte a nagyító is nyitva van, az Esc azt zárja be
+      // if the lightbox is open above it, Esc closes that
       if (event.key === 'Escape' && document.querySelector('.lightbox:not([hidden])') === null) close();
       return;
     }
@@ -870,7 +870,7 @@ document.querySelectorAll('a[href^="mailto:"]').forEach(link => {
     if (event.target === overlay) close();
   });
 
-  // billentyűzettel is elérhető kártyák (a naptár másolatai a klónozással öröklik)
+  // cards reachable by keyboard too (the calendar copies inherit it through cloning)
   const prepare = card => {
     card.tabIndex = 0;
     card.setAttribute('aria-haspopup', 'dialog');
@@ -880,13 +880,13 @@ document.querySelectorAll('a[href^="mailto:"]').forEach(link => {
 })();
 
 // ==========================================================
-// Nagyítás (lightbox): a .camp-col képekre kattintva a kép teljes méretben,
-// sötét háttéren jelenik meg (felirat nélkül). Bezárás: × gomb, háttérre kattintás vagy Esc;
-// léptetés: nyilak a gombokkal vagy a billentyűzeten (bal/jobb nyíl).
+// Lightbox: clicking the .camp-col images shows the image at full size
+// on a dark background (without a caption). Closing: × button, clicking the backdrop or Esc;
+// stepping: arrows with the buttons or on the keyboard (left/right arrow).
 // ==========================================================
 (function initLightbox() {
   const SELECTOR = '.camp-col img, .camp-media-3 img, .side-photos img, .home-gallery img, .team-split-image img, .program-modal-gallery img, .site-gallery img';
-  // a programok oldalán a képek csak a felugró ablakban jelennek meg később, ezért ott is kell
+  // on the programs page the images only appear later in the pop-up, so they are needed there too
   if (!document.querySelector(SELECTOR) && !document.querySelector('#newsGrid, #calendarSource')) return;
 
   const overlay = document.createElement('div');
@@ -914,10 +914,10 @@ document.querySelectorAll('a[href^="mailto:"]').forEach(link => {
     index = (i + images.length) % images.length;
     const item = images[index];
     const src = item.dataset.full || item.currentSrc || item.src;
-    videoStage.replaceChildren();   // a továbblapozás leállítja az épp futó videót
+    videoStage.replaceChildren();   // moving on stops the video that is playing
     if (item.dataset.video) {
-      // videó: előbb csak az előnézet és a lejátszás gomb; kattintásra indul a Drive lejátszója
-      // (a Google-höz csak ekkor kapcsolódik az oldal)
+      // video: at first only the preview and the play button; a click starts the Drive player
+      // (the page only connects to Google at that point)
       view.hidden = true;
       videoStage.hidden = false;
       const poster = document.createElement('img');
@@ -939,15 +939,15 @@ document.querySelectorAll('a[href^="mailto:"]').forEach(link => {
     } else {
       videoStage.hidden = true;
       view.hidden = false;
-      // a kis bélyegkép helyett a nagy változatot töltjük be (data-full)
+      // load the large version (data-full) instead of the small thumbnail
       view.src = src;
       view.alt = item.alt;
     }
   }
 
   function open(trigger) {
-    // egy program képei (data-gallery) egymás között lapozhatók, a többi kép az egész oldalon;
-    // a sorrend a megjelenés (DOM) szerinti
+    // one program's images (data-gallery) page among themselves, the other images across the whole page;
+    // the order is the order of appearance (DOM)
     const gallery = trigger.closest('[data-gallery]');
     images = gallery ? [...gallery.querySelectorAll('img')]
       : [...document.querySelectorAll(SELECTOR)].filter(img => !img.closest('[data-gallery]'));
@@ -960,7 +960,7 @@ document.querySelectorAll('a[href^="mailto:"]').forEach(link => {
 
   function close() {
     overlay.hidden = true;
-    videoStage.replaceChildren();   // a videó leáll
+    videoStage.replaceChildren();   // the video stops
     document.body.style.overflow = document.querySelector('.program-modal:not([hidden])') ? 'hidden' : '';
     opener?.focus();
   }
@@ -972,7 +972,7 @@ document.querySelectorAll('a[href^="mailto:"]').forEach(link => {
   }
   document.querySelectorAll(SELECTOR).forEach(prepare);
 
-  // eseménydelegálás: a később (pl. a naptárban) másolt képek is nagyíthatók
+  // event delegation: images copied later (e.g. into the calendar) can be enlarged too
   document.addEventListener('click', event => {
     const image = event.target.closest?.(SELECTOR);
     if (image && !overlay.contains(image)) open(image);
@@ -1000,12 +1000,12 @@ document.querySelectorAll('a[href^="mailto:"]').forEach(link => {
 })();
 
 // ==========================================================
-// "Üzenet másolása" gomb a programoknál
-// Minden id-vel rendelkező .news-card aljára egy gombot tesz, amely a
-// program rövid üzenetét a vágólapra másolja, hogy be lehessen illeszteni
-// WhatsAppba, Messengerbe vagy bárhova. Az üzenet a kártyából áll össze:
-// név, dátum, időpont, helyszín és a program linkje. A kapcsolattartók
-// adatai szándékosan nincsenek benne.
+// "Üzenet másolása" (copy message) button on programs
+// Adds a button to the bottom of every .news-card with an id, which copies the
+// program's short message to the clipboard, to paste it into
+// WhatsApp, Messenger or anywhere. The message is built from the card:
+// name, date, time, place and the program's link. The contacts'
+// details are deliberately left out.
 // ==========================================================
 const COPY_ICON =
   '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/>' +
@@ -1040,10 +1040,10 @@ const CALENDAR_ICON =
   '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/>' +
   '<path d="M3 10h18M8 3v4M16 3v4"/></svg>';
 
-// A Google Naptár "esemény létrehozása" hivatkozása, előre kitöltve (a látogatónak
-// csak a Mentés gombot kell megnyomnia). Ha a kártyán van időpont (pl. "14:00–20:00"
-// vagy "17:45"), időponthoz kötött esemény lesz; ha nincs, egész napos.
-// Egy időpontnál (pl. gyülekező) alapból 1 órás eseményt hoz létre.
+// The Google Calendar "create event" link, pre-filled (the visitor only has
+// to press Save). If the card has a time (e.g. "14:00–20:00"
+// or "17:45"), it becomes a timed event; otherwise an all-day one.
+// With a single time (e.g. a meeting time) it creates a 1-hour event by default.
 function buildCalendarLink(card) {
   const startDate = card.dataset.date;
   if (!startDate) return '';
@@ -1056,7 +1056,7 @@ function buildCalendarLink(card) {
 
   let dates;
   if (times.length === 0) {
-    // egész napos: a befejezés napja nem tartozik bele, ezért a következő nap
+    // all-day: the end day is exclusive, so the next day
     const [y, m, d] = endDate.split('-').map(Number);
     const next = new Date(y, m - 1, d + 1);
     const nextKey = `${next.getFullYear()}${pad2(next.getMonth() + 1)}${pad2(next.getDate())}`;
@@ -1100,7 +1100,7 @@ function buildCalendarLink(card) {
 const programsUrl = id => `${location.origin}${location.pathname.replace(/[^/]*$/, '')}programok.html#${id}`;
 
 document.querySelectorAll('#newsGrid .news-card[id], #calendarSource .news-card[id]').forEach(card => {
-  if (card.closest('#calendarSource') && isPastCard(card)) return;   // lejárt programhoz nem kell
+  if (card.closest('#calendarSource') && isPastCard(card)) return;   // not needed for a past program
   const actions = document.createElement('div');
   actions.className = 'news-actions';
   const button = document.createElement('button');
@@ -1140,11 +1140,11 @@ document.addEventListener('click', async event => {
 });
 
 // ==========================================================
-// Személyek bemutatkozó ablaka
-// A .person-card.has-bio kártyára kattintva felugró ablakban megjelenik a személy
-// képe, neve, szerepe, a "Miért keresd?" lista és a másolható e-mail cím(ek).
-// A tartalom a kártyán belüli rejtett .person-bio blokkból jön. Bezárás: × gomb,
-// háttérre kattintás vagy Esc. A kártyán lévő linkekre/gombokra kattintás nem nyitja meg.
+// People's introduction pop-up
+// Clicking a .person-card.has-bio card opens a pop-up with the person's
+// photo, name, role, introduction and copyable e-mail address(es).
+// The content comes from the hidden .person-bio block inside the card. Closing: × button,
+// clicking the backdrop or Esc. Clicking links/buttons on the card does not open it.
 // ==========================================================
 (function initPersonModals() {
   const cards = [...document.querySelectorAll('.person-card.has-bio')];
@@ -1187,7 +1187,7 @@ document.addEventListener('click', async event => {
 
     body.replaceChildren();
     bio?.childNodes.forEach(node => {
-      if (node.nodeType === 1 && node.classList.contains('person-bio-role')) return; // a szerep a fejlécben van
+      if (node.nodeType === 1 && node.classList.contains('person-bio-role')) return; // the role is in the header
       body.append(node.cloneNode(true));
     });
 
@@ -1231,11 +1231,11 @@ document.addEventListener('click', async event => {
 })();
 
 // ==========================================================
-// Rólunk / Csapatotthonunk: váltakozó "szöveg + fotók" blokkok (mint a Tábor oldalon)
-// A .side-photos blokk fotóit és a szöveg szakaszait (h3 címek) a script összepárosítja: a szöveget
-// egyenletes hosszúságú részekre bontja, és mindegyik mellé 2-3 fotót tesz kollázsként
-// (.camp-block / .camp-media / .camp-col, ugyanaz a stílus, mint a Tábor oldalon). A blokkok
-// váltakozva a bal és a jobb oldalra teszik a képeket; telefonon a képek a szöveg fölött állnak.
+// Rólunk / Csapatotthonunk: alternating "text + photos" blocks (as on the Tábor page)
+// The script pairs the photos of the .side-photos block with the text sections (h3 headings): it
+// splits the text into parts of even length and puts 2-3 photos next to each as a collage
+// (.camp-block / .camp-media / .camp-col, the same style as on the Tábor page). The blocks
+// alternate the images between left and right; on phones the images sit above the text.
 // ==========================================================
 (function initSplitBlocks() {
   document.querySelectorAll('.has-side-photos').forEach(section => {
@@ -1245,7 +1245,7 @@ document.addEventListener('click', async event => {
     const images = [...holder.querySelectorAll('img')];
     if (images.length === 0) return;
 
-    // a szöveg szakaszai: minden h3-tól a következő h3-ig (a forrás-sor a végén marad)
+    // text sections: from each h3 to the next h3 (the source line stays at the end)
     const groups = [];
     let current = null;
     let firstHeading = null;
@@ -1267,7 +1267,7 @@ document.addEventListener('click', async event => {
     const chunks = [];
     let chunk = [];
     if (groups.some(group => group[0].classList.contains('block-start'))) {
-      // kézi tördelés: a .block-start osztályú címnél kezdődik új blokk
+      // manual breaks: a new block starts at a heading with the .block-start class
       groups.forEach(group => {
         if (group[0].classList.contains('block-start') && chunk.length) {
           chunks.push(chunk);
@@ -1276,7 +1276,7 @@ document.addEventListener('click', async event => {
         chunk.push(group);
       });
     } else {
-      // a szakaszokat összefüggő, hozzávetőleg egyenlő hosszú részekre osztjuk
+      // split the sections into contiguous parts of roughly equal length
       let acc = 0;
       groups.forEach((group, i) => {
         chunk.push(group);
@@ -1294,7 +1294,7 @@ document.addEventListener('click', async event => {
     const base = Math.floor(images.length / chunks.length);
     const extra = images.length % chunks.length;
     const fragment = document.createDocumentFragment();
-    // a blokkok helye: az első cím elé tett jelölő (maga a cím is átkerül a szövegdobozba)
+    // place of the blocks: a marker put before the first heading (the heading itself moves into the text box)
     const marker = document.createComment('');
     firstHeading.before(marker);
     let imageIndex = 0;
@@ -1311,11 +1311,11 @@ document.addEventListener('click', async event => {
       if (index % 2 === 1) media.style.cssText = '--col1:54%;--col2:56%;--overlap:-10%';
 
       if (blockImages.length === 3) {
-        // 3 kép: egy lépcsőzetes, egymásra kissé ráfedő oszlop (nem két oszlop)
+        // 3 images: one staggered column, slightly overlapping (not two columns)
         media.classList.add('camp-media-3');
         blockImages.forEach(img => media.append(img));
       } else {
-        // oszlopok: az első oszlopba kevesebb vagy ugyanannyi kép, a másodikba a többi
+        // columns: the first column gets fewer or the same number of images, the second the rest
         const firstCount = Math.floor(blockImages.length / 2) || blockImages.length;
         [blockImages.slice(0, firstCount), blockImages.slice(firstCount)].forEach(list => {
           if (list.length === 0) return;
@@ -1340,13 +1340,13 @@ document.addEventListener('click', async event => {
 })();
 
 // ==========================================================
-// Pénzügyek oldal: fülek (Tagdíj / Nagytábordíj / Kcs tábordíj) és időablak
-// Fülsáv nincs (a tulajdonos kérése): a fül a címben lévő #tagdij / #nagytabor /
-// #kcstabor alapján nyílik, azaz a menü Pénzügyek lenyílójából; cím nélkül a Tagdíj.
-// Időszak: a fülnek (.fee-panel) a data-from / data-until napjai között látszik a
-// tartalma (a vég napja még beleszámít; data-until nélkül nincs vége); azon kívül,
-// vagy ha nincs data-from, a .fee-empty alapüzenet. A tartalmat a Google Táblázatból
-// a tools/sync_penzugyek.py írja. Teszt a konzolban:
+// Pénzügyek page: tabs (Tagdíj / Nagytábordíj / Kcs tábordíj) and time window
+// There is no tab bar (the owner's request): the tab opens from the #tagdij / #nagytabor /
+// #kcstabor hash, i.e. from the Pénzügyek dropdown in the menu; without a hash, Tagdíj.
+// Period: a tab's (.fee-panel) content is shown between its data-from / data-until days
+// (the end day still counts; without data-until there is no end); outside that,
+// or without data-from, the .fee-empty default message. The content is written from the
+// Google Sheet by tools/sync_fees.py. Test in the console:
 // updateFees(new Date('2026-03-15T10:00:00'))
 // ==========================================================
 function updateFees(now = new Date()) {
@@ -1359,8 +1359,8 @@ function updateFees(now = new Date()) {
     if (content) content.hidden = !active;
     if (empty) empty.hidden = active;
   });
-  // A támogatás-igénylés: a határidő UTÁNI nap 23:59-kor az űrlap eltűnik (és ki is kerül az
-  // oldalból, így nem érhető el), a helyén a "határidő lejárt" üzenet jelenik meg.
+  // Support request: at 23:59 on the day AFTER the deadline the form disappears (and is removed
+  // from the page, so it cannot be reached), and the "deadline passed" message takes its place.
   document.querySelectorAll('.fee-form[data-until]').forEach(form => {
     const closed = now >= feeFormCloseTime(form);
     const open = form.querySelector('.fee-form-open');
@@ -1371,14 +1371,14 @@ function updateFees(now = new Date()) {
   });
 }
 
-// a határidő utáni nap 23:59
+// 23:59 on the day after the deadline
 function feeFormCloseTime(form) {
   const close = new Date(`${form.dataset.until}T23:59:00`);
   close.setDate(close.getDate() + 1);
   return close;
 }
 
-// ha az oldal nyitva marad, a zárás pillanatában magától frissül
+// if the page stays open, it updates itself at the moment of closing
 (function scheduleFeeFormClose() {
   const ends = [...document.querySelectorAll('.fee-form[data-until]')]
     .map(form => feeFormCloseTime(form).getTime())
@@ -1388,13 +1388,13 @@ function feeFormCloseTime(form) {
   if (wait < 2 ** 31) setTimeout(() => { updateFees(); scheduleFeeFormClose(); }, wait);
 })();
 
-// A Kcs tábordíj fül kapcsolata: a Rajok táblázat kártyái közül csak az látszik, amelyik raj
-// most 4. osztályos (ugyanaz a számítás, mint a Csatlakozom oldalon). Igazat ad vissza, ha
-// van ilyen raj; ha nincs, a fülön a pénzügyi felelős marad a kapcsolat.
-function updateKcsContact(now = new Date()) {
+// Contact of the Kcs tábordíj (cub camp fee) tab: of the Rajok sheet's cards only the one of the troop
+// that is in 4th grade now is shown (the same calculation as on the Csatlakozom page). Returns true if
+// there is such a troop; if not, the finance deputy stays the contact on the tab.
+function updateCubCampContact(now = new Date()) {
   const schoolYear = now.getMonth() >= 8 ? now.getFullYear() : now.getFullYear() - 1;
   let found = false;
-  document.querySelectorAll('.fee-raj-contact [data-school-year]').forEach(card => {
+  document.querySelectorAll('.fee-troop-contact [data-school-year]').forEach(card => {
     const grade = Number(card.dataset.grade) + (schoolYear - Number(card.dataset.schoolYear));
     card.hidden = grade !== 4;
     if (!card.hidden) found = true;
@@ -1412,18 +1412,18 @@ function updateKcsContact(now = new Date()) {
 
   function select(name) {
     if (!names.includes(name)) name = names[0];
-    // a címsávban a fül neve áll (Tagdíj / Nagytábordíj / Kcs tábordíj), nem a "Pénzügyek"
+    // the title banner shows the tab's name (Tagdíj / Nagytábordíj / Kcs tábordíj), not "Pénzügyek"
     const label = panels.find(panel => panel.dataset.tab === name).dataset.label;
     if (banner && label) banner.textContent = label;
     if (label) document.title = `${label} – ${baseTitle}`;
-    // kapcsolat a fül alján; a Kcs fülön a 4. osztályos raj, ha nincs ilyen, a pénzügyi felelős
-    const contactFor = name === 'kcstabor' && !updateKcsContact() ? 'tagdij' : name;
+    // contact at the bottom of the tab; on the Kcs tab the 4th-grade troop, or the finance deputy if there is none
+    const contactFor = name === 'kcstabor' && !updateCubCampContact() ? 'tagdij' : name;
     document.querySelectorAll('.fee-contact[data-for]').forEach(contact => {
       contact.hidden = !contact.dataset.for.split(' ').includes(contactFor);
     });
     panels.forEach(panel => {
       panel.hidden = panel.dataset.tab !== name;
-      // a beágyazott űrlap (Google) csak akkor töltődik be, ha a fülje látszik
+      // the embedded (Google) form only loads when its tab is visible
       if (!panel.hidden) panel.querySelectorAll('.fee-form-open:not([hidden]) iframe[data-src]').forEach(frame => {
         frame.src = frame.dataset.src;
         frame.removeAttribute('data-src');
@@ -1436,6 +1436,6 @@ function updateKcsContact(now = new Date()) {
   }
 
   window.addEventListener('hashchange', () => select(location.hash.slice(1)));
-  updateFees();   // előbb az időszakok és a lejárt űrlapok, hogy lejárt űrlap be se töltődjön
+  updateFees();   // first the periods and the expired forms, so an expired form never loads
   select(location.hash.slice(1));
 })();

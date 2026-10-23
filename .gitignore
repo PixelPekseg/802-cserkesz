@@ -1,8 +1,8 @@
 .DS_Store
 Thumbs.db
 
-# kész, de még nem publikált tervezetek (pl. adatkezelési tájékoztató)
+# finished but not yet published drafts (e.g. the privacy notice)
 drafts/
 
-# eredeti / tömörítetlen képek (az oldal az images/webp/ mappát használja)
+# original / uncompressed images (the site uses the images/webp/ folder)
 images/originals/

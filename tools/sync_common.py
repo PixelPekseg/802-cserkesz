@@ -1,7 +1,7 @@
-"""Közös segédfüggvények a Google Táblázatból (közzétett CSV) dolgozó frissítő szkriptekhez.
+"""Shared helpers for the sync scripts that build page sections from Google Sheets.
 
-Használja: sync_taborok.py, sync_rajok.py
-(a sync_programok.py önálló, ugyanezeket az elveket követi).
+Used by most tools/sync_*.py scripts (sync_programs.py has its own copy of the basics but
+follows the same rules). Log messages stay in Hungarian: they are read by the sheet editors.
 """
 import argparse
 import csv
@@ -25,20 +25,20 @@ def fail(message):
     sys.exit(1)
 
 
-# Két közös táblázat, mindkettő egészben, Excel (.xlsx) formátumban közzétéve. Ha a címe meg van
-# adva, a szkriptek a saját lapjukat ebből olvassák, és a régi, lapokénti CSV-címeket nem használják.
-#   CSAPAT_TABLAZAT_URL  – "Csapat adatai" (szűk kör szerkeszti): Csapatvezetés, Rajok, Számlálók, Táborok
-#   VEZETOI_TABLAZAT_URL – "Vezetői táblázat" (minden vezető szerkeszti): Programok, Értesítők, Eszközök,
-#                          Eszközök kapcsolattartója
-CSAPAT_ENV = 'CSAPAT_TABLAZAT_URL'
-VEZETOI_ENV = 'VEZETOI_TABLAZAT_URL'
+# Two shared workbooks, each published as a whole in Excel (.xlsx) format. When the URL is set,
+# the scripts read their own sheet from it and ignore the old per-sheet CSV URLs.
+#   TEAM_SHEET_URL    – "Csapat adatai" (edited by a small group): Csapatvezetés, Rajok, Számlálók, Táborok
+#   LEADERS_SHEET_URL – "Vezetői táblázat" (edited by every leader): Programok, Értesítők, Eszközök,
+#                       Eszközök kapcsolattartója
+TEAM_SHEET_ENV = 'TEAM_SHEET_URL'
+LEADERS_SHEET_ENV = 'LEADERS_SHEET_URL'
 
 
 def get_args(env_name):
     parser = argparse.ArgumentParser()
     parser.add_argument('--url')
     parser.add_argument('--file')
-    parser.add_argument('--xlsx', help='a közös táblázat helyi .xlsx fájlja')
+    parser.add_argument('--xlsx', help='local .xlsx copy of the shared workbook')
     return parser.parse_args(), env_name
 
 
@@ -47,7 +47,7 @@ def _cell_csv(value):
     if value is None:
         return ''
     if isinstance(value, datetime.datetime):
-        if value.date() == datetime.date(1899, 12, 30):   # csak időpont (Excel-dátum nulla napja)
+        if value.date() == datetime.date(1899, 12, 30):   # time only (day zero of Excel dates)
             return value.strftime('%H:%M')
         if value.time() != datetime.time(0, 0):
             return value.strftime('%Y.%m.%d. %H:%M')
@@ -62,7 +62,7 @@ def _cell_csv(value):
 
 
 def xlsx_sheet_as_csv(data, sheet_name):
-    """A közös táblázat egy lapját CSV-szöveggé alakítja (ugyanúgy, mint a lapokénti CSV-közzététel)."""
+    """Converts one sheet of the shared workbook to CSV text (the same as a per-sheet CSV export)."""
     try:
         import openpyxl
     except ImportError:
@@ -76,7 +76,7 @@ def xlsx_sheet_as_csv(data, sheet_name):
     if sheet is None:
         fail(f'A közös táblázatban nincs "{sheet_name}" lap. Valaki átnevezte vagy törölte?')
     rows = [[_cell_csv(v) for v in row] for row in sheet.iter_rows(values_only=True)]
-    while rows and not any(cell.strip() for cell in rows[-1]):   # a végi üres sorok (mint a CSV-exportban)
+    while rows and not any(cell.strip() for cell in rows[-1]):   # trailing empty rows (as in the CSV export)
         rows.pop()
     out = io.StringIO()
     csv.writer(out, lineterminator='\n').writerows(rows)
@@ -87,8 +87,8 @@ _BOOKS = {}
 
 
 def shared_sheet_csv(args, sheet, book_env):
-    """A közös táblázat (--xlsx helyi fájl vagy a book_env címe) egy lapja CSV-szövegként, vagy
-    None, ha nincs megadva közös táblázat. A letöltött fájlt egy futáson belül újrahasználja."""
+    """One sheet of the shared workbook (local --xlsx file or the URL in book_env) as CSV text, or
+    None when no shared workbook is configured. The download is reused within one run."""
     if getattr(args, 'file', None):
         return None
     path, url = getattr(args, 'xlsx', None), os.environ.get(book_env)
@@ -108,9 +108,9 @@ def shared_sheet_csv(args, sheet, book_env):
     return xlsx_sheet_as_csv(_BOOKS[key], sheet)
 
 
-def fetch(args, env_name, sheet=None, book_env=CSAPAT_ENV):
-    """A lap tartalma CSV-szövegként. Sorrend: --file (CSV) · a közös táblázat (--xlsx vagy a
-    book_env címe, ha a szkript megadja a lapja nevét) · a régi, lapokénti CSV-cím."""
+def fetch(args, env_name, sheet=None, book_env=TEAM_SHEET_ENV):
+    """The sheet's content as CSV text. Order: --file (CSV) · the shared workbook (--xlsx or the
+    URL in book_env, when the script passes its sheet name) · the old per-sheet CSV URL."""
     if sheet:
         text = shared_sheet_csv(args, sheet, book_env)
         if text is not None:
@@ -134,21 +134,21 @@ SHEET_ERRORS = ('#ERROR!', '#NAME?', '#REF!', '#VALUE!', '#N/A', '#DIV/0!', '#NU
 
 
 def is_sheet_error(value):
-    """A Google Táblázat hibaértéke (pl. "+36 …" képletként értelmezve #ERROR! lesz) – ne kerüljön ki az oldalra."""
+    """A Google Sheets error value (e.g. "+36 …" parsed as a formula becomes #ERROR!) – never publish it."""
     return value.strip().upper() in SHEET_ERRORS
 
 
 def read_table(csv_text, columns, required):
-    """A fejléc alapján oszlopindexeket keres (a fejléc ELEJÉT kisbetűsen hasonlítja; egy kulcshoz
-    több előtag is megadható tuple-ként), és
-    a sorokat szótárakként adja vissza: [(sorszám, {kulcs: érték}), ...]."""
+    """Finds column indexes from the header row (compares the START of each header, lowercased;
+    a key may accept several prefixes as a tuple) and returns the rows as dicts:
+    [(line number, {key: value}), ...]."""
     rows = list(csv.reader(io.StringIO(csv_text)))
     if not rows:
         fail('A táblázat üres.')
     lowered = [cell.strip().lower() for cell in rows[0]]
     index = {}
     for key, prefix in columns.items():
-        prefixes = prefix if isinstance(prefix, tuple) else (prefix,)   # több elfogadott fejléc is lehet
+        prefixes = prefix if isinstance(prefix, tuple) else (prefix,)   # several accepted headers
         for i, cell in enumerate(lowered):
             if cell.startswith(prefixes):
                 index[key] = i
@@ -174,18 +174,18 @@ def read_table(csv_text, columns, required):
 
 
 def fix_phone(phone):
-    """Ha a táblázat a "+36 …" számot számmá alakította (pl. 36707582659), visszaadja olvasható
-    formában (+36 70 758 2659). Minden más beírást változatlanul hagy."""
+    """If the sheet turned "+36 …" into a number (e.g. 36707582659), returns it in readable form
+    (+36 70 758 2659). Any other input is returned unchanged."""
     raw = phone.strip()
-    if re.fullmatch(r'36\d{9}', raw):          # mobil / vidéki: 36 + 2 jegyű körzet + 7 jegy
+    if re.fullmatch(r'36\d{9}', raw):          # mobile / regional: 36 + 2-digit area code + 7 digits
         return f'+36 {raw[2:4]} {raw[4:7]} {raw[7:]}'
-    if re.fullmatch(r'361\d{7}', raw):         # budapesti: 36 1 + 7 jegy
+    if re.fullmatch(r'361\d{7}', raw):         # Budapest: 36 1 + 7 digits
         return f'+36 1 {raw[3:6]} {raw[6:]}'
     return phone
 
 
 def contact_lines(email, phone):
-    """E-mail és telefon HTML-hivatkozásai (mindkettő opcionális)."""
+    """HTML links for an e-mail address and a phone number (both optional)."""
     lines = []
     if email:
         if '@' in email:
@@ -203,8 +203,8 @@ def contact_lines(email, phone):
 
 
 def replace_block(page_path, marker, body, indent):
-    """A page-ben a <!-- MARKER:START ... --> és <!-- MARKER:END --> közötti részt cseréli.
-    Igazat ad vissza, ha az oldal változott."""
+    """Replaces the part between <!-- MARKER:START ... --> and <!-- MARKER:END --> in the page.
+    Returns True if the page changed."""
     with open(page_path, encoding='utf-8') as handle:
         page = handle.read()
     pattern = re.compile(r'(<!-- %s:START[^\n]*-->\n)(.*?)(\n[ \t]*<!-- %s:END -->)' % (marker, marker), re.S)

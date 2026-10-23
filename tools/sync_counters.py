@@ -1,16 +1,16 @@
 #!/usr/bin/env python3
-"""A közzétett Google Táblázat (Számlálók lap, CSV) alapján frissíti a számláló-kártyákat
-(Tagok, Rajok, Őrsök …) a főoldal "Csapatunk" szekciójában és a Rólunk oldalon.
+"""Updates the counter cards (members, troops, patrols …) in the "Csapatunk" section of the home
+page and on the Rólunk page from the Számlálók sheet.
 
-Használat:
-    python tools/sync_szamlalok.py                # a SZAMLALOK_CSV_URL környezeti változóból tölt
-    python tools/sync_szamlalok.py --url <link>
-    python tools/sync_szamlalok.py --file x.csv   # helyi fájlból (teszteléshez)
+Usage:
+    python tools/sync_counters.py                 # from TEAM_SHEET_URL (or the old COUNTERS_CSV_URL)
+    python tools/sync_counters.py --xlsx t.xlsx   # from a local copy of the shared workbook
+    python tools/sync_counters.py --file x.csv    # from a local CSV file (for testing)
 
-Az oldalak <!-- SZAMLALOK:START --> és <!-- SZAMLALOK:END --> közötti részét írja újra.
-A kártyán a végső szám áll (JS nélkül is helyes); a feltekerődő animációt a script.js
-(initCounters) adja a data-count attribútum alapján.
-Hibás táblázat esetén hibával leáll, és semmit nem módosít.
+Rewrites the part of the pages between <!-- COUNTERS:START --> and <!-- COUNTERS:END -->.
+The card holds the final number (correct without JS too); the rolling animation comes from
+script.js (initCounters) based on the data-count attribute.
+On a broken sheet it stops with an error and changes nothing.
 """
 import html
 import os
@@ -20,15 +20,15 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import sync_common as common
 
-# oldal -> a blokk behúzása
+# page -> indentation of the block
 PAGES = {'index.html': ' ' * 8, 'rolunk.html': ' ' * 8}
-SNAPSHOT = os.path.join(common.ROOT, 'data', 'szamlalok.csv')
+SNAPSHOT = os.path.join(common.ROOT, 'data', 'counters.csv')
 
 COLUMNS = {'label': 'felirat', 'number': 'szám', 'visible': 'megjelenjen'}
 
 
 def format_number(number):
-    """Magyar ezres tagolás nem törő szóközzel: 1200 -> 1&nbsp;200."""
+    """Hungarian thousands grouping with a non-breaking space: 1200 -> 1&nbsp;200."""
     return f'{number:,}'.replace(',', '&nbsp;')
 
 
@@ -46,7 +46,7 @@ def build_block(cards, indent):
 
 
 def main():
-    args, env_name = common.get_args('SZAMLALOK_CSV_URL')
+    args, env_name = common.get_args('COUNTERS_CSV_URL')
     csv_text = common.fetch(args, env_name, sheet='Számlálók')
     table = common.read_table(csv_text, COLUMNS, required=['label', 'number', 'visible'])
 
@@ -67,7 +67,7 @@ def main():
 
     changed = []
     for page, indent in PAGES.items():
-        if common.replace_block(os.path.join(common.ROOT, page), 'SZAMLALOK', build_block(cards, indent), indent):
+        if common.replace_block(os.path.join(common.ROOT, page), 'COUNTERS', build_block(cards, indent), indent):
             changed.append(page)
     common.save_snapshot(SNAPSHOT, csv_text)
     print(f'{len(cards)} számláló; frissített oldalak: {", ".join(changed) if changed else "nincs"}.')

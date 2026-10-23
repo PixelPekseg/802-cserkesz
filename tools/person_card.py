@@ -1,6 +1,6 @@
-"""Személykártya (fotó/monogram, név, szerep, e-mail; kattintásra felugró ablak a rejtett
-.person-bio tartalmával) – közös a sync_vezetok.py és a sync_eszkozok.py számára.
-A felugró ablakot a script.js (.person-card.has-bio) kezeli."""
+"""Person card (photo/monogram, name, role, e-mail, phone; clicking opens a pop-up with the
+hidden .person-bio content) – shared by sync_leaders.py, sync_troops.py and sync_equipment.py.
+The pop-up is handled by script.js (.person-card.has-bio)."""
 import html
 import re
 
@@ -13,10 +13,10 @@ def esc(text):
 
 
 def build_card(row, photo, indent):
-    """row: name, role, intro (rövid bemutatkozó szöveg, opcionális), email, phone (opcionális;
-    ha meg van adva, a kártyán az e-mail alatt és a felugró ablakban is megjelenik).
-    A felugró ablak fejlécében a név és a szerep áll (person-bio-role), alatta a bemutatkozás,
-    majd az elérhetőségek."""
+    """row: name, role, intro (short introduction, optional), email, phone (optional; when set,
+    it appears on the card below the e-mail and in the pop-up as well).
+    The pop-up header shows the name and the role (person-bio-role), then the introduction,
+    then the contact details."""
     i = indent
     email = row.get('email', '')
     lines = [
@@ -33,7 +33,7 @@ def build_card(row, photo, indent):
     if email:
         user, domain = email.split('@', 1)
         lines.append(f'{i}  <a class="person-email" href="mailto:{esc(email)}">{esc(user)}@<wbr>{esc(domain)}</a>')
-    # telefonszám a kártyán is, az e-mail alatt (nem csak a felugró ablakban)
+    # the phone number on the card too, below the e-mail (not only in the pop-up)
     phone = common.fix_phone(row.get('phone', '')).strip()
     if phone:
         digits = re.sub(r'[^\d+]', '', phone)

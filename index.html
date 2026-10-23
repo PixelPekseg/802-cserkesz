@@ -7,10 +7,10 @@
   <meta name="description" content="A 802. sz. Szent Korona Cserkészcsapat Gödöllőn működő cserkészcsapat. Csatlakozz hozzánk 4. osztálytól: közösség, kaland, természet.">
 
   <!--
-    FONTOS: amint megvan a saját domain, mind a 6 HTML fájlban, a
-    robots.txt-ben és a sitemap.xml-ben cseréld le a
-    "https://www.YOUR-DOMAIN-HERE.com" placeholdert a valódi domainre
-    (canonical, Open Graph és strukturált adat linkek).
+    IMPORTANT: once the custom domain exists, replace the
+    "https://www.YOUR-DOMAIN-HERE.com" placeholder with the real domain in every
+    HTML file, in robots.txt and in sitemap.xml
+    (canonical, Open Graph and structured data links).
   -->
   <link rel="canonical" href="https://www.YOUR-DOMAIN-HERE.com/">
 
@@ -26,12 +26,12 @@
   <meta name="twitter:card" content="summary_large_image">
   <meta property="og:locale" content="hu_HU">
 
-  <!-- Logók: a fejlécben az images/webp/kozos/logo_white.jpg (fekete jel fehér alapon) látszik, faviconként az images/webp/kozos/logo_green.jpg -->
+  <!-- Logos: the header shows images/webp/kozos/logo_white.jpg (black mark on white), the favicon is images/webp/kozos/logo_green.jpg -->
   <link rel="icon" type="image/jpeg" href="images/webp/kozos/logo_green.jpg?v=1">
   <link rel="apple-touch-icon" href="images/webp/kozos/logo_green.jpg?v=1">
-  <link rel="stylesheet" href="style.css?v=113">
+  <link rel="stylesheet" href="style.css?v=114">
 
-  <!-- Strukturált adat: segít a Google-nek megérteni, hogy ez egy szervezet -->
+  <!-- Structured data: helps Google understand that this is an organisation -->
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -47,8 +47,8 @@
 </head>
 <body>
 
-  <!-- Értesítősáv (piros, az oldal tetején) -->
-  <!-- ERTESITOK:START – a tools/sync_ertesitok.py írja a Google Táblázatból, kézzel ne szerkeszd -->
+  <!-- Notice bar (red, top of the page) -->
+  <!-- NOTICES:START – written by tools/sync_notices.py from the Google Sheet, do not edit by hand -->
   <div class="notice-bar" id="noticeBar">
     <div class="notice" data-id="4f63410636" data-from="2027-03-01" data-until="2027-05-31" hidden>
       <div class="container notice-inner">
@@ -62,9 +62,9 @@
     </div>
   </div>
 
-  <!-- ERTESITOK:END -->
+  <!-- NOTICES:END -->
 
-  <!-- Fejléc / navigáció -->
+  <!-- Header / navigation -->
   <header class="site-header">
     <div class="container header-inner">
       <a href="index.html" class="logo">
@@ -72,7 +72,7 @@
         <span class="logo-text">802. sz. Szent Korona Cserkészcsapat</span>
       </a>
 
-      <!-- Hamburger gomb mobil nézethez -->
+      <!-- Hamburger button for the mobile view -->
       <button class="nav-toggle" id="navToggle" type="button" aria-label="Menü megnyitása" aria-expanded="false" aria-controls="mainNav">
         <span></span>
         <span></span>
@@ -109,20 +109,20 @@
   </header>
 
   <!--
-    Borítókép + név (images/webp/fooldal/csapatunk.webp). A kép teljes egészében látszik,
-    levágás nélkül, a saját arányában, teljes szélességben.
+    Cover image + name (images/webp/fooldal/csapatunk.webp). The image is shown in full,
+    without cropping, in its own ratio, at full width.
   -->
   <section class="hero">
     <img class="hero-img" src="images/webp/fooldal/csapatunk.webp" alt="A csapat tagjai közös csoportképen az erdő előtt" data-optional>
-    <!-- Telefonon a csoportkép helyett a 802-es légifotó látszik (a CSS váltja), a címmel együtt -->
+    <!-- On phones the 802 aerial photo replaces the group photo (switched by the CSS), together with the title -->
     <img class="hero-img-mobile" src="images/webp/fooldal/hero.webp" width="1200" height="899" alt="Cserkészek madártávlatból, a réten kirakott 802-es szám" data-optional>
     <h1>802. sz. Szent Korona Cserkészcsapat</h1>
   </section>
 
   <!--
-    Csapatunk: bal oldalon a kép (images/webp/fooldal/hero.webp, teljes egészében látszik,
-    levágás nélkül), jobb oldalon a szöveg sima zöld háttéren.
-    Mobilon a kép fölül, a szöveg alatta jelenik meg.
+    Csapatunk: the image on the left (images/webp/fooldal/hero.webp, shown in full,
+    without cropping), the text on the right on a plain green background.
+    On mobile the image is on top, the text below.
   -->
   <section id="csapatunk" class="team-split">
     <div class="team-split-image">
@@ -131,10 +131,10 @@
     <div class="team-split-text">
       <div>
         <!--
-          A szöveg a csapat korábbi honlapja alapján készült (Rólunk és
-          "Csapatunk múltja" oldalak: az 1920-as évek eleji indulás, az 1948-as
-          betiltás, az 1989-es újraindulás, a heti őrsgyűlések és a nyári tábor).
-          Az első bekezdés a cserkészetet, a második a csapatot mutatja be.
+          The text is based on the team's earlier website (the Rólunk and
+          "Csapatunk múltja" pages: the start in the early 1920s, the ban in 1948,
+          the restart in 1989, the weekly patrol meetings and the summer camp).
+          The first paragraph introduces scouting, the second the team.
         -->
         <p>
           A cserkészet olyan önkéntes ifjúságnevelő mozgalom, melynek célja, hogy
@@ -149,8 +149,8 @@
           hagyományt viszünk tovább, de a lényeg ma is ugyanaz: barátság, kaland
           és egy közösség, amelyre egész életedben számíthatsz.
         </p>
-        <!-- Számlálók (odagörgetéskor feltekerődnek) -->
-        <!-- SZAMLALOK:START – a tools/sync_szamlalok.py írja a Google Táblázatból, kézzel ne szerkeszd -->
+        <!-- Counters (they roll up when scrolled into view) -->
+        <!-- COUNTERS:START – written by tools/sync_counters.py from the Google Sheet, do not edit by hand -->
         <div class="stats">
           <div class="stat-card">
             <span class="stat-number" data-count="411">411</span>
@@ -166,7 +166,7 @@
           </div>
         </div>
 
-        <!-- SZAMLALOK:END -->
+        <!-- COUNTERS:END -->
         <a class="btn btn-light" href="rolunk.html">Tovább a Rólunk oldalra</a>
       </div>
     </div>
@@ -174,17 +174,17 @@
 
   <!-- Kapcsolat -->
   <!--
-    A kártyákat (név, szerep, bemutatkozás, "Miért keresd?", e-mail, telefon, fotó) a
-    "Csapatvezetés" Google Táblázat adja; a fotókat a Drive "Képek" mappájából a
-    tools/sync_vezetok.py tölti az images/webp/kozos/team/<név>.webp fájlokba.
-    Amíg egy fotó nincs feltöltve, a kártyán a monogram látszik.
+    The cards (name, role, introduction, e-mail, phone, photo) come from the
+    "Csapatvezetés" sheet; tools/sync_leaders.py downloads the photos from the Drive "Képek"
+    folder into images/webp/kozos/team/<name>.webp files.
+    While a photo is not uploaded, the card shows the monogram.
   -->
   <section id="kapcsolat" class="section contact">
     <div class="container">
       <h2>Kapcsolat</h2>
 
       <div class="people-grid">
-        <!-- VEZETOK:START – a tools/sync_vezetok.py írja a Google Táblázatból (Csapatvezetés), kézzel ne szerkeszd -->
+        <!-- LEADERS:START – written by tools/sync_leaders.py from the Google Sheet (Csapatvezetés), do not edit by hand -->
         <div class="person-card has-bio">
           <div class="person-photo" data-initials="CL">
             <img src="images/webp/kozos/team/cseri-holzman-lili.webp" alt="Cseri-Holzman Lili" data-optional>
@@ -265,13 +265,13 @@
           </div>
         </div>
 
-        <!-- VEZETOK:END -->
+        <!-- LEADERS:END -->
       </div>
 
       <!--
-        Közösségi oldalak: szándékosan csak linkek, a Facebook/Instagram
-        tartalmát nem töltjük be az oldalra (így a látogató adatait nem
-        küldjük el a Metának, amíg ő maga nem kattint).
+        Social pages: deliberately links only, the Facebook/Instagram
+        content is not loaded into the page (so the visitor's data is not
+        sent to Meta until they click).
       -->
       <div class="social-section">
         <h3>Kövesd a csapatot Facebookon és Instagramon!</h3>
@@ -283,7 +283,7 @@
     </div>
   </section>
 
-  <!-- Lábléc -->
+  <!-- Footer -->
   <footer class="site-footer">
     <div class="container">
       <div class="footer-links">
@@ -298,10 +298,10 @@
   </footer>
 
   <!--
-    Közelgő program füle: ha az programok.html-ben a következő 7 napban van
-    program (data-date), jobbról becsúszik ez a fül a program nevével és
-    dátumával. A kattintás a Programok oldal megfelelő hírére visz.
-    Az adatot a script.js az programok.html-ből olvassa, itt nincs mit szerkeszteni.
+    Upcoming program tab: if programok.html has a program in the next 7 days
+    (data-date), this tab slides in from the right with the program's name and
+    date. Clicking it leads to the matching card on the Programok page.
+    script.js reads the data from programok.html, there is nothing to edit here.
   -->
   <aside class="upcoming-tab" id="upcomingTab" aria-label="Közelgő programok" hidden>
     <button class="upcoming-close" id="upcomingClose" type="button" aria-label="Bezárás">&times;</button>
@@ -309,6 +309,6 @@
     <ul class="upcoming-list" id="upcomingList"></ul>
   </aside>
 
-  <script src="script.js?v=69"></script>
+  <script src="script.js?v=70"></script>
 </body>
 </html>

@@ -1,17 +1,16 @@
 #!/usr/bin/env python3
-"""A közzétett Google Táblázat (Értesítők lap, CSV) alapján frissíti az oldal tetején
-megjelenő piros értesítősávot – minden HTML oldalon.
+"""Updates the red notice bar at the top of every HTML page from the Értesítők sheet.
 
-Használat:
-    python tools/sync_ertesitok.py                # az ERTESITOK_CSV_URL környezeti változóból tölt
-    python tools/sync_ertesitok.py --url <link>
-    python tools/sync_ertesitok.py --file x.csv   # helyi fájlból (teszteléshez)
+Usage:
+    python tools/sync_notices.py                 # from LEADERS_SHEET_URL (or the old NOTICES_CSV_URL)
+    python tools/sync_notices.py --xlsx v.xlsx   # from a local copy of the shared workbook
+    python tools/sync_notices.py --file x.csv    # from a local CSV file (for testing)
 
-Minden oldal <!-- ERTESITOK:START --> és <!-- ERTESITOK:END --> közötti részét írja újra.
-Az értesítők alapból rejtettek; a script.js (updateNotices) a data-from / data-until
-dátumok alapján mutatja őket, így a megjelenés és az eltűnés újabb szinkron nélkül is
-pontos. Az üres lista megengedett (nincs értesítő = nincs sáv).
-Hibás táblázat esetén hibával leáll, és semmit nem módosít.
+Rewrites the part of every page between <!-- NOTICES:START --> and <!-- NOTICES:END -->.
+Notices are hidden by default; script.js (updateNotices) shows them by their data-from /
+data-until dates, so they appear and disappear on time without another sync. An empty list is
+allowed (no notice = no bar).
+On a broken sheet it stops with an error and changes nothing.
 """
 import datetime as dt
 import hashlib
@@ -25,7 +24,7 @@ import sync_common as common
 
 PAGES = ['index.html', 'rolunk.html', 'tabor.html', 'csatlakozom.html', 'csapatotthon.html',
          'programok.html', 'naptar.html', 'tamogass.html', 'eszkozok.html', 'penzugyek.html', 'dokumentumok.html', 'galeria.html', '404.html']
-SNAPSHOT = os.path.join(common.ROOT, 'data', 'ertesitok.csv')
+SNAPSHOT = os.path.join(common.ROOT, 'data', 'notices.csv')
 MONTHS = ['január', 'február', 'március', 'április', 'május', 'június', 'július',
           'augusztus', 'szeptember', 'október', 'november', 'december']
 
@@ -50,7 +49,7 @@ def hungarian_date(date):
 
 
 def read_date(row, key, line_number, label):
-    """A cella dátuma, vagy None; ha ki van töltve, de nem értelmezhető, figyelmeztet."""
+    """The cell's date, or None; warns if the cell is filled in but cannot be parsed."""
     if not row[key]:
         return None
     date = parse_date(row[key])
@@ -60,7 +59,7 @@ def read_date(row, key, line_number, label):
 
 
 def build_notice(row, start, until, deadline):
-    # Az azonosító a tartalomból készül: ha a szöveg változik, a bezárt értesítő újra megjelenik.
+    # The id is derived from the content: if the text changes, a dismissed notice shows up again.
     key = '\n'.join([row['title'], row['message'], deadline.isoformat() if deadline else ''])
     notice_id = hashlib.sha1(key.encode('utf-8')).hexdigest()[:10]
     attrs = [f'class="notice"', f'data-id="{notice_id}"']
@@ -86,8 +85,8 @@ def build_notice(row, start, until, deadline):
 
 
 def main():
-    args, env_name = common.get_args('ERTESITOK_CSV_URL')
-    csv_text = common.fetch(args, env_name, sheet='Értesítők', book_env=common.VEZETOI_ENV)
+    args, env_name = common.get_args('NOTICES_CSV_URL')
+    csv_text = common.fetch(args, env_name, sheet='Értesítők', book_env=common.LEADERS_SHEET_ENV)
     table = common.read_table(csv_text, COLUMNS, required=['title', 'message', 'visible'])
     today = dt.date.today()
 
@@ -103,7 +102,7 @@ def main():
         deadline = read_date(row, 'deadline', line_number, 'Határidő')
         until = until or deadline
         if until and until < today:
-            continue  # már lejárt – az oldalra sem kerül
+            continue  # already expired – not even written to the page
         notices.append(build_notice(row, start, until, deadline))
 
     if notices:
@@ -113,7 +112,7 @@ def main():
 
     changed = []
     for page in PAGES:
-        if common.replace_block(os.path.join(common.ROOT, page), 'ERTESITOK', body, '  '):
+        if common.replace_block(os.path.join(common.ROOT, page), 'NOTICES', body, '  '):
             changed.append(page)
     common.save_snapshot(SNAPSHOT, csv_text)
     print(f'{len(notices)} értesítő; frissített oldalak: {", ".join(changed) if changed else "nincs"}.')

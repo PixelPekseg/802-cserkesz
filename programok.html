@@ -6,7 +6,7 @@
   <title>Programok – 802. sz. Szent Korona Cserkészcsapat</title>
   <meta name="description" content="A 802. sz. Szent Korona Cserkészcsapat programjai és eseményei, naptárral: toborzó nap, cserkészmise, október 23-i megemlékezés.">
 
-  <!-- FONTOS: a "https://www.YOUR-DOMAIN-HERE.com" placeholdert cseréld le a valódi domainre (lásd index.html) -->
+  <!-- IMPORTANT: replace the "https://www.YOUR-DOMAIN-HERE.com" placeholder with the real domain (see index.html) -->
   <link rel="canonical" href="https://www.YOUR-DOMAIN-HERE.com/programok.html">
 
   <meta property="og:type" content="website">
@@ -23,12 +23,12 @@
 
   <link rel="icon" type="image/jpeg" href="images/webp/kozos/logo_green.jpg?v=1">
   <link rel="apple-touch-icon" href="images/webp/kozos/logo_green.jpg?v=1">
-  <link rel="stylesheet" href="style.css?v=113">
+  <link rel="stylesheet" href="style.css?v=114">
 </head>
 <body>
 
-  <!-- Értesítősáv (piros, az oldal tetején) -->
-  <!-- ERTESITOK:START – a tools/sync_ertesitok.py írja a Google Táblázatból, kézzel ne szerkeszd -->
+  <!-- Notice bar (red, top of the page) -->
+  <!-- NOTICES:START – written by tools/sync_notices.py from the Google Sheet, do not edit by hand -->
   <div class="notice-bar" id="noticeBar">
     <div class="notice" data-id="4f63410636" data-from="2027-03-01" data-until="2027-05-31" hidden>
       <div class="container notice-inner">
@@ -42,9 +42,9 @@
     </div>
   </div>
 
-  <!-- ERTESITOK:END -->
+  <!-- NOTICES:END -->
 
-  <!-- Fejléc / navigáció -->
+  <!-- Header / navigation -->
   <header class="site-header">
     <div class="container header-inner">
       <a href="index.html" class="logo">
@@ -52,7 +52,7 @@
         <span class="logo-text">802. sz. Szent Korona Cserkészcsapat</span>
       </a>
 
-      <!-- Hamburger gomb mobil nézethez -->
+      <!-- Hamburger button for the mobile view -->
       <button class="nav-toggle" id="navToggle" type="button" aria-label="Menü megnyitása" aria-expanded="false" aria-controls="mainNav">
         <span></span>
         <span></span>
@@ -88,26 +88,26 @@
     </div>
   </header>
 
-  <!-- Címsáv -->
+  <!-- Title banner -->
   <section class="page-banner">
     <h1>Programok</h1>
   </section>
 
   <!--
-    A PROGRAMOK KÁRTYÁIT NEM KÉZZEL KELL SZERKESZTENI. A "PROGRAMOK:START" és "PROGRAMOK:END"
-    közötti részt a tools/sync_programok.py írja újra a csapat Google Táblázatából (óránként,
-    GitHub Actions: .github/workflows/sync-tablazat.yml). Új program felvétele = új sor a
-    táblázatban; a táblázat útmutatója leírja az oszlopokat.
+    THE PROGRAM CARDS ARE NOT EDITED BY HAND. The part between "PROGRAMS:START" and "PROGRAMS:END"
+    is rewritten by tools/sync_programs.py from the team's Google Sheet (hourly,
+    GitHub Actions: .github/workflows/sync-sheets.yml). Adding a program = a new row in the
+    sheet; the sheet's guide describes the columns.
 
-    - A kártyák dátum szerint maguktól rendeződnek; a lejárt események az esemény napja után
-      a script.js-sel átkerülnek a lenti "Program Archívum" sávba (a legfrissebb elöl). A
-      naptárnézet külön oldalon van (naptar.html), ugyanezekből a kártyákból.
-    - A "Képek" oszlopban megadott Drive-mappa (Képek/Program képek/<mappa>) képei a kártyára
-      kerülnek a kártya aljára (2 kép látszik, nyilakkal lapozható). A kártyára kattintva
-      felugró ablakban nagyítva nyílik meg (szöveg + többoszlopos képgaléria, script.js).
-    - Ha egy programnál nincs kapcsolattartó, a script.js az alapértelmezettet írja oda
-      (a rács data-default-contact-name és data-default-contact-email attribútuma).
-    - Időpont nélküli program egész napos eseményként kerül a Google Naptárba.
+    - The cards sort themselves by date; past events move after the event day, by
+      script.js, to the "Program Archívum" strip below (the most recent first). The
+      calendar view is on its own page (naptar.html), built from the same cards.
+    - The images of the Drive folder given in the "Képek" column (Képek/Program képek/<folder>)
+      go to the bottom of the card (2 images visible, paged with arrows). Clicking the card
+      opens it enlarged in a pop-up (text + multi-column image gallery, script.js).
+    - If a program has no contact, script.js fills in the default one
+      (the grid's data-default-contact-name and data-default-contact-email attributes).
+    - A program without a time goes into Google Calendar as an all-day event.
   -->
   <section class="section">
     <div class="container">
@@ -118,7 +118,7 @@
       <div class="news-grid" id="newsGrid"
            data-default-contact-name="Bedő Gergely" data-default-contact-email="bedo.gergely@cserkesz.hu">
 
-        <!-- PROGRAMOK:START (automatikusan generálja a tools/sync_programok.py a Google Táblázatból; ne szerkeszd kézzel) -->
+        <!-- PROGRAMS:START (generated automatically by tools/sync_programs.py from the Google Sheet; do not edit by hand) -->
         <article class="news-card" id="toborzo-nap-20261011" data-date="2026-10-11">
           <div class="news-meta"><span class="news-date">2026. október 11.</span></div>
           <h3>Toborzó nap</h3>
@@ -244,7 +244,7 @@
           </p>
         </article>
 
-        <!-- PROGRAMOK:END -->
+        <!-- PROGRAMS:END -->
 
       </div>
         <button class="carousel-btn carousel-next" id="newsNext" type="button" aria-label="Következő programok">&#8250;</button>
@@ -261,8 +261,8 @@
   </section>
 
   <!--
-    Program Archívum: a script.js ide helyezi át a fenti lejárt programokat (a legfrissebb
-    elöl). Ha nincs lejárt program, a sáv rejtve marad. Nincs itt mit szerkeszteni.
+    Program Archívum: script.js moves the past programs from above into here (the most recent
+    first). Without past programs the strip stays hidden. There is nothing to edit here.
   -->
   <section class="section archive-section" id="archivum" hidden>
     <div class="container">
@@ -275,7 +275,7 @@
     </div>
   </section>
 
-  <!-- Lábléc -->
+  <!-- Footer -->
   <footer class="site-footer">
     <div class="container">
       <div class="footer-links">
@@ -289,6 +289,6 @@
     </div>
   </footer>
 
-  <script src="script.js?v=69"></script>
+  <script src="script.js?v=70"></script>
 </body>
 </html>

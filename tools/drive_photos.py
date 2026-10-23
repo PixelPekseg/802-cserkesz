@@ -1,21 +1,21 @@
-"""Képek a Google Drive "Képek" mappájából – közös rész a sync_vezetok.py, a sync_eszkozok.py és
-a sync_programok.py számára.
+"""Images from the Google Drive "Képek" folder – shared by sync_leaders.py, sync_equipment.py and
+sync_programs.py.
 
-A nyilvános "Képek és videók" mappát a Drive API-val olvassa (GOOGLE_API_KEY + DRIVE_KEPEK_FOLDER_ID;
-az azonosító átnevezéskor sem változik). Szerkezete:
+Reads the public "Képek és videók" folder with the Drive API (GOOGLE_API_KEY + DRIVE_IMAGES_FOLDER_ID;
+the id does not change when the folder is renamed). Structure:
     Képek és videók/
-        Csapatvezetés/      személyfotók (és bármely más almappa, illetve maga a gyökér)
-        Program képek/      programonként egy-egy almappa (pl. "csm"), benne a képek és videók
-                            (bármely "Program…" kezdetű név jó)
+        Csapatvezetés/      portraits (and any other subfolder, or the root itself)
+        Program képek/      one subfolder per program (e.g. "csm") with its images and videos
+                            (any name starting with "Program…" works)
 
-Személyfotók (PhotoSync): a táblázatban csak a fájl NEVÉT adják meg (kiterjesztéssel). A modul a
-Képek gyökerében és az almappáiban (a "Program képek" kivételével) név szerint keresi (kis/nagybetű
-nem számít; azonos névnél a legutóbb módosított), letölti, EXIF szerint elforgatja, kicsinyíti, és
-WebP-be menti az images/webp/kozos/team/<név-slug>.webp fájlba. Csak a változott fájlokat tölti le
-(data/fotok.json). Üres fájlnév, nem található vagy nem kép fájl → monogram (a régi fotó törlődik).
+Portraits (PhotoSync): the sheet only gives the file NAME (with extension). The module looks it up
+by name in the Képek root and its subfolders (except "Program képek"; case-insensitive; with
+duplicate names the most recently modified wins), downloads it, rotates it by EXIF, scales it down
+and saves it as WebP to images/webp/kozos/team/<name-slug>.webp. Only changed files are downloaded
+(data/photos.json). Empty file name, file not found or not an image → monogram (the old photo is deleted).
 
-Ha nincs API-kulcs, semmit nem frissít (figyelmeztet), a meglévő képek maradnak.
-Teszteléshez a DRIVE_LOCAL_DIR környezeti változóval egy helyi mappa(fa) helyettesítheti a Drive-ot.
+Without an API key nothing is updated (with a warning); existing images stay.
+For testing, the DRIVE_LOCAL_DIR environment variable can replace Drive with a local folder tree.
 """
 import datetime as dt
 import io
@@ -31,11 +31,11 @@ import sync_common as common
 
 TEAM_DIR_REL = 'images/webp/kozos/team'
 TEAM_DIR = os.path.join(common.ROOT, *TEAM_DIR_REL.split('/'))
-STATE = os.path.join(common.ROOT, 'data', 'fotok.json')
+STATE = os.path.join(common.ROOT, 'data', 'photos.json')
 API = 'https://www.googleapis.com/drive/v3/files'
 FOLDER_MIME = 'application/vnd.google-apps.folder'
-PROGRAM_FOLDER = 'program'           # a programok almappája: aminek a neve így kezdődik (pl. "Program képek")
-MAX_SHORT_SIDE = 400   # személyfotó: a kártyán legfeljebb ~120 px-es kör
+PROGRAM_FOLDER = 'program'           # the programs' subfolder: its name starts with this (e.g. "Program képek")
+MAX_SHORT_SIDE = 400   # portrait: at most a ~120 px circle on the card
 MAX_LONG_SIDE = 600
 
 
@@ -49,7 +49,7 @@ def initials(name):
 
 
 def to_webp(data, max_short=None, max_long=None, quality=80):
-    """Kép bájtjai → WebP bájtok (EXIF szerinti forgatással, arányos kicsinyítéssel)."""
+    """Image bytes → WebP bytes (rotated by EXIF, scaled down proportionally)."""
     from PIL import Image, ImageOps
     try:
         import pillow_heif
@@ -84,17 +84,17 @@ def is_program_folder(item):
 
 
 class Drive:
-    """A "Képek" mappa olvasása: a Drive API-val, vagy teszteléshez egy helyi mappából."""
+    """Reads the "Képek" folder: via the Drive API, or from a local folder for testing."""
 
     def __init__(self):
         self.local_dir = os.environ.get('DRIVE_LOCAL_DIR', '')
         self.api_key = os.environ.get('GOOGLE_API_KEY', '')
-        self.root_id = self.local_dir or os.environ.get('DRIVE_KEPEK_FOLDER_ID', '')
+        self.root_id = self.local_dir or os.environ.get('DRIVE_IMAGES_FOLDER_ID', '')
         self.enabled = bool(self.local_dir or (self.api_key and self.root_id))
         self._cache = {}
 
     def children(self, folder_id):
-        """A mappa közvetlen elemei: [{'id', 'name', 'mimeType', 'modifiedTime'}, ...]"""
+        """Direct children of the folder: [{'id', 'name', 'mimeType', 'modifiedTime'}, ...]"""
         if folder_id in self._cache:
             return self._cache[folder_id]
         items = []
@@ -129,7 +129,7 @@ class Drive:
         return items
 
     def subfolder(self, folder_id, name):
-        """Az adott nevű almappa (kis/nagybetű nem számít), vagy None."""
+        """The subfolder with the given name (case-insensitive), or None."""
         for item in self.children(folder_id):
             if item.get('mimeType') == FOLDER_MIME and item['name'].strip().lower() == name.strip().lower():
                 return item
@@ -149,12 +149,12 @@ class Drive:
 
 
 class PhotoSync:
-    """Személyfotók (csapatvezetés, eszközös kapcsolattartó)."""
+    """Portraits (team leaders, equipment contacts)."""
 
     def __init__(self):
         self.drive = Drive()
         self.enabled = self.drive.enabled
-        self.files = None          # {kisbetűs név: [fájl, ...]}, első használatkor töltődik
+        self.files = None          # {lowercase name: [file, ...]}, loaded on first use
         try:
             with open(STATE, encoding='utf-8') as handle:
                 self.state = json.load(handle)
@@ -164,7 +164,7 @@ class PhotoSync:
         self.warned_disabled = False
 
     def _files(self):
-        """A Képek gyökerének és almappáinak (a Program képek kivételével) fájljai név szerint."""
+        """Files of the Képek root and its subfolders (except Program képek), by name."""
         if self.files is not None:
             return self.files
         self.files = {}
@@ -179,16 +179,16 @@ class PhotoSync:
         return self.files
 
     def photo_for(self, name, filename, where):
-        """A személy fotójának relatív útvonala, vagy None (= monogram).
+        """Relative path of the person's photo, or None (= monogram).
 
-        Ha elérhető a Drive: üres fájlnév, nem található vagy nem kép fájl esetén monogram (a régi
-        fotófájl törlődik). Ha a letöltés átmenetileg nem sikerül, vagy nincs API-kulcs, a meglévő
-        fotó marad."""
+        With Drive available: empty file name, file not found or not an image → monogram (the old
+        photo file is deleted). If the download fails temporarily, or there is no API key, the
+        existing photo stays."""
         target_name = slugify(name) + '.webp'
         target_path = os.path.join(TEAM_DIR, target_name)
         if not self.enabled:
             if filename and not self.warned_disabled:
-                common.warn('Nincs GOOGLE_API_KEY / DRIVE_KEPEK_FOLDER_ID, a fotókat most nem frissítem (a meglévők maradnak).')
+                common.warn('Nincs GOOGLE_API_KEY / DRIVE_IMAGES_FOLDER_ID, a fotókat most nem frissítem (a meglévők maradnak).')
                 self.warned_disabled = True
         elif not filename or not self._refresh(filename, target_name, target_path, where):
             self._remove(target_name, target_path)
@@ -201,8 +201,8 @@ class PhotoSync:
         self.state.pop(target_name, None)
 
     def _refresh(self, filename, target_name, target_path, where):
-        """Igaz, ha a fotó megvan (frissítve vagy változatlan, illetve átmeneti letöltési hibánál
-        a régi marad); hamis, ha a fájl nem található vagy nem kép (→ monogram)."""
+        """True if the photo exists (updated or unchanged; on a temporary download error the old one
+        stays); False if the file is not found or not an image (→ monogram)."""
         from PIL import UnidentifiedImageError
         matches = self._files().get(filename.strip().lower())
         if not matches:

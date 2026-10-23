@@ -1,21 +1,22 @@
 #!/usr/bin/env python3
-"""A közzétett Google Táblázat (CSV) alapján frissíti a programok.html programkártyáit.
+"""Updates the program cards of programok.html from the Programok sheet.
 
-Használat:
-    python tools/sync_programok.py                 # a PROGRAMOK_CSV_URL környezeti változóból tölt
-    python tools/sync_programok.py --url <link>    # megadott CSV-hivatkozásból
-    python tools/sync_programok.py --file x.csv    # helyi CSV-fájlból (teszteléshez)
+Usage:
+    python tools/sync_programs.py                 # from LEADERS_SHEET_URL (or the old PROGRAMS_CSV_URL)
+    python tools/sync_programs.py --xlsx v.xlsx   # from a local copy of the shared workbook
+    python tools/sync_programs.py --url <link>    # from the given CSV link
+    python tools/sync_programs.py --file x.csv    # from a local CSV file (for testing)
 
-A script a programok.html és a naptar.html (ott rejtve, a naptárnézethez) két megjegyzés közötti
-szakaszát írja újra:
-    <!-- PROGRAMOK:START ... -->  ...  <!-- PROGRAMOK:END -->
-Ha a letöltés vagy az ellenőrzés hibás (pl. változott a fejléc, vagy egyetlen érvényes sor
-sincs), a script hibával leáll, és semmit nem módosít: az oldal az utolsó jó állapotot mutatja.
-Hibás egyedi sorokat kihagy, és figyelmeztetést ír (GitHub Actionsben "::warning::" jelzést).
-A "Képek" oszlopban megadott Drive-mappa (Képek és videók/Program képek/<mappa>) képei és videói
-a kártyára kerülnek (a videókat a Drive lejátszója játssza le)
-(program_images.py; ehhez GOOGLE_API_KEY, DRIVE_KEPEK_FOLDER_ID és Pillow kell – nélkülük a meglévő
-képek maradnak).
+Rewrites the section between two comments in programok.html and naptar.html (hidden there, for
+the calendar view):
+    <!-- PROGRAMS:START ... -->  ...  <!-- PROGRAMS:END -->
+If the download or the validation fails (e.g. the header changed, or there is no valid row at all),
+the script stops with an error and changes nothing: the page keeps its last good state.
+Broken single rows are skipped with a warning ("::warning::" in GitHub Actions).
+The images and videos of the Drive folder given in the "Képek" column (Képek és videók/Program
+képek/<folder>) go onto the card (videos are played by the Drive player)
+(program_images.py; needs GOOGLE_API_KEY, DRIVE_IMAGES_FOLDER_ID and Pillow – without them the
+existing images stay).
 """
 import argparse
 import csv
@@ -29,17 +30,17 @@ import unicodedata
 import urllib.request
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from program_images import ProgramImages  # noqa: E402  (a Drive-os képek; PIL csak képfeldolgozáskor kell)
+from program_images import ProgramImages  # noqa: E402  (Drive images; PIL is only needed for image processing)
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PAGE = os.path.join(ROOT, 'programok.html')
-PAGES = [PAGE, os.path.join(ROOT, 'naptar.html')]   # a naptár oldal rejtve, a naptárnézethez
-SNAPSHOT = os.path.join(ROOT, 'data', 'programok.csv')
+PAGES = [PAGE, os.path.join(ROOT, 'naptar.html')]   # the calendar page, hidden, for the calendar view
+SNAPSHOT = os.path.join(ROOT, 'data', 'programs.csv')
 
 MONTHS = ['január', 'február', 'március', 'április', 'május', 'június',
           'július', 'augusztus', 'szeptember', 'október', 'november', 'december']
 
-# A fejléc elejét keressük (kisbetűsen), így apróbb átfogalmazás nem töri el.
+# We match the start of the header (lowercased), so small rewordings do not break it.
 COLUMNS = {
     'name': 'név',
     'start_date': 'kezdő dátum',
@@ -75,20 +76,20 @@ def fail(message):
 
 
 def fetch(args):
-    # a közös "Vezetői táblázat" Programok lapja (--xlsx vagy VEZETOI_TABLAZAT_URL), ha meg van adva
-    if not args.file and (args.xlsx or os.environ.get('VEZETOI_TABLAZAT_URL')):
+    # the Programok sheet of the shared leaders workbook (--xlsx or LEADERS_SHEET_URL), if given
+    if not args.file and (args.xlsx or os.environ.get('LEADERS_SHEET_URL')):
         import sync_common
-        return sync_common.shared_sheet_csv(args, 'Programok', sync_common.VEZETOI_ENV)
+        return sync_common.shared_sheet_csv(args, 'Programok', sync_common.LEADERS_SHEET_ENV)
     if args.file:
         with open(args.file, encoding='utf-8-sig') as handle:
             return handle.read()
-    url = args.url or os.environ.get('PROGRAMOK_CSV_URL')
+    url = args.url or os.environ.get('PROGRAMS_CSV_URL')
     if not url:
-        fail('Nincs megadva a CSV címe (PROGRAMOK_CSV_URL vagy --url).')
+        fail('Nincs megadva a CSV címe (PROGRAMS_CSV_URL vagy --url).')
     try:
         with urllib.request.urlopen(url, timeout=30) as response:
             return response.read().decode('utf-8-sig')
-    except Exception as error:  # hálózati hiba, 4xx/5xx stb.
+    except Exception as error:  # network error, 4xx/5xx etc.
         fail(f'A táblázat letöltése nem sikerült: {error}')
 
 
@@ -145,8 +146,8 @@ def display_date(start, end):
 
 
 def fix_phone(phone):
-    """Ha a táblázat a "+36 …" számot számmá alakította (pl. 36707582659), visszaadja olvasható
-    formában (+36 70 758 2659). Minden más beírást változatlanul hagy. (Ld. sync_common.fix_phone.)"""
+    """If the sheet turned "+36 …" into a number (e.g. 36707582659), returns it in readable form
+    (+36 70 758 2659). Any other input is returned unchanged. (See sync_common.fix_phone.)"""
     raw = phone.strip()
     if re.fullmatch(r'36\d{9}', raw):
         return f'+36 {raw[2:4]} {raw[4:7]} {raw[7:]}'
@@ -155,7 +156,7 @@ def fix_phone(phone):
     return phone
 
 
-# a Google Táblázat hibaértékei (pl. "+36 …" képletként értelmezve #ERROR! lesz) – ne kerüljenek ki az oldalra
+# Google Sheets error values (e.g. "+36 …" parsed as a formula becomes #ERROR!) – never publish them
 SHEET_ERRORS = ('#ERROR!', '#NAME?', '#REF!', '#VALUE!', '#N/A', '#DIV/0!', '#NUM!', '#NULL!')
 
 
@@ -168,8 +169,8 @@ def phone_link(phone):
 
 
 def contact_html(name, email, phone):
-    """Egy kapcsolattartó: név, e-mail és/vagy telefon (mind opcionális). A régi, közös
-    "e-mail vagy telefon" oszlopból jövő telefonszámot is felismeri."""
+    """One contact: name, e-mail and/or phone (all optional). Also recognises a phone number in the
+    old combined "e-mail vagy telefon" column."""
     name, email, phone = name.strip(), email.strip(), phone.strip()
     if email and '@' not in email and not phone:
         email, phone = '', email
@@ -177,7 +178,7 @@ def contact_html(name, email, phone):
     if email:
         first.append(f'<a class="inline-link" href="mailto:{html.escape(email, quote=True)}">{html.escape(email)}</a>')
     text = ', '.join(first)
-    if phone:   # a telefonszám mindig új sorba kerül (a név, illetve az e-mail alá)
+    if phone:   # the phone number always goes on a new line (below the name or the e-mail)
         text = (text + '<br>\n            ' if text else '') + phone_link(phone)
     return text
 
@@ -198,9 +199,9 @@ def build_card(row, used_ids):
         f'          <h3>{html.escape(row["name"])}</h3>',
     ]
 
-    # leírás (a közelgő programoknál) és beszámoló (rejtve; a script.js mutatja a leírás helyett,
-    # ha a program már az archívumba került). A Facebook-link csak a leírás végére kerül
-    # (.news-fb), és az archívumban az is elrejtődik.
+    # description (for upcoming programs) and report (hidden; script.js shows it instead of the
+    # description once the program is in the archive). The Facebook link only goes at the end of
+    # the description (.news-fb), and it is hidden in the archive too.
     def text_block(source, css_class, hidden=False, facebook=''):
         paragraphs = [p.strip() for p in re.split(r'\n\s*\n', source.strip()) if p.strip()]
         if not paragraphs and facebook:
@@ -242,15 +243,15 @@ def build_card(row, used_ids):
         lines.append('          </p>')
 
     if row.get('images'):
-        # képek a kártya alján (az "Üzenet másolása" fölött): egyszerre 2 látszik, több kép esetén
-        # két oldalt nyilakkal lapozható; kattintásra a nagyító nyílik (script.js)
+        # images at the bottom of the card (above "Üzenet másolása"): 2 visible at a time, with more
+        # images arrows on both sides; clicking opens the lightbox (script.js)
         many = len(row['images']) > 2
         lines.append('          <div class="news-gallery" data-gallery>')
         if many:
             lines.append('            <button class="gallery-btn gallery-prev" type="button" aria-label="Előző képek" disabled>&#8249;</button>')
         lines.append('            <div class="news-gallery-track">')
         for n, item in enumerate(row['images'], start=1):
-            # videó: a Drive lejátszója játssza le (a felugró ablakban, kattintásra); itt az előnézete
+            # video: played by the Drive player (in the pop-up, on click); here only its preview
             video = f' data-video="{html.escape(item["video"], quote=True)}"' if item['video'] else ''
             kind = 'videó' if item['video'] else 'kép'
             alt = html.escape(f'{row["name"]} – {n}. {kind}', quote=True)
@@ -282,7 +283,7 @@ def parse_rows(csv_text):
     parsed = []
     for line_number, row in enumerate(reader[1:], start=2):
         if not any(c.strip() for c in row):
-            continue  # teljesen üres sor
+            continue  # completely empty row
         label = f'{line_number}. sor ({cell(row, "name") or "név nélkül"})'
         if cell(row, 'visible').lower() == 'nem':
             continue
@@ -325,7 +326,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument('--url')
     parser.add_argument('--file')
-    parser.add_argument('--xlsx', help='a közös Vezetői táblázat helyi .xlsx fájlja')
+    parser.add_argument('--xlsx', help='local .xlsx copy of the shared leaders workbook')
     args = parser.parse_args()
 
     csv_text = fetch(args).replace('\r\n', '\n').replace('\r', '\n')
@@ -341,15 +342,15 @@ def main():
     used_ids = set()
     cards = '\n\n'.join(build_card(row, used_ids) for row in rows)
 
-    # ugyanazok a kártyák a Programok oldalra és (rejtve, a naptárhoz) a Naptár oldalra
-    pattern = re.compile(r'(<!-- PROGRAMOK:START[^\n]*-->\n)(.*?)(\n[ \t]*<!-- PROGRAMOK:END -->)', re.S)
+    # the same cards on the Programok page and (hidden, for the calendar) on the Naptár page
+    pattern = re.compile(r'(<!-- PROGRAMS:START[^\n]*-->\n)(.*?)(\n[ \t]*<!-- PROGRAMS:END -->)', re.S)
     changed = False
     for path in PAGES:
         with open(path, encoding='utf-8') as handle:
             page = handle.read()
         if not pattern.search(page):
-            fail(f'A {os.path.basename(path)}-ben nem találom a PROGRAMOK:START / PROGRAMOK:END jelölőket.')
-        new_page = pattern.sub(lambda m: m.group(1) + cards + '\n\n        <!-- PROGRAMOK:END -->', page, count=1)
+            fail(f'A {os.path.basename(path)}-ben nem találom a PROGRAMS:START / PROGRAMS:END jelölőket.')
+        new_page = pattern.sub(lambda m: m.group(1) + cards + '\n\n        <!-- PROGRAMS:END -->', page, count=1)
         if new_page != page:
             with open(path, 'w', encoding='utf-8') as handle:
                 handle.write(new_page)
