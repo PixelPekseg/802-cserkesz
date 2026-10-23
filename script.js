@@ -89,6 +89,39 @@ function addDismissed(key, id, keepOnly) {
 }
 
 // ==========================================================
+// Back button closes pop-ups (important on phones)
+// Every opened pop-up (person card, program card, lightbox) adds one history entry, so the
+// browser's / phone's Back button closes the topmost pop-up instead of leaving the page.
+// When a pop-up is closed another way (×, Esc, backdrop), its entry is removed again, so the
+// history does not fill up.
+// ==========================================================
+const modalHistory = (() => {
+  const stack = [];   // close functions of the open pop-ups, topmost last
+  let ignoredPops = 0;
+  window.addEventListener('popstate', () => {
+    if (ignoredPops > 0) {   // caused by our own history.back() below
+      ignoredPops--;
+      return;
+    }
+    const close = stack.pop();
+    if (close) close(true);
+  });
+  return {
+    opened(close) {
+      stack.push(close);
+      history.pushState({ popup: stack.length }, '');
+    },
+    closed(close) {
+      const i = stack.lastIndexOf(close);
+      if (i === -1) return;
+      stack.splice(i, 1);
+      ignoredPops++;
+      history.back();
+    }
+  };
+})();
+
+// ==========================================================
 // Notice bar (top of every page, from the "Értesítők" sheet)
 // Every .notice is hidden by default; it is shown when today falls between
 // data-from and data-until (both optional, the data-until day still
@@ -814,8 +847,10 @@ document.querySelectorAll('a[href^="mailto:"]').forEach(link => {
     box.classList.toggle('no-images', images.length === 0);
 
     overlay.setAttribute('aria-label', card.querySelector('h3')?.textContent.trim() ?? 'Program');
+    const wasHidden = overlay.hidden;
     overlay.hidden = false;
     document.body.style.overflow = 'hidden';
+    if (wasHidden) modalHistory.opened(close);
     box.scrollTop = 0;
     text.scrollTop = 0;
     gallery.scrollTop = 0;
@@ -843,11 +878,14 @@ document.querySelectorAll('a[href^="mailto:"]').forEach(link => {
     return tile;
   }
 
-  function close() {
+  // fromHistory: closed by the Back button (its history entry is already gone)
+  function close(fromHistory) {
+    if (overlay.hidden) return;
     overlay.hidden = true;
     gallery.replaceChildren();
     document.body.style.overflow = '';
     opener?.focus();
+    if (fromHistory !== true) modalHistory.closed(close);
   }
 
   document.addEventListener('click', event => {
@@ -962,16 +1000,21 @@ document.querySelectorAll('a[href^="mailto:"]').forEach(link => {
       : [...document.querySelectorAll(SELECTOR)].filter(img => !img.closest('[data-gallery]'));
     opener = trigger;
     show(Math.max(0, images.indexOf(trigger)));
+    const wasHidden = overlay.hidden;
     overlay.hidden = false;
     document.body.style.overflow = 'hidden';
     closeButton.focus();
+    if (wasHidden) modalHistory.opened(close);
   }
 
-  function close() {
+  // fromHistory: closed by the Back button (its history entry is already gone)
+  function close(fromHistory) {
+    if (overlay.hidden) return;
     overlay.hidden = true;
     videoStage.replaceChildren();   // the video stops
     document.body.style.overflow = document.querySelector('.program-modal:not([hidden])') ? 'hidden' : '';
     opener?.focus();
+    if (fromHistory !== true) modalHistory.closed(close);
   }
 
   function prepare(image) {
@@ -1201,15 +1244,20 @@ document.addEventListener('click', async event => {
     });
 
     overlay.setAttribute('aria-label', `${name} bemutatkozása`);
+    const wasHidden = overlay.hidden;
     overlay.hidden = false;
     document.body.style.overflow = 'hidden';
     closeButton.focus();
+    if (wasHidden) modalHistory.opened(close);
   }
 
-  function close() {
+  // fromHistory: closed by the Back button (its history entry is already gone)
+  function close(fromHistory) {
+    if (overlay.hidden) return;
     overlay.hidden = true;
     document.body.style.overflow = '';
     opener?.focus();
+    if (fromHistory !== true) modalHistory.closed(close);
   }
 
   cards.forEach(card => {
