@@ -14,6 +14,7 @@ mainNav.querySelectorAll('a').forEach(link => {
   link.addEventListener('click', () => {
     mainNav.classList.remove('open');
     navToggle.setAttribute('aria-expanded', 'false');
+    closeSubMenus();   // a same-page link (e.g. a fee tab) would otherwise leave the dropdown open
   });
 });
 
@@ -1480,8 +1481,8 @@ function updateCubCampContact(now = new Date()) {
     });
     panels.forEach(panel => {
       panel.hidden = panel.dataset.tab !== name;
-      // the embedded (Google) form only loads when its tab is visible
-      if (!panel.hidden) panel.querySelectorAll('.fee-form-open:not([hidden]) iframe[data-src]').forEach(frame => {
+      // the embedded (Google) form only loads when its tab and its period's content are visible
+      if (!panel.hidden) panel.querySelectorAll('.fee-content:not([hidden]) .fee-form-open:not([hidden]) iframe[data-src]').forEach(frame => {
         // only a Google Form may be embedded here (the address comes from a sheet)
         if (frame.dataset.src.startsWith('https://docs.google.com/forms/')) frame.src = frame.dataset.src;
         frame.removeAttribute('data-src');

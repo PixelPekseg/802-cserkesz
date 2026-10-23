@@ -26,6 +26,9 @@ jobs:
     # a hung download must not block the hourly runs (a normal run takes 1–3 minutes)
     timeout-minutes: 20
     env:
+      # Dates (expired notices, closed forms, the September 1 troop step-up) are evaluated in
+      # Hungarian time, not in the runner's UTC
+      TZ: Europe/Budapest
       # The shared "Csapat adatai" workbook (Csapatvezetés, Rajok, Számlálók, Táborok sheets), published
       # as a whole in Excel (.xlsx) format.
       TEAM_SHEET_URL: https://docs.google.com/spreadsheets/d/e/2PACX-1vSNyNpdFavNXNehYPeRSQPIFVAoJvAnhYHvsccsap6jcOZuWMf_JlW2MbptfsoMhiPl4FPGKrzf5fjc/pub?output=xlsx
@@ -105,7 +108,9 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add *.html data/ images/webp/kozos/team/ images/webp/programok/
+          # images/webp as a whole: a named subfolder that no longer exists (e.g. every program image
+          # removed) would make "git add" fail and lose every other change of the run
+          git add -A -- '*.html' data images/webp
           if git diff --cached --quiet; then
             echo "Nincs változás."
             exit 0

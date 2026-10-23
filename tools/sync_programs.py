@@ -67,20 +67,6 @@ FACEBOOK_HOSTS = {'facebook.com', 'www.facebook.com', 'm.facebook.com', 'web.fac
 warn, fail = common.warn, common.fail
 
 
-def resolve_columns(header):
-    lowered = [cell.strip().lower() for cell in header]
-    index = {}
-    for key, prefix in COLUMNS.items():
-        for i, cell in enumerate(lowered):
-            if cell.startswith(prefix):
-                index[key] = i
-                break
-    missing = [COLUMNS[key] for key in REQUIRED if key not in index]
-    if missing:
-        fail('A táblázat fejlécéből hiányzik: ' + ', '.join(missing) + '. Valaki átírta az első sort?')
-    return index
-
-
 def parse_date(text):
     match = re.search(r'(\d{4})\D+(\d{1,2})\D+(\d{1,2})', text or '')
     if not match:
@@ -222,9 +208,9 @@ def build_card(row, used_ids):
 
 def parse_rows(csv_text):
     reader = list(csv.reader(io.StringIO(csv_text)))
-    if not reader:
+    if not any(any(c.strip() for c in row) for row in reader):
         fail('A táblázat üres.')
-    index = resolve_columns(reader[0])
+    header_row, index = common.find_header(reader, COLUMNS, REQUIRED)
 
     def cell(row, key):
         i = index.get(key)
@@ -236,7 +222,7 @@ def parse_rows(csv_text):
         return value
 
     parsed = []
-    for line_number, row in enumerate(reader[1:], start=2):
+    for line_number, row in enumerate(reader[header_row + 1:], start=header_row + 2):
         if not any(c.strip() for c in row):
             continue  # completely empty row
         label = f'{line_number}. sor ({cell(row, "name") or "név nélkül"})'
@@ -262,8 +248,10 @@ def parse_rows(csv_text):
         if end_time and not start_time:
             warn(f'{label}: van befejező idő, de nincs kezdő idő, a befejező idő figyelmen kívül marad.')
             end_time = None
-        if start_time and end_time and end_time <= start_time and not end:
-            warn(f'{label}: a befejező idő ({end_time}) nem a kezdő idő ({start_time}) után van, figyelmen kívül hagyva.')
+        # an end time before the start time means the next day (e.g. a night hike 22:00–02:00);
+        # only an identical start and end time is surely a typo
+        if start_time and end_time and end_time == start_time:
+            warn(f'{label}: a kezdő és a befejező idő ugyanaz ({start_time}), a befejező idő figyelmen kívül marad.')
             end_time = None
         facebook = cell(row, 'facebook')
         if facebook and not common.safe_url(facebook, FACEBOOK_HOSTS):
@@ -279,7 +267,7 @@ def parse_rows(csv_text):
             'facebook': facebook, 'image_folder': cell(row, 'images'), 'label': label,
         })
     parsed.sort(key=lambda r: (r['start'], r['start_time'] or ''))
-    return parsed
+    return parsed, 'images' in index   # whether the sheet has a "Képek" column at all
 
 
 def main():
@@ -289,15 +277,14 @@ def main():
     args = parser.parse_args()
 
     csv_text = common.fetch(args, 'Programok', book_env=common.LEADERS_SHEET_ENV)
-    rows = parse_rows(csv_text)
+    rows, rows_have_image_column = parse_rows(csv_text)
     if not rows and not os.environ.get('ALLOW_EMPTY'):
         fail('Egyetlen érvényes, megjelenő program sincs a táblázatban, ezért nem írom felül az oldalt.')
 
     images = ProgramImages()
     for row in rows:
         row['images'] = images.images_for(row['image_folder'], row['label'])
-    has_image_column = any(cell.strip().lower().startswith(COLUMNS['images'])
-                           for cell in next(csv.reader(io.StringIO(csv_text)), []))
+    has_image_column = rows_have_image_column
     if not has_image_column:
         warn('A táblázatban nincs "Képek" oszlop, ezért a programképeket most nem törlöm (a meglévők maradnak).')
     images.finish(allow_delete=has_image_column)

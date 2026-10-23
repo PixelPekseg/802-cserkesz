@@ -24,7 +24,7 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import sync_common as common
-from drive_photos import PhotoSync
+from drive_photos import PhotoSync, slugify
 from person_card import build_card
 
 INDEX = os.path.join(common.ROOT, 'index.html')
@@ -64,7 +64,12 @@ def main():
         if row['email'] and '@' not in row['email']:
             common.warn(f'{line_number}. sor: az e-mail cím nem tűnik érvényesnek, kihagyva: "{row["email"]}"')
             row['email'] = ''
-        row['photo'] = photos.photo_for(row['name'], row['filename'], f'{line_number}. sor ({row["name"]})')
+        if any(slugify(p['name']) == slugify(row['name']) for p in people):
+            common.warn(f'{line_number}. sor: "{row["name"]}" neve egy korábbi sorral egyezik (ékezet nélkül); '
+                        'a fotójuk ugyanabba a fájlba kerülne, ezért ennek a sornak nem töltök fotót (monogram).')
+            row['photo'] = None
+        else:
+            row['photo'] = photos.photo_for(row['name'], row['filename'], f'{line_number}. sor ({row["name"]})')
         people.append(row)
     if not people:
         common.fail('Egyetlen megjelenő vezető sincs a táblázatban, ezért nem írom felül az oldalt.')

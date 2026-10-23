@@ -98,6 +98,7 @@ class ProgramImages:
             self.state = {}
         self.used = set()
         self.synced = set()
+        self.folder_of = {}   # storage slug -> the folder name it was first used for
         self.updated = []
         self.warned_disabled = False
 
@@ -105,6 +106,13 @@ class ProgramImages:
         """Items of the folder: [{'thumb', 'full', 'video'}, ...] ('video' is the Drive id or None)."""
         parts, slug = folder_parts(folder_name)
         if not slug:
+            return []
+        key = '/'.join(p.strip().lower() for p in parts)
+        if self.folder_of.setdefault(slug, key) != key:
+            # two different Drive folders that differ only in accents/punctuation share a storage
+            # folder, so the second program would show the first one's images
+            common.warn(f'{where}: a(z) "{"/".join(parts)}" mappa neve csak ékezetben vagy írásjelben tér el a(z) '
+                        f'"{self.folder_of[slug]}" mappától, ezért az oldalon ugyanaz lenne a képük. Nevezd át az egyiket.')
             return []
         self.used.add(slug)
         if slug not in self.synced:

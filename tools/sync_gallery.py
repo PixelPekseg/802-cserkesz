@@ -87,7 +87,7 @@ def program_groups():
         state = json.load(open(PROGRAM_STATE, encoding='utf-8'))
     except (FileNotFoundError, json.JSONDecodeError):
         state = {}
-    rows = programs.parse_rows(open(snapshot, encoding='utf-8').read())
+    rows, _ = programs.parse_rows(open(snapshot, encoding='utf-8').read())
     folders = {}
     for row in rows:
         _, slug = folder_parts(row['image_folder'])

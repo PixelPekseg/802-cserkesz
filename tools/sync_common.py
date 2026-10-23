@@ -223,14 +223,11 @@ def is_sheet_error(value):
     return value.strip().upper() in SHEET_ERRORS
 
 
-def read_table(csv_text, columns, required):
-    """Finds column indexes from the header row (compares the START of each header, lowercased;
-    a key may accept several prefixes as a tuple) and returns the rows as dicts:
-    [(line number, {key: value}), ...]."""
-    rows = list(csv.reader(io.StringIO(csv_text)))
-    if not rows:
-        fail('A táblázat üres.')
-    lowered = [cell.strip().lower() for cell in rows[0]]
+HEADER_SEARCH_ROWS = 5   # the header may sit a few rows down (an empty or title row inserted above it)
+
+
+def _match_columns(header, columns):
+    lowered = [cell.strip().lower() for cell in header]
     index = {}
     for key, prefix in columns.items():
         prefixes = prefix if isinstance(prefix, tuple) else (prefix,)   # several accepted headers
@@ -238,11 +235,37 @@ def read_table(csv_text, columns, required):
             if cell.startswith(prefixes):
                 index[key] = i
                 break
+    return index
+
+
+def find_header(rows, columns, required):
+    """(header row index, {key: column index}). Looks at the first few rows, so a row inserted
+    above the header by mistake does not break the sync; fails if no row has every required column."""
+    best = None
+    for n, row in enumerate(rows[:HEADER_SEARCH_ROWS]):
+        index = _match_columns(row, columns)
+        if all(key in index for key in required):
+            if n:
+                warn(f'A fejléc a(z) {n + 1}. sorban van (fölötte üres vagy más sor áll); így is beolvasom, '
+                     'de érdemes a fölötte lévő sort törölni.')
+            return n, index
+        if best is None or len(index) > len(best[1]):
+            best = (n, index)
+    index = best[1] if best else {}
     missing = [(lambda p: p if isinstance(p, str) else p[0])(columns[key]) for key in required if key not in index]
-    if missing:
-        fail('A táblázat fejlécéből hiányzik: ' + ', '.join(missing) + '. Valaki átírta az első sort?')
+    fail('A táblázat fejlécéből hiányzik: ' + ', '.join(missing) + '. Valaki átírta vagy törölte a fejléc sorát?')
+
+
+def read_table(csv_text, columns, required):
+    """Finds column indexes from the header row (compares the START of each header, lowercased;
+    a key may accept several prefixes as a tuple) and returns the rows as dicts:
+    [(line number, {key: value}), ...]."""
+    rows = list(csv.reader(io.StringIO(csv_text)))
+    if not any(any(cell.strip() for cell in row) for row in rows):
+        fail('A táblázat üres.')
+    header_row, index = find_header(rows, columns, required)
     result = []
-    for line_number, row in enumerate(rows[1:], start=2):
+    for line_number, row in enumerate(rows[header_row + 1:], start=header_row + 2):
         if not any(cell.strip() for cell in row):
             continue
         record = {}
