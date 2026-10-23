@@ -2,7 +2,7 @@
 """Updates the red notice bar at the top of every HTML page from the Értesítők sheet.
 
 Usage:
-    python tools/sync_notices.py                 # from LEADERS_SHEET_URL (or the old NOTICES_CSV_URL)
+    python tools/sync_notices.py                 # from LEADERS_SHEET_URL
     python tools/sync_notices.py --xlsx v.xlsx   # from a local copy of the shared workbook
     python tools/sync_notices.py --file x.csv    # from a local CSV file (for testing)
 
@@ -85,8 +85,8 @@ def build_notice(row, start, until, deadline):
 
 
 def main():
-    args, env_name = common.get_args('NOTICES_CSV_URL')
-    csv_text = common.fetch(args, env_name, sheet='Értesítők', book_env=common.LEADERS_SHEET_ENV)
+    args = common.get_args()
+    csv_text = common.fetch(args, 'Értesítők', book_env=common.LEADERS_SHEET_ENV)
     table = common.read_table(csv_text, COLUMNS, required=['title', 'message', 'visible'])
     today = dt.date.today()
 

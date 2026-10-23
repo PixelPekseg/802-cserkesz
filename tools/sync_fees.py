@@ -41,7 +41,6 @@ import json
 import os
 import re
 import sys
-import urllib.request
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import sync_common as common
@@ -206,11 +205,17 @@ def money(text):
     return text
 
 
-def check_link(text, what):
-    if text and not re.match(r'https://', text):
-        common.warn(f'A(z) {what} nem https:// kezdetű, kihagyom: "{text}"')
+# Links typed into the sheet may only point here (anything else is dropped with a warning):
+# the ECSET list is a Drive/Docs file, the support form a Google Form (it is embedded in the page).
+ECSET_HOSTS = {'drive.google.com', 'docs.google.com'}
+FORM_HOSTS = {'docs.google.com'}
+
+
+def check_link(text, what, hosts, path_prefix=''):
+    if text and not common.safe_url(text, hosts, path_prefix):
+        common.warn(f'A(z) {what} nem engedélyezett cím ({", ".join(sorted(hosts))}{path_prefix}…), kihagyom: "{text}"')
         return ''
-    return text
+    return text.strip()
 
 
 # ---------- HTML ----------
@@ -308,7 +313,7 @@ def render_form(form_link, deadline=''):
                 az alábbi űrlap kitöltésével.
               </p>
               <div class="fee-form-frame">
-                <iframe data-src="{esc(embed)}" title="Támogatás igénylése (Google Űrlap)" loading="lazy">Betöltés…</iframe>
+                <iframe data-src="{esc(embed)}" title="Támogatás igénylése (Google Űrlap)" loading="lazy" sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox">Betöltés…</iframe>
               </div>
               <p class="fee-form-link">Nem jelenik meg az űrlap? <a class="inline-link" href="{esc(form_link)}" target="_blank" rel="noopener noreferrer">Megnyitás új lapon</a></p>
             </div>{closed_text}
@@ -415,17 +420,16 @@ def render_tab(key, data, today):
 
 def fetch_bytes(url):
     try:
-        with urllib.request.urlopen(url, timeout=30) as response:
-            return response.read()
-    except Exception as error:
+        return common.download(url)
+    except common.DownloadError as error:
         raise SheetError(f'a letöltés nem sikerült: {error}')
 
 
 def read_tab(sheet):
     blocks = split_blocks(sheet)
     fields = read_fields(blocks.get('fields'))
-    fields['ecset'] = check_link(fields['ecset'], 'ECSET kódok linkje')
-    fields['form'] = check_link(fields['form'], 'támogatás űrlap linkje')
+    fields['ecset'] = check_link(fields['ecset'], 'ECSET kódok linkje', ECSET_HOSTS)
+    fields['form'] = check_link(fields['form'], 'támogatás űrlap linkje', FORM_HOSTS, '/forms/')
     result = {'fields': fields}
     for key, (block_name, columns) in BLOCKS.items():
         result[key] = read_rows(blocks.get(key), block_name, columns)

@@ -2,7 +2,7 @@
 """Updates the troop (raj) cards on csatlakozom.html from the Rajok sheet.
 
 Usage:
-    python tools/sync_troops.py                 # from TEAM_SHEET_URL (or the old TROOPS_CSV_URL)
+    python tools/sync_troops.py                 # from TEAM_SHEET_URL
     python tools/sync_troops.py --xlsx t.xlsx   # from a local copy of the shared workbook
     python tools/sync_troops.py --file x.csv    # from a local CSV file (for testing)
 
@@ -87,8 +87,8 @@ def build_cub_camp_group(row, start_year, today):
 
 
 def main():
-    args, env_name = common.get_args('TROOPS_CSV_URL')
-    csv_text = common.fetch(args, env_name, sheet='Rajok')
+    args = common.get_args()
+    csv_text = common.fetch(args, 'Rajok')
     table = common.read_table(csv_text, COLUMNS, required=['name', 'year', 'visible'])
     today = dt.date.today()
 

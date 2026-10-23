@@ -69,7 +69,6 @@ const DISMISS_KEYS = ['closedNotices', 'upcomingTabClosed'];
 (function resetDismissalsOnReload() {
   const navigation = performance.getEntriesByType?.('navigation')[0];
   try {
-    localStorage.removeItem('closedNotices');   // leftover of the earlier, persistent storage
     if (navigation?.type === 'reload') DISMISS_KEYS.forEach(key => sessionStorage.removeItem(key));
   } catch (e) { /* storage not available – everything is shown */ }
 })();
@@ -929,6 +928,8 @@ document.querySelectorAll('a[href^="mailto:"]').forEach(link => {
       play.setAttribute('aria-label', `${item.alt} lejátszása`);
       play.addEventListener('click', () => {
         const frame = document.createElement('iframe');
+        // the Drive player runs in a sandbox (it cannot navigate this page); set before src
+        frame.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-presentation allow-popups allow-popups-to-escape-sandbox');
         frame.src = `https://drive.google.com/file/d/${encodeURIComponent(item.dataset.video)}/preview`;
         frame.title = item.alt;
         frame.allow = 'autoplay; fullscreen';
@@ -1425,7 +1426,8 @@ function updateCubCampContact(now = new Date()) {
       panel.hidden = panel.dataset.tab !== name;
       // the embedded (Google) form only loads when its tab is visible
       if (!panel.hidden) panel.querySelectorAll('.fee-form-open:not([hidden]) iframe[data-src]').forEach(frame => {
-        frame.src = frame.dataset.src;
+        // only a Google Form may be embedded here (the address comes from a sheet)
+        if (frame.dataset.src.startsWith('https://docs.google.com/forms/')) frame.src = frame.dataset.src;
         frame.removeAttribute('data-src');
       });
     });

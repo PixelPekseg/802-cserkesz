@@ -22,7 +22,6 @@ import io
 import json
 import os
 import shutil
-import urllib.request
 
 import sync_common as common
 from drive_photos import Drive, is_image, is_program_folder, is_video, save_json, slugify, to_webp
@@ -30,6 +29,12 @@ from drive_photos import Drive, is_image, is_program_folder, is_video, save_json
 DIR_REL = 'images/webp/programok'
 DIR = os.path.join(common.ROOT, *DIR_REL.split('/'))
 STATE = os.path.join(common.ROOT, 'data', 'program_images.json')
+
+
+def _inside_dir(path):
+    """True only for a folder strictly inside images/webp/programok (a safety net before deleting)."""
+    base = os.path.realpath(DIR)
+    return os.path.realpath(path).startswith(base + os.sep)
 FULL_LONG_SIDE = 1400   # in the lightbox
 THUMB_LONG_SIDE = 480   # on the card
 MAX_ITEMS = 40
@@ -132,9 +137,8 @@ class ProgramImages:
             return None
         link = link.replace('=s220', '=s1600')   # larger version
         try:
-            with urllib.request.urlopen(link, timeout=30) as response:
-                return response.read()
-        except Exception:
+            return common.download(link)
+        except common.DownloadError:
             return None
 
     def _sync(self, parts, slug, where):
@@ -198,10 +202,8 @@ class ProgramImages:
                     files[name] = previous     # the old version stays
                     order.append(name)
                 continue
-            os.makedirs(os.path.dirname(thumb_path), exist_ok=True)
             for path, content in ((full_path, full), (thumb_path, thumb)):
-                with open(path, 'wb') as handle:
-                    handle.write(content)
+                common.write_bytes(path, content)
             files[name] = stamp
             order.append(name)
             self.updated.append(f'{slug}/{name}' + (' (videó)' if video else ''))
@@ -216,19 +218,22 @@ class ProgramImages:
 
     def _drop(self, slug):
         target = os.path.join(DIR, slug)
-        if os.path.isdir(target):
+        if os.path.isdir(target) and _inside_dir(target):
             shutil.rmtree(target)
             self.updated.append(f'{slug} (törölve)')
         self.state.pop(slug, None)
 
-    def finish(self):
-        """Deletes the files of folders no program uses any more, and saves the state."""
-        if self.drive.enabled:
+    def finish(self, allow_delete=True):
+        """Deletes the files of folders no program uses any more, and saves the state.
+        allow_delete=False keeps every stored folder (used when the sheet's "Képek" column is
+        missing: then every program would look image-less, and all images would be deleted)."""
+        if self.drive.enabled and allow_delete:
             for slug in list(self.state):
                 if slug not in self.used:
                     self._drop(slug)
             if os.path.isdir(DIR):
                 for entry in os.listdir(DIR):
-                    if entry not in self.used and os.path.isdir(os.path.join(DIR, entry)):
-                        shutil.rmtree(os.path.join(DIR, entry))
+                    path = os.path.join(DIR, entry)
+                    if entry not in self.used and os.path.isdir(path) and _inside_dir(path):
+                        shutil.rmtree(path)
         save_json(STATE, self.state)

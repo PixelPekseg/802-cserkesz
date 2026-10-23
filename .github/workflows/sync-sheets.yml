@@ -23,75 +23,64 @@ concurrency:
 jobs:
   sync:
     runs-on: ubuntu-latest
+    # a hung download must not block the hourly runs (a normal run takes 1–3 minutes)
+    timeout-minutes: 20
     env:
       # The shared "Csapat adatai" workbook (Csapatvezetés, Rajok, Számlálók, Táborok sheets), published
-      # as a whole in Excel (.xlsx) format. When set, these four steps read from it and ignore the
-      # old per-sheet *_CSV_URL addresses of the steps.
+      # as a whole in Excel (.xlsx) format.
       TEAM_SHEET_URL: https://docs.google.com/spreadsheets/d/e/2PACX-1vSNyNpdFavNXNehYPeRSQPIFVAoJvAnhYHvsccsap6jcOZuWMf_JlW2MbptfsoMhiPl4FPGKrzf5fjc/pub?output=xlsx
       # The shared "Vezetői táblázat" workbook (Programok, Értesítők, Eszközök, Eszközök kapcsolattartója
-      # sheets), edited by every leader; published as a whole in Excel (.xlsx) format. When set, the
-      # programs, notices and equipment steps read from it and ignore the old per-sheet *_CSV_URL addresses.
+      # sheets), edited by every leader; published as a whole in Excel (.xlsx) format.
       LEADERS_SHEET_URL: https://docs.google.com/spreadsheets/d/e/2PACX-1vRP5XgBM0ai_DzoDBPQTH5-OgK9hiTGr7opLP4V0sr58ONPOaMQw3xPKiUwGaCTiSBMBtApZIo893Vk/pub?output=xlsx
+      # Public id of the Drive "Képek és videók" folder (not a secret; only the API key is)
+      DRIVE_IMAGES_FOLDER_ID: 13jB-lTr4Eqt1WOImYwWhMahGHwDTLALA
     steps:
-      - uses: actions/checkout@v4
+      # Actions are pinned to a full commit SHA (a tag can be moved, a SHA cannot): supply-chain safety.
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262   # v4.4.0
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065   # v5.6.0
         with:
           python-version: '3.12'
 
-      # For processing the images from Drive (portraits, program images: WebP, iPhone HEIC) and the xlsx workbooks
+      # For processing the images from Drive (portraits, program images: WebP, iPhone HEIC) and the
+      # xlsx workbooks; exact versions in tools/requirements.txt
       - name: Képkezelő csomagok telepítése
-        run: pip install --quiet pillow pillow-heif openpyxl
+        run: pip install --quiet --disable-pip-version-check -r tools/requirements.txt
 
       - name: Programok (kártyák + képek a Drive-ról) frissítése
         if: ${{ !cancelled() }}
         env:
-          DRIVE_IMAGES_FOLDER_ID: 13jB-lTr4Eqt1WOImYwWhMahGHwDTLALA
           GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
-          PROGRAMS_CSV_URL: https://docs.google.com/spreadsheets/d/e/2PACX-1vRxIhMKUiMXX41ujoCjIpmizaXDQwlRyBieMUQZSqZcFUF3ChIpqB1d5Q2Br608v88gWJOSxcu46zPV/pub?gid=659195366&single=true&output=csv
         run: python tools/sync_programs.py
 
       # The following steps run even if an earlier one failed (one broken sheet must not block the
       # others); the run is still shown as failed on GitHub.
       - name: Táborok letöltése és az oldal frissítése
         if: ${{ !cancelled() }}
-        env:
-          CAMPS_CSV_URL: https://docs.google.com/spreadsheets/d/e/2PACX-1vSKJZCKF6eEgtepX6QnyK6d2cWgMlBenGM2il8-DDNytnpuUNoo1Eh37bdvaoroRgJrwyNfyTDIwzsy/pub?gid=1184983016&single=true&output=csv
         run: python tools/sync_camps.py
 
       - name: Rajok letöltése és az oldal frissítése
         if: ${{ !cancelled() }}
-        env:
-          TROOPS_CSV_URL: https://docs.google.com/spreadsheets/d/e/2PACX-1vSo3ta8YoCSTVLeuRsM1CHEXhe2TKCUrlYM4wG6UENCMWkkMgbqnwLe-bvMzxjyKxk9IsfZ40NA4__Z/pub?gid=1082322737&single=true&output=csv
         run: python tools/sync_troops.py
 
       - name: Értesítők letöltése és az oldalak frissítése
         if: ${{ !cancelled() }}
-        env:
-          NOTICES_CSV_URL: https://docs.google.com/spreadsheets/d/e/2PACX-1vSCFQEfDB5PGysGIga4CyQ7XH2KX09TWyreCDGbciXWjAP9a4PUgFuH6MbBRCjUZKOWaLA_BzbIuvXs/pub?gid=160520110&single=true&output=csv
         run: python tools/sync_notices.py
 
       - name: Számlálók letöltése és az oldalak frissítése
         if: ${{ !cancelled() }}
-        env:
-          COUNTERS_CSV_URL: https://docs.google.com/spreadsheets/d/e/2PACX-1vQG9oKFwKR3SA_rogOVR9y6l_pefGSZKirDeMSxZU7_F-PdaYSleD8wkEQKg89VPK_ThCB2xQzJUWLA/pub?gid=1088990736&single=true&output=csv
         run: python tools/sync_counters.py
 
       - name: Csapatvezetés (kártyák + fotók a Drive-ról) frissítése
         if: ${{ !cancelled() }}
         env:
-          LEADERS_CSV_URL: https://docs.google.com/spreadsheets/d/e/2PACX-1vTZ5xTnj9CNorqCmaTuwwpy-EPoRpyBcjJTMWM5QPH5G1lccxpX-z1DA0uwvh3emtt-OLgib1zOfLHf/pub?gid=1268841503&single=true&output=csv
-          DRIVE_IMAGES_FOLDER_ID: 13jB-lTr4Eqt1WOImYwWhMahGHwDTLALA
           GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
         run: python tools/sync_leaders.py
 
       - name: Eszközök letöltése és az oldal frissítése
         if: ${{ !cancelled() }}
         env:
-          DRIVE_IMAGES_FOLDER_ID: 13jB-lTr4Eqt1WOImYwWhMahGHwDTLALA
           GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
-          EQUIPMENT_CSV_URL: https://docs.google.com/spreadsheets/d/e/2PACX-1vTawBNHKmmN8o2RHWIeLXtHikZ7oJTr19isdSULQXbp2sJte3a5TnaKpjeM_TA5UkxhjZ6OtOVCtMRD/pub?gid=263580124&single=true&output=csv
-          EQUIPMENT_CONTACT_CSV_URL: https://docs.google.com/spreadsheets/d/e/2PACX-1vTawBNHKmmN8o2RHWIeLXtHikZ7oJTr19isdSULQXbp2sJte3a5TnaKpjeM_TA5UkxhjZ6OtOVCtMRD/pub?gid=1765500368&single=true&output=csv
         run: python tools/sync_equipment.py
 
       # Finance page: one workbook (sheets: Leírás, Tagdíj, Nagytábordíj, Kcs tábordíj), the WHOLE
@@ -119,7 +108,13 @@ jobs:
           git add *.html data/ images/webp/kozos/team/ images/webp/programok/
           if git diff --cached --quiet; then
             echo "Nincs változás."
-          else
-            git commit -m "Oldal frissítése a táblázatból"
-            git push
+            exit 0
           fi
+          git commit -m "Oldal frissítése a táblázatból"
+          # if someone pushed in the meantime, rebase onto it and try again (at most 3 times)
+          for attempt in 1 2 3; do
+            if git push; then exit 0; fi
+            echo "A push nem sikerült ($attempt. próba), frissítem az ágat és újrapróbálom."
+            git pull --rebase --quiet || { git rebase --abort; exit 1; }
+          done
+          exit 1

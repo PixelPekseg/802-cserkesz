@@ -3,7 +3,7 @@
 page and on the Rólunk page from the Számlálók sheet.
 
 Usage:
-    python tools/sync_counters.py                 # from TEAM_SHEET_URL (or the old COUNTERS_CSV_URL)
+    python tools/sync_counters.py                 # from TEAM_SHEET_URL
     python tools/sync_counters.py --xlsx t.xlsx   # from a local copy of the shared workbook
     python tools/sync_counters.py --file x.csv    # from a local CSV file (for testing)
 
@@ -46,8 +46,8 @@ def build_block(cards, indent):
 
 
 def main():
-    args, env_name = common.get_args('COUNTERS_CSV_URL')
-    csv_text = common.fetch(args, env_name, sheet='Számlálók')
+    args = common.get_args()
+    csv_text = common.fetch(args, 'Számlálók')
     table = common.read_table(csv_text, COLUMNS, required=['label', 'number', 'visible'])
 
     cards = []

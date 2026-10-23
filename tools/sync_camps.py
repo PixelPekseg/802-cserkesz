@@ -2,7 +2,7 @@
 """Updates the camp cards on tabor.html from the Táborok sheet.
 
 Usage:
-    python tools/sync_camps.py                 # from TEAM_SHEET_URL (or the old CAMPS_CSV_URL)
+    python tools/sync_camps.py                 # from TEAM_SHEET_URL
     python tools/sync_camps.py --xlsx t.xlsx   # from a local copy of the shared workbook
     python tools/sync_camps.py --file x.csv    # from a local CSV file (for testing)
 
@@ -61,8 +61,8 @@ def build_card(row):
 
 
 def main():
-    args, env_name = common.get_args('CAMPS_CSV_URL')
-    csv_text = common.fetch(args, env_name, sheet='Táborok')
+    args = common.get_args()
+    csv_text = common.fetch(args, 'Táborok')
     table = common.read_table(csv_text, COLUMNS, required=['name', 'visible'])
 
     rows = []

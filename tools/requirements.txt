@@ -1,0 +1,6 @@
+# Python packages of the sync scripts (installed by .github/workflows/sync-sheets.yml).
+# Pinned to exact, already proven versions so a new release cannot change or break the run
+# unnoticed; update them deliberately (and test locally) instead.
+pillow==12.1.0        # image processing (WebP output)
+pillow-heif==1.8.0    # HEIC photos from iPhones
+openpyxl==3.1.5       # reading the shared .xlsx workbooks

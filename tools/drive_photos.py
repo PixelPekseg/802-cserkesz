@@ -25,7 +25,6 @@ import os
 import re
 import unicodedata
 import urllib.parse
-import urllib.request
 
 import sync_common as common
 
@@ -116,9 +115,8 @@ class Drive:
                 if token:
                     params['pageToken'] = token
                 try:
-                    with urllib.request.urlopen(f'{API}?{urllib.parse.urlencode(params)}', timeout=30) as response:
-                        data = json.load(response)
-                except Exception as error:
+                    data = json.loads(common.download(f'{API}?{urllib.parse.urlencode(params)}').decode('utf-8'))
+                except (common.DownloadError, ValueError) as error:
                     common.fail('A Drive "Képek" mappa olvasása nem sikerült (jó a mappa azonosítója, nyilvános a '
                                 f'mappa, be van kapcsolva a Drive API, és érvényes az API-kulcs?): {error}')
                 items += data.get('files', [])
@@ -140,8 +138,7 @@ class Drive:
             with open(item['id'], 'rb') as handle:
                 return handle.read()
         url = f'{API}/{urllib.parse.quote(item["id"])}?alt=media&key={urllib.parse.quote(self.api_key)}'
-        with urllib.request.urlopen(url, timeout=60) as response:
-            return response.read()
+        return common.download(url, timeout=60)
 
     @staticmethod
     def stamp(item):
@@ -223,11 +220,9 @@ class PhotoSync:
         except Exception as error:
             common.warn(f'{where}: a(z) "{filename}" most nem tölthető le ({error}); a régi fotó marad, ha van.')
             return True
-        os.makedirs(TEAM_DIR, exist_ok=True)
         old = open(target_path, 'rb').read() if os.path.exists(target_path) else None
         if old != webp:
-            with open(target_path, 'wb') as handle:
-                handle.write(webp)
+            common.write_bytes(target_path, webp)
             self.updated.append(target_name)
         self.state[target_name] = stamp
         return True
@@ -237,9 +232,4 @@ class PhotoSync:
 
 
 def save_json(path, data):
-    os.makedirs(os.path.dirname(path), exist_ok=True)
-    text = json.dumps(data, ensure_ascii=False, indent=2, sort_keys=True) + '\n'
-    old = open(path, encoding='utf-8').read() if os.path.exists(path) else None
-    if old != text:
-        with open(path, 'w', encoding='utf-8') as handle:
-            handle.write(text)
+    common.save_snapshot(path, json.dumps(data, ensure_ascii=False, indent=2, sort_keys=True) + '\n')

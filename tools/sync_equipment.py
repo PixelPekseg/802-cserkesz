@@ -3,8 +3,7 @@
 sheets (Eszközök, Eszközök kapcsolattartója).
 
 Usage:
-    python tools/sync_equipment.py                 # from LEADERS_SHEET_URL (or the old
-                                                   # EQUIPMENT_CSV_URL and EQUIPMENT_CONTACT_CSV_URL)
+    python tools/sync_equipment.py                 # from LEADERS_SHEET_URL
     python tools/sync_equipment.py --xlsx v.xlsx   # from a local copy of the shared workbook
     python tools/sync_equipment.py --file e.csv --contact-file k.csv   # from local CSV files (for testing)
 
@@ -61,17 +60,15 @@ def build_contacts(rows):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--url')
-    parser.add_argument('--file')
-    parser.add_argument('--contact-url')
-    parser.add_argument('--contact-file')
+    parser.add_argument('--file', help='local CSV export of the Eszközök sheet (for testing)')
+    parser.add_argument('--contact-file', help='local CSV export of the contacts sheet (for testing)')
     parser.add_argument('--xlsx', help='local .xlsx copy of the shared leaders workbook')
     args = parser.parse_args()
 
-    items_csv = common.fetch(argparse.Namespace(url=args.url, file=args.file, xlsx=args.xlsx), 'EQUIPMENT_CSV_URL',
-                             sheet='Eszközök', book_env=common.LEADERS_SHEET_ENV)
-    contacts_csv = common.fetch(argparse.Namespace(url=args.contact_url, file=args.contact_file, xlsx=args.xlsx),
-                                'EQUIPMENT_CONTACT_CSV_URL', sheet='Eszközök kapcsolattartója', book_env=common.LEADERS_SHEET_ENV)
+    items_csv = common.fetch(argparse.Namespace(file=args.file, xlsx=args.xlsx), 'Eszközök',
+                             book_env=common.LEADERS_SHEET_ENV)
+    contacts_csv = common.fetch(argparse.Namespace(file=args.contact_file, xlsx=args.xlsx),
+                                'Eszközök kapcsolattartója', book_env=common.LEADERS_SHEET_ENV)
 
     items = []
     for line_number, row in common.read_table(items_csv, ITEM_COLUMNS, required=['name', 'visible']):

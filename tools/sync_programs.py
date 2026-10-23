@@ -2,9 +2,8 @@
 """Updates the program cards of programok.html from the Programok sheet.
 
 Usage:
-    python tools/sync_programs.py                 # from LEADERS_SHEET_URL (or the old PROGRAMS_CSV_URL)
+    python tools/sync_programs.py                 # from LEADERS_SHEET_URL
     python tools/sync_programs.py --xlsx v.xlsx   # from a local copy of the shared workbook
-    python tools/sync_programs.py --url <link>    # from the given CSV link
     python tools/sync_programs.py --file x.csv    # from a local CSV file (for testing)
 
 Rewrites the section between two comments in programok.html and naptar.html (hidden there, for
@@ -27,12 +26,12 @@ import os
 import re
 import sys
 import unicodedata
-import urllib.request
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import sync_common as common  # noqa: E402
 from program_images import ProgramImages  # noqa: E402  (Drive images; PIL is only needed for image processing)
 
-ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+ROOT = common.ROOT
 PAGE = os.path.join(ROOT, 'programok.html')
 PAGES = [PAGE, os.path.join(ROOT, 'naptar.html')]   # the calendar page, hidden, for the calendar view
 SNAPSHOT = os.path.join(ROOT, 'data', 'programs.csv')
@@ -62,35 +61,10 @@ COLUMNS = {
     'visible': 'megjelenjen',
 }
 REQUIRED = ['name', 'start_date', 'visible']
+# Facebook event links typed into the sheet must point to Facebook (checked before publishing)
+FACEBOOK_HOSTS = {'facebook.com', 'www.facebook.com', 'm.facebook.com', 'web.facebook.com', 'fb.me', 'fb.com'}
 
-in_actions = os.environ.get('GITHUB_ACTIONS') == 'true'
-
-
-def warn(message):
-    print(('::warning::' if in_actions else 'FIGYELEM: ') + message)
-
-
-def fail(message):
-    print(('::error::' if in_actions else 'HIBA: ') + message)
-    sys.exit(1)
-
-
-def fetch(args):
-    # the Programok sheet of the shared leaders workbook (--xlsx or LEADERS_SHEET_URL), if given
-    if not args.file and (args.xlsx or os.environ.get('LEADERS_SHEET_URL')):
-        import sync_common
-        return sync_common.shared_sheet_csv(args, 'Programok', sync_common.LEADERS_SHEET_ENV)
-    if args.file:
-        with open(args.file, encoding='utf-8-sig') as handle:
-            return handle.read()
-    url = args.url or os.environ.get('PROGRAMS_CSV_URL')
-    if not url:
-        fail('Nincs megadva a CSV címe (PROGRAMS_CSV_URL vagy --url).')
-    try:
-        with urllib.request.urlopen(url, timeout=30) as response:
-            return response.read().decode('utf-8-sig')
-    except Exception as error:  # network error, 4xx/5xx etc.
-        fail(f'A táblázat letöltése nem sikerült: {error}')
+warn, fail = common.warn, common.fail
 
 
 def resolve_columns(header):
@@ -145,27 +119,8 @@ def display_date(start, end):
     return f'{full(start)} – {full(end)}'
 
 
-def fix_phone(phone):
-    """If the sheet turned "+36 …" into a number (e.g. 36707582659), returns it in readable form
-    (+36 70 758 2659). Any other input is returned unchanged. (See sync_common.fix_phone.)"""
-    raw = phone.strip()
-    if re.fullmatch(r'36\d{9}', raw):
-        return f'+36 {raw[2:4]} {raw[4:7]} {raw[7:]}'
-    if re.fullmatch(r'361\d{7}', raw):
-        return f'+36 1 {raw[3:6]} {raw[6:]}'
-    return phone
-
-
-# Google Sheets error values (e.g. "+36 …" parsed as a formula becomes #ERROR!) – never publish them
-SHEET_ERRORS = ('#ERROR!', '#NAME?', '#REF!', '#VALUE!', '#N/A', '#DIV/0!', '#NUM!', '#NULL!')
-
-
 def phone_link(phone):
-    phone = fix_phone(phone)
-    digits = re.sub(r'[^\d+]', '', phone)
-    if len(re.sub(r'\D', '', digits)) >= 6:
-        return f'<a class="inline-link" href="tel:{digits}">{html.escape(phone)}</a>'
-    return html.escape(phone)
+    return common.contact_lines('', phone)[0]
 
 
 def contact_html(name, email, phone):
@@ -274,7 +229,7 @@ def parse_rows(csv_text):
     def cell(row, key):
         i = index.get(key)
         value = row[i].strip() if i is not None and i < len(row) else ''
-        if value.upper() in SHEET_ERRORS:
+        if common.is_sheet_error(value):
             warn(f'Egy cellában táblázathiba van ({value}), üresnek veszem. (Telefonszámnál a "+" jel okozza: '
                  'állítsd az oszlopot Egyszerű szövegre, vagy írd így: \'+36 …)')
             return ''
@@ -306,8 +261,8 @@ def parse_rows(csv_text):
             warn(f'{label}: van befejező idő, de nincs kezdő idő, a befejező idő figyelmen kívül marad.')
             end_time = None
         facebook = cell(row, 'facebook')
-        if facebook and not re.match(r'https?://', facebook):
-            warn(f'{label}: a Facebook-link nem http(s)-sel kezdődik, kihagyva a linket.')
+        if facebook and not common.safe_url(facebook, FACEBOOK_HOSTS):
+            warn(f'{label}: a Facebook-link nem https://…facebook.com/ cím, kihagyva a linket.')
             facebook = ''
         parsed.append({
             'name': cell(row, 'name'), 'start': start, 'end': end,
@@ -324,12 +279,11 @@ def parse_rows(csv_text):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument('--url')
-    parser.add_argument('--file')
+    parser.add_argument('--file', help='local CSV export of the Programok sheet (for testing)')
     parser.add_argument('--xlsx', help='local .xlsx copy of the shared leaders workbook')
     args = parser.parse_args()
 
-    csv_text = fetch(args).replace('\r\n', '\n').replace('\r', '\n')
+    csv_text = common.fetch(args, 'Programok', book_env=common.LEADERS_SHEET_ENV)
     rows = parse_rows(csv_text)
     if not rows and not os.environ.get('ALLOW_EMPTY'):
         fail('Egyetlen érvényes, megjelenő program sincs a táblázatban, ezért nem írom felül az oldalt.')
@@ -337,30 +291,20 @@ def main():
     images = ProgramImages()
     for row in rows:
         row['images'] = images.images_for(row['image_folder'], row['label'])
-    images.finish()
+    has_image_column = any(cell.strip().lower().startswith(COLUMNS['images'])
+                           for cell in next(csv.reader(io.StringIO(csv_text)), []))
+    if not has_image_column:
+        warn('A táblázatban nincs "Képek" oszlop, ezért a programképeket most nem törlöm (a meglévők maradnak).')
+    images.finish(allow_delete=has_image_column)
 
     used_ids = set()
     cards = '\n\n'.join(build_card(row, used_ids) for row in rows)
 
     # the same cards on the Programok page and (hidden, for the calendar) on the Naptár page
-    pattern = re.compile(r'(<!-- PROGRAMS:START[^\n]*-->\n)(.*?)(\n[ \t]*<!-- PROGRAMS:END -->)', re.S)
     changed = False
     for path in PAGES:
-        with open(path, encoding='utf-8') as handle:
-            page = handle.read()
-        if not pattern.search(page):
-            fail(f'A {os.path.basename(path)}-ben nem találom a PROGRAMS:START / PROGRAMS:END jelölőket.')
-        new_page = pattern.sub(lambda m: m.group(1) + cards + '\n\n        <!-- PROGRAMS:END -->', page, count=1)
-        if new_page != page:
-            with open(path, 'w', encoding='utf-8') as handle:
-                handle.write(new_page)
-            changed = True
-
-    os.makedirs(os.path.dirname(SNAPSHOT), exist_ok=True)
-    old_snapshot = open(SNAPSHOT, encoding='utf-8').read() if os.path.exists(SNAPSHOT) else None
-    if old_snapshot != csv_text:
-        with open(SNAPSHOT, 'w', encoding='utf-8') as handle:
-            handle.write(csv_text)
+        changed |= common.replace_block(path, 'PROGRAMS', cards, ' ' * 8)
+    common.save_snapshot(SNAPSHOT, csv_text)
 
     print(f'{len(rows)} program; frissített képek: {len(images.updated)}; '
           f'programok.html/naptar.html {"frissítve" if changed else "változatlan"}.')

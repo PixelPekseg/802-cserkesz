@@ -744,14 +744,6 @@ section[id] {
   text-align: center;
 }
 
-.home-address {
-  margin: 0 auto 8px;
-  font-family: var(--font-heading);
-  font-size: 1.3rem;
-  font-weight: bold;
-  color: var(--color-primary);
-}
-
 .home-contact-title {
   margin-bottom: 20px;
   text-align: center;
@@ -2039,15 +2031,6 @@ body:has(.main-nav.open) .upcoming-tab {
   margin-bottom: 48px;
 }
 
-/* Footer: privacy notice link */
-.footer-privacy {
-  text-decoration: underline;
-}
-
-.footer-privacy:hover {
-  color: var(--color-highlight);
-}
-
 /* 404: button row */
 .error-links {
   display: flex;
@@ -2357,15 +2340,6 @@ body:has(.main-nav.open) .upcoming-tab {
   margin: 0 0 18px;
   line-height: 1.6;
   text-align: center;
-}
-
-.person-bio-title {
-  margin: 0 0 8px;
-  font-size: 0.8rem;
-  font-weight: 700;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  color: var(--color-accent);
 }
 
 .person-modal-body ul {
@@ -3431,10 +3405,6 @@ body:has(.main-nav.open) .upcoming-tab {
   color: #fff;
   background: var(--color-primary);
   border-radius: 30px;
-}
-
-.fee-form-cta {
-  text-align: center;
 }
 
 .fee-form-link {

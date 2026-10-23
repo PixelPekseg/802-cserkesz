@@ -2,6 +2,11 @@
 <html lang="hu">
 <head>
   <meta charset="UTF-8">
+  <!-- Content Security Policy: scripts only from this site (plus the hashed inline script of
+       404.html), embeds only from Google Forms/Drive/Maps; a defence in depth against injected code.
+       Keep it identical on every page; a new external resource has to be allowed here. -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-ILmEoDmaDFn/JUVySfZHBvQvwyPFL4ER1KanXS+sU4k='; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-src https://docs.google.com https://drive.google.com https://www.google.com https://maps.google.com; object-src 'none'; base-uri 'self'; form-action 'none'; upgrade-insecure-requests">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Csatlakozom – 802. sz. Szent Korona Cserkészcsapat</title>
   <meta name="description" content="Csapatunk 4. osztálytól fogadja a cserkészkedni vágyó gyerekeket Gödöllőről és környékéről. Itt találod osztályonként a rajparancsnokokat.">
@@ -23,7 +28,7 @@
 
   <link rel="icon" type="image/jpeg" href="images/webp/kozos/logo_green.jpg?v=1">
   <link rel="apple-touch-icon" href="images/webp/kozos/logo_green.jpg?v=1">
-  <link rel="stylesheet" href="style.css?v=114">
+  <link rel="stylesheet" href="style.css?v=115">
 </head>
 <body>
 
@@ -222,6 +227,6 @@
     </div>
   </footer>
 
-  <script src="script.js?v=70"></script>
+  <script src="script.js?v=71"></script>
 </body>
 </html>

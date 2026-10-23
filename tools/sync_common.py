@@ -9,20 +9,107 @@ import html
 import io
 import os
 import re
+import ssl
 import sys
+import tempfile
+import time
+import urllib.error
+import urllib.parse
 import urllib.request
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 in_actions = os.environ.get('GITHUB_ACTIONS') == 'true'
 
 
+def _log_text(message):
+    """Messages often quote sheet cells. In GitHub Actions a line starting with "::" is a workflow
+    command, so the data is escaped the official way (%, CR, LF): a cell cannot inject commands."""
+    text = str(message)
+    if in_actions:
+        text = text.replace('%', '%25').replace('\r', '%0D').replace('\n', '%0A')
+    return text
+
+
 def warn(message):
-    print(('::warning::' if in_actions else 'FIGYELEM: ') + message)
+    print(('::warning::' if in_actions else 'FIGYELEM: ') + _log_text(message))
 
 
 def fail(message):
-    print(('::error::' if in_actions else 'HIBA: ') + message)
+    print(('::error::' if in_actions else 'HIBA: ') + _log_text(message))
     sys.exit(1)
+
+
+# ---------- downloads ----------
+
+MAX_DOWNLOAD = 30 * 1024 * 1024   # a workbook or an image is far smaller; protects against runaway responses
+USER_AGENT = '802-cserkesz-sync (+https://github.com/PixelPekseg/802-cserkesz)'
+
+
+class DownloadError(Exception):
+    """A download failed. The message never contains the URL (it may carry an API key)."""
+
+
+def download(url, max_bytes=MAX_DOWNLOAD, timeout=30, attempts=3):
+    """Downloads an https URL and returns the bytes. Temporary errors (network, timeout, 5xx, 429)
+    are retried with a growing pause; permanent ones (other 4xx) fail at once."""
+    if urllib.parse.urlsplit(url).scheme != 'https':
+        raise DownloadError('csak https:// címről töltök le')
+    request = urllib.request.Request(url, headers={'User-Agent': USER_AGENT})
+    for attempt in range(1, attempts + 1):
+        try:
+            with urllib.request.urlopen(request, timeout=timeout) as response:
+                data = response.read(max_bytes + 1)
+            if len(data) > max_bytes:
+                raise DownloadError(f'a válasz nagyobb, mint {max(1, max_bytes // 1024)} kB')
+            return data
+        except urllib.error.HTTPError as error:
+            reason = f'HTTP {error.code}'
+            if error.code < 500 and error.code != 429:
+                raise DownloadError(reason) from None
+        except (urllib.error.URLError, TimeoutError, ConnectionError, OSError) as error:
+            reason = getattr(error, 'reason', None) or type(error).__name__
+            if isinstance(reason, ssl.SSLError):   # a certificate problem does not go away by retrying
+                raise DownloadError(f'SSL-hiba: {reason}') from None
+        if attempt < attempts:
+            time.sleep(3 * attempt)
+    raise DownloadError(f'{reason} ({attempts} próbálkozás után)')
+
+
+def safe_url(url, hosts, path_prefix=''):
+    """The URL if it is https and points to one of the allowed hosts (and path), otherwise ''.
+    Links typed into a sheet are checked with this before they reach the page."""
+    parts = urllib.parse.urlsplit(url.strip())
+    if parts.scheme != 'https' or (parts.hostname or '').lower() not in hosts:
+        return ''
+    if path_prefix and not parts.path.startswith(path_prefix):
+        return ''
+    return url.strip()
+
+
+# ---------- files ----------
+
+def _write_atomic(path, data, mode):
+    """Writes to a temporary file in the same folder, then swaps it in: an interrupted run never
+    leaves a half-written page, image or state file behind."""
+    folder = os.path.dirname(path) or '.'
+    os.makedirs(folder, exist_ok=True)
+    handle, temp = tempfile.mkstemp(dir=folder, prefix='.tmp-')
+    try:
+        with os.fdopen(handle, mode, **({'encoding': 'utf-8'} if 'b' not in mode else {})) as out:
+            out.write(data)
+        os.replace(temp, path)
+    except BaseException:
+        if os.path.exists(temp):
+            os.remove(temp)
+        raise
+
+
+def write_text(path, text):
+    _write_atomic(path, text, 'w')
+
+
+def write_bytes(path, data):
+    _write_atomic(path, data, 'wb')
 
 
 # Two shared workbooks, each published as a whole in Excel (.xlsx) format. When the URL is set,
@@ -34,12 +121,11 @@ TEAM_SHEET_ENV = 'TEAM_SHEET_URL'
 LEADERS_SHEET_ENV = 'LEADERS_SHEET_URL'
 
 
-def get_args(env_name):
+def get_args():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--url')
-    parser.add_argument('--file')
+    parser.add_argument('--file', help='local CSV export of the sheet (for testing)')
     parser.add_argument('--xlsx', help='local .xlsx copy of the shared workbook')
-    return parser.parse_args(), env_name
+    return parser.parse_args()
 
 
 def _cell_csv(value):
@@ -101,32 +187,22 @@ def shared_sheet_csv(args, sheet, book_env):
                 _BOOKS[key] = handle.read()
         else:
             try:
-                with urllib.request.urlopen(url, timeout=30) as response:
-                    _BOOKS[key] = response.read()
-            except Exception as error:
+                _BOOKS[key] = download(url)
+            except DownloadError as error:
                 fail(f'A közös táblázat letöltése nem sikerült: {error}')
     return xlsx_sheet_as_csv(_BOOKS[key], sheet)
 
 
-def fetch(args, env_name, sheet=None, book_env=TEAM_SHEET_ENV):
-    """The sheet's content as CSV text. Order: --file (CSV) · the shared workbook (--xlsx or the
-    URL in book_env, when the script passes its sheet name) · the old per-sheet CSV URL."""
-    if sheet:
-        text = shared_sheet_csv(args, sheet, book_env)
-        if text is not None:
-            return text
+def fetch(args, sheet, book_env=TEAM_SHEET_ENV):
+    """The sheet's content as CSV text: from --file (a local CSV, for testing), otherwise from the
+    shared workbook (--xlsx or the URL in book_env)."""
     if args.file:
         with open(args.file, encoding='utf-8-sig') as handle:
             text = handle.read()
     else:
-        url = args.url or os.environ.get(env_name)
-        if not url:
-            fail(f'Nincs megadva a CSV címe ({env_name} vagy --url).')
-        try:
-            with urllib.request.urlopen(url, timeout=30) as response:
-                text = response.read().decode('utf-8-sig')
-        except Exception as error:
-            fail(f'A táblázat letöltése nem sikerült: {error}')
+        text = shared_sheet_csv(args, sheet, book_env)
+        if text is None:
+            fail(f'Nincs megadva a közös táblázat címe ({book_env} vagy --xlsx).')
     return text.replace('\r\n', '\n').replace('\r', '\n')
 
 
@@ -212,15 +288,12 @@ def replace_block(page_path, marker, body, indent):
         fail(f'A {os.path.basename(page_path)}-ben nem találom a {marker}:START / {marker}:END jelölőket.')
     new_page = pattern.sub(lambda m: m.group(1) + body + '\n\n' + indent + f'<!-- {marker}:END -->', page, count=1)
     if new_page != page:
-        with open(page_path, 'w', encoding='utf-8') as handle:
-            handle.write(new_page)
+        write_text(page_path, new_page)
         return True
     return False
 
 
 def save_snapshot(path, text):
-    os.makedirs(os.path.dirname(path), exist_ok=True)
     old = open(path, encoding='utf-8').read() if os.path.exists(path) else None
     if old != text:
-        with open(path, 'w', encoding='utf-8') as handle:
-            handle.write(text)
+        write_text(path, text)
