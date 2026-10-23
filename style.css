@@ -322,7 +322,7 @@ img {
 
 /* Egérrel használt széles képernyőn: csak rámutatásra nyílik (kattintásra nem történik semmi),
    nyíl nélkül; billentyűzettel (Tab) a fókusz nyitja. Érintőképernyőn marad a kattintás + nyíl. */
-@media (hover: hover) and (min-width: 1381px) {
+@media (hover: hover) and (min-width: 1281px) {
   .has-sub:hover > .sub-nav,
   .has-sub:has(:focus-visible) > .sub-nav {
     display: flex;
@@ -1376,9 +1376,9 @@ section[id] {
 /* ==========================================================
    Reszponzivitás
    ========================================================== */
-/* A hosszú csapatnév + a menü (8 elem, ebből 2 lenyíló) kb. 1360px alatt már nem fér el egy sorban,
+/* A hosszú csapatnév + a menü (7 elem, ebből 2 lenyíló) kb. 1250px alatt már nem fér el egy sorban,
    ezért itt vált a menü hamburgerre (új menüpontnál mérd újra!) */
-@media (max-width: 1380px) {
+@media (max-width: 1280px) {
   .nav-toggle {
     display: flex;
   }

@@ -50,10 +50,10 @@ tools/*.py          a Táblázat → HTML generátorok
 drafts/             kész, de nem publikált anyagok (.gitignore-ban): adatkezeles.html
 ```
 
-- **Menü:** Főoldal · **Események ▾** (lenyíló: Programok = `programok.html`, Naptár = `naptar.html`, Tábor = `tabor.html`) · Csapatotthonunk · Eszközbérlés · Rólunk · **Pénzügyek ▾** (lenyíló: `penzugyek.html#tagdij`, `#nagytabor`, `#kcstabor`; `ul#subFinance`) · [Csatlakozom] · [Támogass minket]. A lenyíló `li.has-sub` > `button.nav-sub-toggle` + `ul.sub-nav`; az aktuális aloldalnál a `li` `is-current` osztályt, a link `aria-current="page"`-et kap. Egérrel használt széles képernyőn (`@media (hover: hover) and (min-width: 1381px)`) csak rámutatásra (és Tab-fókuszra) nyílik, nyíl nélkül, a kattintás ott szándékosan nem csinál semmit (a tulajdonos kérése); telefonon/érintőképernyőn kattintásra, nyíllal, a hamburger menüben behúzva; a JS (`script.js` eleje) kezeli a nyitást, a kívül kattintást és az Esc-et.
+- **Menü:** Főoldal · **Események ▾** (lenyíló: Programok = `programok.html`, Naptár = `naptar.html`, Tábor = `tabor.html`) · Csapatotthonunk · Rólunk · **Pénzügyek ▾** (lenyíló: `penzugyek.html#tagdij`, `#nagytabor`, `#kcstabor`, valamint `eszkozok.html`; `ul#subFinance` – az Eszközbérlés a tulajdonos kérésére került ide, a menü rövidítése miatt) · [Csatlakozom] · [Támogass minket]. A lenyíló `li.has-sub` > `button.nav-sub-toggle` + `ul.sub-nav`; az aktuális aloldalnál a `li` `is-current` osztályt, a link `aria-current="page"`-et kap. Egérrel használt széles képernyőn (`@media (hover: hover) and (min-width: 1281px)`) csak rámutatásra (és Tab-fókuszra) nyílik, nyíl nélkül, a kattintás ott szándékosan nem csinál semmit (a tulajdonos kérése); telefonon/érintőképernyőn kattintásra, nyíllal, a hamburger menüben behúzva; a JS (`script.js` eleje) kezeli a nyitást, a kívül kattintást és az Esc-et.
 - **A fejléc és a lábléc minden HTML fájlban külön szerepel** (12 oldal + 404). Menü-/lábléc-módosítást mindenhol át kell vezetni; utána `diff`-eld az oldalakat.
 - **Jekyll-csapda:** a GitHub Pages figyelmen kívül hagyja az `_`-lal kezdődő mappákat. Ezért `images/webp`, `images/originals`, `drafts` (korábban `_webp` stb. volt, a képek emiatt nem látszottak). **Soha ne nevezz el mappát `_`-lal.** `.nojekyll` nincs és nem kell.
-- **Cache-bust:** a HTML-ek `style.css?v=110` és `script.js?v=68` formában hivatkoznak a fájlokra (az utolsó ismert állapot). Bármely CSS/JS módosítás után **minden HTML-ben emeld a számot** (`sed`-del vagy ciklussal), különben a böngésző/CDN a régit mutatja.
+- **Cache-bust:** a HTML-ek `style.css?v=111` és `script.js?v=69` formában hivatkoznak a fájlokra (az utolsó ismert állapot). Bármely CSS/JS módosítás után **minden HTML-ben emeld a számot** (`sed`-del vagy ciklussal), különben a böngésző/CDN a régit mutatja.
 
 ---
 
@@ -145,7 +145,7 @@ Külön nyilvános Google Táblázat két, külön közzétett lappal: **Eszköz
 - A `sync_eszkozok.py` mindkét CSV-t letölti (`--url/--file` és `--contact-url/--contact-file`). Üres darabszámnál nincs „db” címke; nincs megjelenő eszköz → hiba, az oldal változatlan. Nincs kapcsolattartó → figyelmeztetés, és a 802@cserkesz.hu kerül az oldalra. A kapcsolattartók a főoldalihoz hasonló személykártyát kapnak (`person_card.py`, fotó a Drive-ról, lásd 6. pont).
 - Az e-mail mellé **ne generálj másolás gombot**: a `script.js` minden mailto link mellé magától tesz egyet (különben kettő lesz).
 - A bevezető szöveg (a tulajdonos kérésére úgy fogalmazva, hogy kiderüljön: nem ingyenes, de a „pénz/díj” szó nem szerepel) az oldalon kézzel szerkeszthető.
-- Az oldal fejléc-menüpont („Eszközbérlés”, a Csapatotthonunk után). A Pénzügyek lenyíló felvétele óta a hamburgerre váltás határa **1380 px** (`@media (max-width: 1380px)`, a `script.js` `hoverMenu`-jében és a hover-szabályban `min-width: 1381px`); a menü+logó kb. 1360 px-et igényel. Újabb menüpontnál mérd újra.
+- Az oldal a menü Pénzügyek lenyílójának utolsó pontja („Eszközbérlés”); ott a lenyíló `is-current`. Az Eszközbérlés a Pénzügyek lenyílóba került, így a hamburgerre váltás határa **1280 px** (`@media (max-width: 1280px)`, a `script.js` `hoverMenu`-jében és a hover-szabályban `min-width: 1281px`); a menü+logó kb. 1250 px-et igényel. Újabb menüpontnál mérd újra.
 
 ---
 

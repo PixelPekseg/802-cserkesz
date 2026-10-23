@@ -24,7 +24,7 @@ mainNav.querySelectorAll('a').forEach(link => {
 // menü, érintés) kattintásra nyílik/csukódik; kívül kattintás vagy Esc bezárja.
 // ==========================================================
 const subMenus = [...document.querySelectorAll('.has-sub')];
-const hoverMenu = window.matchMedia('(hover: hover) and (min-width: 1381px)');
+const hoverMenu = window.matchMedia('(hover: hover) and (min-width: 1281px)');
 
 function closeSubMenus(except) {
   subMenus.forEach(item => {
