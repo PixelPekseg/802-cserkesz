@@ -79,8 +79,8 @@ def main():
 
     bezsilla = [row for row in people if HOME_ROLE_WORD in row['role'].lower()]
     if bezsilla:
-        home_body = '\n\n'.join(build_card(row, row['photo'], ' ' * 8) for row in bezsilla)
-        if common.replace_block(HOME, 'LEADERS_HOME', home_body, ' ' * 8):
+        home_body = '\n\n'.join(build_card(row, row['photo'], ' ' * 12) for row in bezsilla)
+        if common.replace_block(HOME, 'LEADERS_HOME', home_body, ' ' * 12):
             changed.append('csapatotthon.html')
     else:
         common.warn('Senkinek a szerepében nincs "Csapatotthon", a Csapatotthonunk oldal kártyája változatlan marad.')
