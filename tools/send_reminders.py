@@ -112,9 +112,8 @@ def when_text(row):
 
 
 LINKS = '\n'.join(line for line in (f'Programos táblázat: {SHEET_LINK}' if SHEET_LINK else '',
-                                    f'Képek mappa: {IMAGES_LINK}' if IMAGES_LINK else '') if line)
-UPLOAD = ('Töltsd fel a programon készült képeket is a Képek mappa „Program képek” almappájába egy új '
-          'mappába, és a mappa nevét írd be a táblázat „Képek” oszlopába.')
+                                    f'Program képek mappa: {IMAGES_LINK}' if IMAGES_LINK else '') if line)
+NO_REPLY = 'Ez egy automatikus üzenet, kérlek, ne válaszolj rá! Ha kérdésed van, keresd a csapatparancsnokot!'
 
 
 def with_article(name):
@@ -131,27 +130,27 @@ def compose(kind, row, people):
     hello = greeting(people)
     if kind == 'photos':
         subject = f'Hamarosan kezdődik: {name} – ne felejtsetek el képeket készíteni!'
-        text = (f'Hamarosan kezdődik {the_name} ({when_text(row)}), amelynek a kapcsolattartója vagy.\n\n'
-                'Kérünk, hogy készíts (vagy kérj meg valakit, hogy készítsen) néhány jó képet a programról, '
-                'hogy utána feltehessük a honlapra. A képeket a Képek mappa „Program képek” almappájában '
-                'egy új mappába töltsd majd fel, és a mappa nevét írd be a programos táblázat „Képek” '
-                'oszlopába.')
-        closing = 'Jó programot!'
+        text = (f'Hamarosan kezdődik {the_name} ({when_text(row)}), melyhez te vagy feltüntetve szervezőként.\n\n'
+                'Kérünk, hogy készíts (vagy kérj meg valakit, hogy készítsen) néhány képet a programról, amit '
+                'aztán feltehetünk a weboldalra.\n'
+                'A képeknek készíts egy almappát a „Program képek” mappába, és töltsd fel őket oda, majd a mappa '
+                'nevét írd be a programos táblázat „Képek” oszlopába.\n'
+                'Szintén kérünk, hogy a program után írj egy rövid beszámolót arról, ami kikerülhet a weboldalra. '
+                'Ezt a programos táblázat „Beszámoló” oszlopába tedd.')
     elif kind == 'report':
         subject = f'Hogy sikerült {the_name}? Írj róla beszámolót!'
-        text = (f'Reméljük, jól sikerült {the_name} ({date})! Kérünk, írj róla néhány mondatos '
-                f'beszámolót a programos táblázat „Beszámoló” oszlopába. {UPLOAD} A beszámoló és a képek '
-                'pár órán belül megjelennek a honlapon.')
-        closing = 'Köszönjük!'
+        text = (f'Reméljük, jól sikerült {the_name} ({date})! Kérünk, írj róla néhány mondatos beszámolót a '
+                'programos táblázat „Beszámoló” oszlopába. Töltsd fel a programon készült képeket: ehhez hozz '
+                'létre egy új mappát a „Program képek” mappába, és a mappa nevét írd be a táblázat „Képek” '
+                'oszlopába. A beszámoló és a képek pár órán belül megjelennek a honlapon.')
     else:
         subject = f'Emlékeztető: még hiányzik {the_name} beszámolója'
-        text = (f'Egy hete volt {the_name} ({date}), de a honlapra még nem került fel róla beszámoló. '
-                'Kérünk, írd meg néhány mondatban a programos táblázat „Beszámoló” oszlopába, amint tudod. '
-                'Ha vannak képeid a programról, azokat is töltsd fel a Képek mappába, és a mappa nevét írd '
-                'be a „Képek” oszlopba.')
-        closing = 'Köszönjük!'
+        text = (f'Egy hete volt {the_name} ({date}), de a honlapra még nem került fel róla beszámoló. Kérünk, '
+                'írd meg néhány mondatban a programos táblázat „Beszámoló” oszlopába, amint tudod. Ha vannak '
+                'képeid a programról, azoknak hozz létre egy új mappát a „Program képek” mappában, és az új '
+                'mappa nevét írd be a „Képek” oszlopba.')
     links = f'{LINKS}\n\n' if LINKS else ''
-    body = f'{hello}\n\n{text}\n\n{links}{closing}\n{SIGNATURE}\n'
+    body = f'{hello}\n\n{text}\n\n{links}{NO_REPLY}\n\nJó munkát!\n{SIGNATURE}\n'
     return re.sub(r'[\r\n]+', ' ', subject), body
 
 

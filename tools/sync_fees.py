@@ -303,7 +303,7 @@ def render_form(form_link, deadline=''):
     closed_text = ''
     if day:
         closed_text = (f'\n            <p class="fee-form-closed"{"" if closed else " hidden"}>A támogatási igények leadási határideje '
-                       f'{MONTHS[day.month - 1]} {day.day}. volt, sajnos már nem áll lehetőségünkben támogatási igényeket befogadni.</p>')
+                       f'{MONTHS[day.month - 1]} {day.day}. volt, sajnos már nem áll módunkban támogatási igényeket befogadni.</p>')
     return f'''          <div class="fee-form"{until}>
             <h3>Támogatás igénylése</h3>
             <div class="fee-form-open"{" hidden" if closed else ""}>
