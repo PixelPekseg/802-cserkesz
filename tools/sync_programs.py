@@ -12,6 +12,8 @@ the calendar view):
 If the download or the validation fails (e.g. the header changed, or there is no valid row at all),
 the script stops with an error and changes nothing: the page keeps its last good state.
 Broken single rows are skipped with a warning ("::warning::" in GitHub Actions).
+A program that has not ended yet needs a contact with a name and an e-mail address (the reminder
+e-mails go there); without one it is skipped with a warning.
 The images and videos of the Drive folder given in the "Képek" column (Képek és videók/Program
 képek/<folder>) go onto the card (videos are played by the Drive player)
 (program_images.py; needs GOOGLE_API_KEY, DRIVE_IMAGES_FOLDER_ID and Pillow – without them the
@@ -65,6 +67,24 @@ REQUIRED = ['name', 'start_date', 'visible']
 FACEBOOK_HOSTS = {'facebook.com', 'www.facebook.com', 'm.facebook.com', 'web.facebook.com', 'fb.me', 'fb.com'}
 
 warn, fail = common.warn, common.fail
+EMAIL = re.compile(r'[^@\s]+@[^@\s]+\.[^@\s]+')
+
+
+def missing_contact_email(row):
+    """Why the row breaks the "every contact needs an e-mail" rule, or '' if it does not.
+    The reminder e-mails (photos, report) go to these addresses, so an upcoming program needs at
+    least the first contact with an e-mail, and a named second contact needs one too."""
+    if not row['c1_name'] and not row['c2_name']:
+        return 'nincs megadva kapcsolattartó (név és e-mail cím kötelező)'
+    for number in ('1', '2'):
+        name, email = row[f'c{number}_name'], row[f'c{number}_email']
+        if name and not email:
+            return f'a(z) {number}. kapcsolattartónak ({name}) nincs megadva e-mail címe (kötelező)'
+        if email and not EMAIL.fullmatch(email):
+            return f'a(z) {number}. kapcsolattartó e-mail címe nem tűnik érvényesnek ("{email}")'
+        if email and not name:
+            return f'a(z) {number}. kapcsolattartónak nincs megadva a neve (kötelező)'
+    return ''
 
 
 def parse_date(text):
@@ -257,7 +277,7 @@ def parse_rows(csv_text):
         if facebook and not common.safe_url(facebook, FACEBOOK_HOSTS):
             warn(f'{label}: a Facebook-link nem https://…facebook.com/ cím, kihagyva a linket.')
             facebook = ''
-        parsed.append({
+        record = {
             'name': cell(row, 'name'), 'start': start, 'end': end,
             'start_time': start_time, 'end_time': end_time,
             'time_note': cell(row, 'time_note'), 'place': cell(row, 'place'),
@@ -265,7 +285,14 @@ def parse_rows(csv_text):
             'c1_name': cell(row, 'c1_name'), 'c1_email': cell(row, 'c1_email'), 'c1_phone': cell(row, 'c1_phone'),
             'c2_name': cell(row, 'c2_name'), 'c2_email': cell(row, 'c2_email'), 'c2_phone': cell(row, 'c2_phone'),
             'facebook': facebook, 'image_folder': cell(row, 'images'), 'label': label,
-        })
+        }
+        # the contact e-mail is required, but only checked for programs that have not ended yet
+        # (an old row is not worth fixing; it stays on the page as before)
+        problem = missing_contact_email(record) if (end or start) >= dt.date.today() else ''
+        if problem:
+            warn(f'{label}: {problem}, ezért a program nem jelenik meg. Pótold a táblázatban.')
+            continue
+        parsed.append(record)
     parsed.sort(key=lambda r: (r['start'], r['start_time'] or ''))
     return parsed, 'images' in index   # whether the sheet has a "Képek" column at all
 
