@@ -1,6 +1,7 @@
 # Updates the generated parts of the site from the team's Google Sheets: program, camp and troop
 # cards, the notice bar on every page, the counters on the home and Rólunk pages, the equipment
-# page, the leader cards (with photos), the finance page and the gallery.
+# page, the leader cards (with photos), the finance page and the gallery; and sends the reminder
+# e-mails to the program contacts (tools/send_reminders.py).
 # Runs hourly and can be started by hand (Actions tab -> "Oldal frissítése a táblázatból" -> Run workflow).
 # If a sheet is broken or unreachable, that step fails and the page keeps its last good state.
 # Once a month a tiny "keepalive" change is committed, because GitHub disables scheduled
@@ -12,6 +13,11 @@ on:
   schedule:
     - cron: '23 * * * *'
   workflow_dispatch:
+    inputs:
+      reminder_test_to:
+        description: 'Teszt: az emlékeztető levelek mintáját csak erre a címre küldi (üresen hagyva a szokásos futás)'
+        required: false
+        default: ''
 
 permissions:
   contents: write
@@ -98,6 +104,20 @@ jobs:
       - name: Galéria összeállítása
         if: ${{ !cancelled() }}
         run: python tools/sync_gallery.py
+
+      # Reminder e-mails to the program contacts (photos before, report after the program), sent
+      # through the SMTP_USER / SMTP_PASSWORD secrets (an app password); without them only listed.
+      # The sent ones are recorded in data/reminders.json, saved by the next step.
+      - name: Emlékeztető levelek a programok kapcsolattartóinak
+        if: ${{ !cancelled() }}
+        env:
+          SMTP_USER: ${{ secrets.SMTP_USER }}
+          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+          REMINDER_SHEET_LINK: ${{ secrets.REMINDER_SHEET_LINK }}
+          REMINDER_IMAGES_LINK: ${{ secrets.REMINDER_IMAGES_LINK }}
+          # passed through the environment, never pasted into the script
+          REMINDER_TEST_TO: ${{ inputs.reminder_test_to }}
+        run: python tools/send_reminders.py
 
       - name: Havi életjel
         if: ${{ !cancelled() }}
