@@ -8,7 +8,7 @@
     "empty": "Jelenleg nincs tagdíj befizetési időszak!",
     "ecset": "https://drive.google.com/file/d/1ckM3hP6Znzf8MvlFIYrhLcwbrmlWSiMf/view?usp=drive_link",
     "form": "https://docs.google.com/forms/d/e/1FAIpQLSeM3oarAXJWU-QBWlYtX1CtuGWXPdtC0kvSM7cJJ61_z0Awsw/viewform",
-    "form_deadline": "2026.11.15.",
+    "form_deadline": "2026.03.15.",
     "costs_title": "Mire fordítjuk a tagdíjat?",
     "costs_intro": "A tagdíjakból fedezzük a csapatotthon fenntartását és a csapat működését. A Bezsilla-villa üzemeltetése, elsősorban rossz szigetelése miatt, továbbra is nehézséget okoz. Igyekszünk takarékoskodni a gáz- és az áramfogyasztással is, de amíg nem történik meg a megfelelő korszerűsítés, áttörő változást nem tudunk elérni. Ezen kívül a tagdíj jelentős részét az országos szervezetnek kell továbbítanunk, mellyel a Magyar Cserkészszövetség működését fedezik.",
     "costs_note": ""
@@ -26,14 +26,14 @@
   "items": [
     {
       "visible": "igen",
-      "deadline": "2026.11.30.",
+      "deadline": "2026.04.01.",
       "note": "A tagdíjat van lehetőség egy összegben is befizetni. Kérjük, ilyenkor a teljes összeget az első részlet határidejéig utalják át!",
       "amount": "15000",
       "title": "1. részlet"
     },
     {
       "visible": "igen",
-      "deadline": "2026.12.31.",
+      "deadline": "2026.11.31.",
       "note": "Aki az 1. részlettel együtt már a teljes éves tagdíjat (30 000 Ft) befizette, az kérjük hagyja figyelmen kívül ezt a felhívást.",
       "amount": "15000",
       "title": "2. részlet"
