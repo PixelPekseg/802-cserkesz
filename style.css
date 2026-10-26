@@ -1727,30 +1727,10 @@ body:has(.main-nav.open) .upcoming-tab {
     overflow-y: auto;
   }
 
-  /* light card with dark text: the dark green one blended into the dark green Csapatunk section */
+  /* a white frame, so the dark green card does not blend into the dark green Csapatunk section */
   .upcoming-tab {
-    background: var(--color-bg);
-    color: var(--color-text);
-    border: 1px solid var(--color-border);
-    border-left: 6px solid var(--color-highlight);
+    border: 3px solid #fff;
     box-shadow: 0 10px 30px rgba(35, 63, 42, 0.45);
-  }
-
-  .upcoming-title {
-    color: var(--color-primary);
-  }
-
-  .upcoming-list a,
-  .upcoming-close {
-    color: var(--color-text);
-  }
-
-  .upcoming-list li + li {
-    border-top-color: var(--color-border);
-  }
-
-  .upcoming-close:hover {
-    background: var(--color-bg-alt);
   }
 }
 
