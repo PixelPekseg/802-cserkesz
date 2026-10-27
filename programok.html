@@ -28,7 +28,7 @@
 
   <link rel="icon" type="image/jpeg" href="images/webp/kozos/logo_green.jpg?v=1">
   <link rel="apple-touch-icon" href="images/webp/kozos/logo_green.jpg?v=1">
-  <link rel="stylesheet" href="style.css?v=125">
+  <link rel="stylesheet" href="style.css?v=126">
 </head>
 <body>
 
@@ -236,6 +236,15 @@
   <section class="section calendar-section" id="naptar">
     <div class="container">
       <h2 class="section-title">Naptár</h2>
+      <!-- Subscribe to the public "802. Programok" Google Calendar (written by tools/sync_calendar.py from the
+           sheet): the subscribers' own calendars follow every change. -->
+      <div class="calendar-subscribe">
+        <p>Iratkozz fel a programjainkra a saját naptáradban: minden változás magától megjelenik nálad is.</p>
+        <div class="calendar-subscribe-buttons">
+          <a class="btn btn-primary" href="https://calendar.google.com/calendar/u/0?cid=MWQ0ZDQ3ZTYwMWFiMjc0MmY1YjQxNmMzMjZlYTAyMjU2MTFmOTQ2MTVkYTU2YzEwYzhlODZjNDkxMWM5ZDc1MkBncm91cC5jYWxlbmRhci5nb29nbGUuY29t" target="_blank" rel="noopener noreferrer">Feliratkozás Google Naptárban</a>
+          <a class="btn btn-outline" href="webcal://calendar.google.com/calendar/ical/1d4d47e601ab2742f5b416c326ea0225611f94615da56c10c8e86c4911c9d752%40group.calendar.google.com/public/basic.ics">Apple / Outlook naptár</a>
+        </div>
+      </div>
       <div class="calendar" id="calendar"></div>
       <div class="calendar-detail" id="calendarDetail" aria-live="polite"></div>
     </div>

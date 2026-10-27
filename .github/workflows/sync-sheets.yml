@@ -60,7 +60,7 @@ jobs:
       - name: Programok (kártyák + képek a Drive-ról) frissítése
         if: ${{ !cancelled() }}
         env:
-          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+          GOOGLE_API_KEY: ${{ secrets.GOOGLE_DRIVE_API_KEY }}
         run: python tools/sync_programs.py
 
       # The following steps run even if an earlier one failed (one broken sheet must not block the
@@ -84,13 +84,13 @@ jobs:
       - name: Csapatvezetés (kártyák + fotók a Drive-ról) frissítése
         if: ${{ !cancelled() }}
         env:
-          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+          GOOGLE_API_KEY: ${{ secrets.GOOGLE_DRIVE_API_KEY }}
         run: python tools/sync_leaders.py
 
       - name: Eszközök letöltése és az oldal frissítése
         if: ${{ !cancelled() }}
         env:
-          GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+          GOOGLE_API_KEY: ${{ secrets.GOOGLE_DRIVE_API_KEY }}
         run: python tools/sync_equipment.py
 
       # Finance page: one workbook (sheets: Leírás, Tagdíj, Nagytábordíj, Kcs tábordíj), the WHOLE
@@ -119,6 +119,16 @@ jobs:
           # passed through the environment, never pasted into the script
           REMINDER_TEST_TO: ${{ inputs.reminder_test_to }}
         run: python tools/send_reminders.py
+
+      # The public "802. Programok" Google Calendar follows the Programok sheet (people subscribe to it);
+      # written through the service account the calendar is shared with
+      - name: Google Naptár frissítése a programokból
+        if: ${{ !cancelled() }}
+        env:
+          GOOGLE_SERVICE_ACCOUNT_KEY: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_KEY }}
+          PROGRAM_CALENDAR_ID: 1d4d47e601ab2742f5b416c326ea0225611f94615da56c10c8e86c4911c9d752@group.calendar.google.com
+          SITE_URL: https://pixelpekseg.github.io/802-cserkesz/
+        run: python tools/sync_calendar.py
 
       # On September 15 and October 15: an e-mail to 802@cserkesz.hu if the new (4th-grade) troop's
       # leaders are not on the Rajok sheet yet; recorded in data/troop_reminder.json.

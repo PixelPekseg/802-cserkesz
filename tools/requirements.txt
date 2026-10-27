@@ -4,3 +4,4 @@
 pillow==12.1.0        # image processing (WebP output)
 pillow-heif==1.8.0    # HEIC photos from iPhones
 openpyxl==3.1.5       # reading the shared .xlsx workbooks
+cryptography==46.0.3  # signing in as the Google service account (Google Calendar)
