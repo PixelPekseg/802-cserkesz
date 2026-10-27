@@ -112,9 +112,15 @@ def test_safe_url(url, hosts, prefix, expected):
 
 
 def test_contact_lines_escapes_and_links():
-    lines = common.contact_lines('a<b>@x.hu', '36301234567')
-    assert lines[0] == '<a class="inline-link" href="mailto:a&lt;b&gt;@x.hu">a&lt;b&gt;@x.hu</a>'
+    lines = common.contact_lines(" o'brien@x.hu ", '36301234567')
+    assert lines[0] == '<a class="inline-link" href="mailto:o&#x27;brien@x.hu">o&#x27;brien@x.hu</a>'
     assert lines[1] == '<a class="inline-link" href="tel:+36301234567">+36 30 123 4567</a>'
+
+
+@pytest.mark.parametrize('email', ['a@x.hu?cc=evil@y.hu&body=fizess', 'a<b>@x.hu', 'a@x.hu b@y.hu', '"a"@x.hu'])
+def test_contact_lines_refuses_mailto_tricks(email, issues):
+    assert common.contact_lines(email, '') == []      # no prefilled cc / body, no broken attribute
+    assert 'nem tűnik érvényesnek' in issues()[0]['message']
 
 
 def test_contact_lines_bad_email_and_short_phone(capsys):
@@ -144,6 +150,14 @@ def test_quiet_suppresses_warnings_but_not_errors(issues, capsys):
     common.warn('újra hallható')
     assert [i['message'] for i in issues()] == ['újra hallható']
     assert 'elnyelve' not in capsys.readouterr().out
+
+
+def test_say_breaks_workflow_commands_in_actions(monkeypatch, capsys):
+    common.say('Elküldve: Portya\n::add-mask::x')
+    assert capsys.readouterr().out == 'Elküldve: Portya\n::add-mask::x\n'        # locally unchanged
+    monkeypatch.setattr(common, 'in_actions', True)
+    common.say('Elküldve: Portya\n  ::error::hamis\n::stop-commands::t')
+    assert capsys.readouterr().out == 'Elküldve: Portya\n: :error::hamis\n: :stop-commands::t\n'
 
 
 def test_actions_log_escapes_workflow_commands(monkeypatch, capsys):

@@ -36,7 +36,7 @@ def test_mailer_disabled_without_credentials():
 def test_mailer_sends_one_connection_and_clean_headers(smtp):
     with mailing.Mailer() as mailer:
         assert mailer.enabled and mailer.password == 'abcdefgh'      # spaces of the app password removed
-        mailer.send([('Kiss Anna', 'anna@x.hu'), ('', 'b@x.hu')], 'Tárgy\r\nBcc: evil@x.hu', 'Szöveg')
+        mailer.send([('Kiss\nAnna', 'anna@x.hu'), ('', 'b@x.hu')], 'Tárgy\r\nBcc: evil@x.hu', 'Szöveg')
         mailer.send([('', 'c@x.hu')], 'Második', 'x')
     first = smtp.sent[0]
     assert first['Subject'] == 'Tárgy Bcc: evil@x.hu'          # no header injection

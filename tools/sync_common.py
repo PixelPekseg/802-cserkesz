@@ -66,6 +66,15 @@ def _record(level, message):
         pass   # the report is a help, it must never break the sync itself
 
 
+def say(text):
+    """Prints a (possibly multi-line) message that contains sheet data: in GitHub Actions no line of it
+    may start a workflow command ("::error::", "::add-mask::" …), so such a line start is broken up."""
+    lines = str(text).split('\n')
+    if in_actions:
+        lines = [': :' + line.lstrip()[2:] if line.lstrip().startswith('::') else line for line in lines]
+    print('\n'.join(lines))
+
+
 def warn(message):
     if _quiet:
         return
@@ -412,7 +421,8 @@ def contact_lines(email, phone):
     """HTML links for an e-mail address and a phone number (both optional)."""
     lines = []
     if email:
-        if '@' in email:
+        if EMAIL.fullmatch(email.strip()):
+            email = email.strip()
             lines.append(f'<a class="inline-link" href="mailto:{html.escape(email, quote=True)}">{html.escape(email)}</a>')
         else:
             warn(f'Az e-mail cím nem tűnik érvényesnek, kihagyva: "{email}"')

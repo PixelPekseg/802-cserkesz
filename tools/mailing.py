@@ -65,7 +65,8 @@ class Mailer:
         """Sends one e-mail; to = [(name, address)]. Raises the SMTP / network errors."""
         message = email.message.EmailMessage()
         message['From'] = email.utils.formataddr((SENDER_NAME, self.user))
-        message['To'] = ', '.join(email.utils.formataddr(person) for person in to)
+        # names come from the sheet: a line break in a cell must not reach the header
+        message['To'] = ', '.join(email.utils.formataddr((' '.join(name.split()), address)) for name, address in to)
         message['Subject'] = ' '.join(subject.split())   # no line breaks in a header
         message['Date'] = email.utils.formatdate(localtime=True)
         message['Message-ID'] = email.utils.make_msgid(domain=self.user.split('@')[-1])
@@ -158,10 +159,10 @@ def periodic_reminder(kind, label, state_path, due_key, build):
         to, subject, body = test_mail(test_to, to, subject, body, label.lower())
     with Mailer() as mailer:
         if not mailer.enabled:
-            print(f'(SMTP nélkül nem küldöm el) {", ".join(a for _, a in to)}: {subject}\n\n{body}')
+            common.say(f'(SMTP nélkül nem küldöm el) {", ".join(a for _, a in to)}: {subject}\n\n{body}')
             return
         if not mailer.deliver(to, subject, body, label):
             return
-    print(f'{"Tesztlevél e" if test_to is not None else "E"}lküldve: {", ".join(a for _, a in to)}: {subject}')
+    common.say(f'{"Tesztlevél e" if test_to is not None else "E"}lküldve: {", ".join(a for _, a in to)}: {subject}')
     if test_to is None:
         common.save_json(state_path, {**state, key: dt.datetime.now().isoformat(timespec='minutes')})

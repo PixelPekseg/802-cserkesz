@@ -128,8 +128,10 @@ def contact_html(name, email, phone):
     if email and '@' not in email and not phone:
         email, phone = '', email
     first = [html.escape(name)] if name else []
-    if email:
+    if email and EMAIL.fullmatch(email):
         first.append(f'<a class="inline-link" href="mailto:{html.escape(email, quote=True)}">{html.escape(email)}</a>')
+    elif email:
+        first.append(html.escape(email))
     text = ', '.join(first)
     if phone:   # the phone number always goes on a new line (below the name or the e-mail)
         text = (text + '<br>\n            ' if text else '') + phone_link(phone)

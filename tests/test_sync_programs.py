@@ -158,6 +158,7 @@ def test_display_date(start, end, expected):
     ('', '', '06301234567', '<a class="inline-link" href="tel:+36301234567">+36 30 123 4567</a>'),
     ('Anna', '06301234567', '', 'Anna<br>\n            <a class="inline-link" href="tel:+36301234567">+36 30 123 4567</a>'),
     ('<b>Anna</b>', '', '', '&lt;b&gt;Anna&lt;/b&gt;'),
+    ('Anna', 'a@x.hu?cc=b@y.hu', '', 'Anna, a@x.hu?cc=b@y.hu'),       # an old row's bad address: text, no link
 ])
 def test_contact_html(name, email, phone, expected):
     assert programs.contact_html(name, email, phone) == expected

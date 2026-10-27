@@ -18,7 +18,10 @@ def build_card(row, photo, indent):
     The pop-up header shows the name and the role (person-bio-role), then the introduction,
     then the contact details."""
     i = indent
-    email = row.get('email', '')
+    email = row.get('email', '').strip()
+    if email and not common.EMAIL.fullmatch(email):
+        common.warn(f'{row["name"]}: az e-mail cím nem tűnik érvényesnek, kihagyva: "{email}"')
+        email = ''
     lines = [
         f'{i}<div class="person-card has-bio">',
         f'{i}  <div class="person-photo" data-initials="{esc(initials(row["name"]))}">',

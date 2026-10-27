@@ -41,6 +41,13 @@ def test_to_webp_scales_and_converts():
     assert Image.open(io.BytesIO(drive_photos.to_webp(palette.getvalue()))).size == (10, 10)   # not enlarged
 
 
+def test_decompression_bomb_is_refused(monkeypatch):
+    from PIL import Image as PILImage
+    monkeypatch.setattr(drive_photos, 'MAX_PIXELS', 1000)
+    with pytest.raises(PILImage.DecompressionBombError):
+        drive_photos.to_webp(image_bytes((100, 100)))       # 10 000 px > 2 × 1000
+
+
 def test_name_helpers():
     assert drive_photos.slugify('Cseri-Holzman Lili') == 'cseri-holzman-lili'
     assert drive_photos.slugify('???') == 'foto'

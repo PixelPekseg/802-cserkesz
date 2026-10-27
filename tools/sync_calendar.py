@@ -192,7 +192,7 @@ def sync(calendar, wanted, dry_run=False):
             continue
         label = f'{body["summary"]} ({body["start"].get("date") or body["start"]["dateTime"][:10]})'
         if dry_run:
-            print(f'{"Frissíteném" if old else "Felvenném"}: {label}')
+            common.say(f'{"Frissíteném" if old else "Felvenném"}: {label}')
             continue
         try:
             if old:   # also brings back an event deleted earlier (its id cannot be used again)
@@ -218,7 +218,7 @@ def sync(calendar, wanted, dry_run=False):
         if event_id_ in wanted or old.get('status') == 'cancelled':
             continue
         if dry_run:
-            print(f'Törölném: {old.get("summary", event_id_)}')
+            common.say(f'Törölném: {old.get("summary", event_id_)}')
             continue
         try:
             calendar.call('DELETE', f'/{event_id_}')

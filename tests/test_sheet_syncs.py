@@ -151,6 +151,11 @@ def test_person_card_variants():
     assert 'person-bio-contact' in plain
 
 
+def test_person_card_invalid_email_is_left_out(issues):
+    html = person_card.build_card({'name': 'Béla', 'role': 'X', 'email': 'bela-kukac-x.hu', 'phone': ''}, None, '')
+    assert 'mailto' not in html and 'nem tűnik érvényesnek' in issues()[0]['message']
+
+
 # ---------- leaders ----------
 
 LEADER_HEADER = ['Név', 'Szerep (a kártyán)', 'Bemutatkozás', 'E-mail', 'Telefon', 'Fotó', 'Megjelenjen?']

@@ -188,7 +188,7 @@ def compose_media(kind, row, people, media):
 
 
 def finish(subject, text, links):
-    return subject, f'{text}{links}Jó munkát!\n{SIGNATURE}\n'
+    return ' '.join(subject.split()), f'{text}{links}Jó munkát!\n{SIGNATURE}\n'
 
 
 # (state key, who gets it) of the e-mails of each stage
@@ -307,7 +307,7 @@ def test(rows, now, mailer, media):
                                           'médiásnak' if kind == 'media' else 'szervezőnek')
             if mailer.deliver(to, subject, body, f'Tesztlevél ({subject})'):
                 count += 1
-                print(f'Tesztlevél elküldve ide: {", ".join(a for _, a in to)}: {subject}')
+                common.say(f'Tesztlevél elküldve ide: {", ".join(a for _, a in to)}: {subject}')
     print(f'{count} tesztlevél elküldve (a "{row["name"]}" program alapján); semmit nem rögzítettem.')
 
 
@@ -328,14 +328,14 @@ def run(rows, now, mailer, media):
                 continue   # sent in an earlier run (e.g. the other e-mail of the stage failed then)
             addresses = ', '.join(address for _, address in people)
             if not mailer.enabled:
-                print(f'(SMTP nélkül nem küldöm el) {addresses}: {subject}')
+                common.say(f'(SMTP nélkül nem küldöm el) {addresses}: {subject}')
                 continue
             if not mailer.deliver(people, subject, body, row['label'], on_auth_error=lambda: save_state(state)):
                 continue
             sent = {**sent, message_key: now.isoformat(timespec='minutes'), 'end': end_of(row).date().isoformat()}
             state[key] = sent
             sent_count += 1
-            print(f'Elküldve: {addresses}: {subject}')
+            common.say(f'Elküldve: {addresses}: {subject}')
 
     # forget long-finished programs
     limit = (now - KEEP_STATE).date().isoformat()

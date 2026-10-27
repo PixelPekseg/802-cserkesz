@@ -143,16 +143,16 @@ def main():
         return
 
     if args.dry_run:
-        print(f'Tárgy: {subject}\n\n{body}')
+        common.say(f'Tárgy: {subject}\n\n{body}')
         return
     with Mailer() as mailer:
         if not mailer.enabled:
-            print(f'(SMTP nélkül nem küldöm el) {subject}\n\n{body}')
+            common.say(f'(SMTP nélkül nem küldöm el) {subject}\n\n{body}')
             return
         try:
             mailer.send([('', mailer.user)], subject, body)
         except Exception as error:   # the report must not turn a good run red (and not report itself)
-            print(f'::warning::A hibajelentő levél nem ment el ({type(error).__name__}: {error}).')
+            print('::warning::' + common._log_text(f'A hibajelentő levél nem ment el ({type(error).__name__}: {error}).'))
             return
     save(keys, now.isoformat(timespec='minutes') if keys else None)
     print(f'Hibajelentés elküldve: {subject}')

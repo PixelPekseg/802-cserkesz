@@ -34,6 +34,7 @@ FOLDER_MIME = 'application/vnd.google-apps.folder'
 PROGRAM_FOLDER = 'program'           # the programs' subfolder: its name starts with this (e.g. "Program képek")
 MAX_SHORT_SIDE = 400   # portrait: at most a ~120 px circle on the card
 MAX_LONG_SIDE = 600
+MAX_PIXELS = 60_000_000   # ~ a 60-megapixel photo; Pillow refuses above twice this
 
 
 def slugify(text):
@@ -52,6 +53,9 @@ def to_webp(data, max_short=None, max_long=None, quality=80):
         pillow_heif.register_heif_opener()
     except ImportError:
         pass
+    # a photo is at most a few tens of megapixels; anything bigger (e.g. a "decompression bomb": a small
+    # file that unpacks to gigapixels and exhausts the memory) is refused
+    Image.MAX_IMAGE_PIXELS = MAX_PIXELS
     image = ImageOps.exif_transpose(Image.open(io.BytesIO(data)))
     if image.mode not in ('RGB', 'RGBA'):
         image = image.convert('RGB')
