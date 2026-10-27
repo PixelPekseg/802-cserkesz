@@ -79,10 +79,6 @@ def end_of(row):
     return end
 
 
-def key_of(row):
-    return f"{programs.slugify(row['name'])}-{row['start']:%Y%m%d}"
-
-
 def recipients(row):
     """[(name, address)] of the contacts with a valid e-mail address (no duplicates)."""
     result = []
@@ -314,8 +310,8 @@ def test(rows, now, mailer, media):
 def run(rows, now, mailer, media):
     state = load_state()
     sent_count = 0
-    for row in rows:
-        key = key_of(row)
+    # the card id: two programs with the same name on the same day get separate records (…-2)
+    for row, key in zip(rows, programs.card_ids(rows)):
         sent = state.get(key, {})
         stage = due(row, now, sent)
         if not stage:

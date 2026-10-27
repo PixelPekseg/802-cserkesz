@@ -372,6 +372,9 @@ def render_tab(key, data, today, now=None):
         if data['items']:
             out.append('          <div class="fee-items">')
             for row in data['items']:
+                if not row.get('title'):
+                    common.warn(f'{key}: egy részletnek nincs címe ("{row.get("deadline", "")}", '
+                                f'"{row.get("amount", "")}"); cím nélkül jelenik meg.')
                 note = f'\n              <p class="fee-item-note">{rich(row["note"])}</p>' if row.get('note') else ''
                 # the deadline as an ISO date: script.js adds a red "Lejárt" label once it has passed
                 day = parse_date(row.get('deadline', ''))

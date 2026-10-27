@@ -1,7 +1,6 @@
 """Shared helpers for the sync scripts that build page sections from Google Sheets.
 
-Used by most tools/sync_*.py scripts (sync_programs.py has its own copy of the basics but
-follows the same rules). Log messages stay in Hungarian: they are read by the sheet editors.
+Used by every script in tools/. Log messages stay in Hungarian: they are read by the sheet editors.
 """
 import argparse
 import contextlib
@@ -127,12 +126,20 @@ def download(url, max_bytes=MAX_DOWNLOAD, timeout=30, attempts=3):
 def safe_url(url, hosts, path_prefix=''):
     """The URL if it is https and points to one of the allowed hosts (and path), otherwise ''.
     Links typed into a sheet are checked with this before they reach the page."""
-    parts = urllib.parse.urlsplit(url.strip())
+    url = url.strip()
+    # browsers read a backslash as "/" and drop tabs / line breaks, Python does not: such a URL could pass
+    # the host check here and open another site (https://evil.com<backslash>@www.facebook.com/); the same
+    # goes for user info (https://www.facebook.com@evil.com/)
+    if '\\' in url or any(c.isspace() or ord(c) < 32 for c in url):
+        return ''
+    parts = urllib.parse.urlsplit(url)
+    if '@' in parts.netloc:
+        return ''
     if parts.scheme != 'https' or (parts.hostname or '').lower() not in hosts:
         return ''
     if path_prefix and not parts.path.startswith(path_prefix):
         return ''
-    return url.strip()
+    return url
 
 
 # ---------- files ----------
@@ -201,14 +208,15 @@ def xlsx_sheet_as_csv(data, sheet_name):
         import openpyxl
     except ImportError:
         fail('Hiányzik az openpyxl csomag (pip install openpyxl).')
-    book = _OPENED.get(id(data))
+    cached = _OPENED.get(id(data))
+    book = cached[1] if cached and cached[0] is data else None   # the id alone could be reused
     if book is None:
         try:
             book = openpyxl.load_workbook(io.BytesIO(data), data_only=True, read_only=True)
         except Exception as error:
             fail(f'A közös táblázat nem olvasható Excel-fájlként ({error}). A TELJES dokumentum van közzétéve, '
                  'Microsoft Excel (.xlsx) formátumban?')
-        _OPENED[id(data)] = book   # several sheets of the same workbook in one script: opened once
+        _OPENED[id(data)] = (data, book)   # several sheets of the same workbook in one script: opened once
     sheet = next((ws for ws in book.worksheets if ws.title.strip().lower() == sheet_name.lower()), None)
     if sheet is None:
         fail(f'A közös táblázatban nincs "{sheet_name}" lap. Valaki átnevezte vagy törölte?')
@@ -332,6 +340,7 @@ def read_table(csv_text, columns, required):
     if not any(any(cell.strip() for cell in row) for row in rows):
         fail('A táblázat üres.')
     header_row, index = find_header(rows, columns, required)
+    header = rows[header_row]
     result = []
     for line_number, row in enumerate(rows[header_row + 1:], start=header_row + 2):
         if not any(cell.strip() for cell in row):
@@ -340,7 +349,7 @@ def read_table(csv_text, columns, required):
         for key, i in index.items():
             value = row[i].strip() if i < len(row) else ''
             if is_sheet_error(value):
-                warn(f'{line_number}. sor, "{rows[0][i].strip()}" oszlop: a cellában táblázathiba van ({value}), '
+                warn(f'{line_number}. sor, "{header[i].strip()}" oszlop: a cellában táblázathiba van ({value}), '
                      'üresnek veszem. (Telefonszámnál a "+" jel okozza: állítsd az oszlopot Egyszerű szövegre, '
                      'vagy írd így: \'+36 …)')
                 value = ''
@@ -379,19 +388,34 @@ def parse_date(text):
 EMAIL = re.compile(r'[^@\s<>"]+@[^@\s<>"]+\.[^@\s<>"]+')
 
 
+_ADDRESS_IN_TEXT = re.compile(r'[^@\s<>",;()]+@[^@\s<>",;()]+\.[^@\s<>",;()]+')
+
+
 def first_email(text, where):
-    """The first address of a cell that may hold several ("a@x.hu, b@x.hu"), '' if empty; warns if
-    there were more (only the first one is used). Its validity is checked by the caller."""
-    addresses = [a for a in re.split(r'[\s,;]+', text or '') if a]
+    """The first address of a cell that may hold several ("a@x.hu, b@x.hu") or a name too
+    ("Kiss Anna <anna@x.hu>"); warns if there were more (only the first one is used). Without any
+    address the trimmed text comes back, so the caller can report it as invalid; '' if empty."""
+    text = (text or '').strip()
+    addresses = _ADDRESS_IN_TEXT.findall(text)
     if len(addresses) > 1:
         warn(f'{where}: több e-mail cím van megadva, csak az elsőt használom ({addresses[0]}).')
-    return addresses[0] if addresses else ''
+    return addresses[0] if addresses else text
 
 
 def article(word):
-    """The Hungarian definite article for a word: "az" before a vowel (and "1", "5": egy, öt), else "a"."""
-    first = word.strip()[:1].lower()
-    return 'az' if first and first in 'aáeéiíoóöőuúüű15' else 'a'
+    """The Hungarian definite article for a word: "az" before a vowel, else "a". A number counts as it
+    is read: az 1 (egy), az 5 / 50 / 500 (öt…), az 1000 (ezer), but a 10, a 11, a 100 (tíz, száz)."""
+    word = word.strip()
+    number = re.match(r'\d+', word)
+    if number:
+        digits = number.group()
+        if digits[0] == '5':
+            return 'az'
+        if digits[0] == '1':
+            # 1 egy; 1x tíz/tizen…, 1xx száz… ; 1 000–999 999 ezer… ; 1 000 000- millió…
+            return 'az' if len(digits) == 1 or 4 <= len(digits) <= 6 else 'a'
+        return 'a'
+    return 'az' if word[:1].lower() in tuple('aáeéiíoóöőuúüű') else 'a'
 
 
 def slugify(text, fallback='x', limit=None):

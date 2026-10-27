@@ -150,6 +150,9 @@ def periodic_reminder(kind, label, state_path, due_key, build):
         print(f'{label}: ma nincs esedékes levél.')
         return
     mail = build(test_to is not None)
+    if mail is None and test_to is not None:
+        print(f'{label}: nincs miből tesztlevelet írni.')
+        return
     if mail is None:
         print(f'{label}: minden adat megvan, nem kell levelet küldeni.')
         common.save_json(state_path, {**state, key: 'nem kellett'})
