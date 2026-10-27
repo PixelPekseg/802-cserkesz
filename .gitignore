@@ -9,3 +9,6 @@ images/originals/
 
 # the owner's personal to-do list (local only)
 TODO.md
+
+# the maintainer notes (local only; details for developers are in AGENT_HANDOFF.md)
+README.md
