@@ -19,25 +19,24 @@ found → no image on the card (with a warning). Without an API key nothing is u
 files stay.
 """
 import io
-import json
 import os
 import shutil
 
 import sync_common as common
-from drive_photos import Drive, is_image, is_program_folder, is_video, save_json, slugify, to_webp
+from drive_photos import Drive, is_image, is_program_folder, is_video, slugify, to_webp
 
 DIR_REL = 'images/webp/programok'
 DIR = os.path.join(common.ROOT, *DIR_REL.split('/'))
 STATE = os.path.join(common.ROOT, 'data', 'program_images.json')
+FULL_LONG_SIDE = 1400   # in the lightbox
+THUMB_LONG_SIDE = 480   # on the card
+MAX_ITEMS = 40
 
 
 def _inside_dir(path):
     """True only for a folder strictly inside images/webp/programok (a safety net before deleting)."""
     base = os.path.realpath(DIR)
     return os.path.realpath(path).startswith(base + os.sep)
-FULL_LONG_SIDE = 1400   # in the lightbox
-THUMB_LONG_SIDE = 480   # on the card
-MAX_ITEMS = 40
 
 
 def _play_overlay(webp_bytes):
@@ -91,11 +90,7 @@ def on_disk(state, slug):
 class ProgramImages:
     def __init__(self):
         self.drive = Drive()
-        try:
-            with open(STATE, encoding='utf-8') as handle:
-                self.state = json.load(handle)
-        except (FileNotFoundError, json.JSONDecodeError):
-            self.state = {}
+        self.state = common.load_json(STATE, {})
         self.used = set()
         self.synced = set()
         self.folder_of = {}   # storage slug -> the folder name it was first used for
@@ -244,4 +239,4 @@ class ProgramImages:
                     path = os.path.join(DIR, entry)
                     if entry not in self.used and os.path.isdir(path) and _inside_dir(path):
                         shutil.rmtree(path)
-        save_json(STATE, self.state)
+        common.save_json(STATE, self.state)

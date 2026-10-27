@@ -12,3 +12,8 @@ TODO.md
 
 # the maintainer notes (local only; details for developers are in AGENT_HANDOFF.md)
 README.md
+
+# Python caches and the test run's leftovers
+__pycache__/
+.pytest_cache/
+.coverage

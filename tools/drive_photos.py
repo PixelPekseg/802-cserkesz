@@ -22,8 +22,6 @@ import io
 import json
 import mimetypes
 import os
-import re
-import unicodedata
 import urllib.parse
 
 import sync_common as common
@@ -39,8 +37,7 @@ MAX_LONG_SIDE = 600
 
 
 def slugify(text):
-    ascii_text = unicodedata.normalize('NFKD', text).encode('ascii', 'ignore').decode()
-    return re.sub(r'[^a-z0-9]+', '-', ascii_text.lower()).strip('-') or 'foto'
+    return common.slugify(text, 'foto')
 
 
 def initials(name):
@@ -137,7 +134,7 @@ class Drive:
         if self.local_dir:
             with open(item['id'], 'rb') as handle:
                 return handle.read()
-        url = f'{API}/{urllib.parse.quote(item["id"])}?alt=media&key={urllib.parse.quote(self.api_key)}'
+        url = f'{API}/{urllib.parse.quote(item["id"], safe="")}?alt=media&key={urllib.parse.quote(self.api_key)}'
         return common.download(url, timeout=60)
 
     @staticmethod
@@ -152,11 +149,7 @@ class PhotoSync:
         self.drive = Drive()
         self.enabled = self.drive.enabled
         self.files = None          # {lowercase name: [file, ...]}, loaded on first use
-        try:
-            with open(STATE, encoding='utf-8') as handle:
-                self.state = json.load(handle)
-        except (FileNotFoundError, json.JSONDecodeError):
-            self.state = {}
+        self.state = common.load_json(STATE, {})
         self.updated = []
         self.warned_disabled = False
 
@@ -228,8 +221,4 @@ class PhotoSync:
         return True
 
     def save_state(self):
-        save_json(STATE, self.state)
-
-
-def save_json(path, data):
-    common.save_snapshot(path, json.dumps(data, ensure_ascii=False, indent=2, sort_keys=True) + '\n')
+        common.save_json(STATE, self.state)

@@ -67,6 +67,9 @@ def build_card(row, start_year, today):
             lines += ['              ' + part for part in parts]
             lines.append('            </li>')
         lines.append('          </ul>')
+    else:
+        # a troop without leaders yet: say so instead of an empty card
+        lines.append('          <p class="leader-pending">Rajparancsnokok: hamarosan frissítjük!</p>')
     lines.append('        </div>')
     return '\n'.join(lines)
 
@@ -104,6 +107,9 @@ def main():
             common.warn(f'{line_number}. sor ({row["name"]}): hibás indulási év ("{row["year"]}"), kihagyva.')
             continue
         start = int(match.group())
+        if not any(row[f'n{i}'] for i in (1, 2, 3)) and 4 <= 4 + school_year(today) - start <= 8:
+            common.warn(f'{line_number}. sor ({row["name"]}): nincs megadva rajparancsnok, a kártyán '
+                        '„hamarosan frissítjük” áll.')
         cards.append((start, build_card(row, start, today), build_cub_camp_group(row, start, today)))
     if not cards and not os.environ.get('ALLOW_EMPTY'):
         common.fail('Egyetlen érvényes, megjelenő raj sincs a táblázatban, ezért nem írom felül az oldalt.')

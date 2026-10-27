@@ -23,10 +23,8 @@ Usage:
 """
 import argparse
 import base64
-import contextlib
 import datetime as dt
 import hashlib
-import io
 import json
 import os
 import sys
@@ -51,20 +49,6 @@ warn, fail = common.warn, common.fail
 
 
 # ---------- the events from the sheet ----------
-
-def card_ids(rows):
-    """The same ids as the cards on the page (sync_programs.build_card): name-date, -2, -3 …"""
-    used, ids = set(), []
-    for row in rows:
-        base = f"{programs.slugify(row['name'])}-{row['start']:%Y%m%d}"
-        card_id, n = base, 2
-        while card_id in used:
-            card_id = f'{base}-{n}'
-            n += 1
-        used.add(card_id)
-        ids.append(card_id)
-    return ids
-
 
 def event_id(card_id):
     # Calendar event ids may use the characters a-v and 0-9 (base32hex): a hex digest fits
@@ -112,7 +96,7 @@ def description(row, card_id):
 def build_events(rows):
     """{event id: event body} of every program on the sheet."""
     events = {}
-    for row, card_id in zip(rows, card_ids(rows)):
+    for row, card_id in zip(rows, programs.card_ids(rows)):
         start, end = when(row)
         body = {
             'summary': row['name'],
@@ -146,7 +130,10 @@ def access_token(key):
     now = int(time.time())
     claims = {'iss': key['client_email'], 'scope': SCOPE, 'aud': key['token_uri'], 'iat': now, 'exp': now + 3600}
     unsigned = b64(json.dumps({'alg': 'RS256', 'typ': 'JWT'}).encode()) + '.' + b64(json.dumps(claims).encode())
-    private_key = serialization.load_pem_private_key(key['private_key'].encode(), password=None)
+    try:
+        private_key = serialization.load_pem_private_key(key['private_key'].encode(), password=None)
+    except (ValueError, TypeError):
+        fail('A GOOGLE_SERVICE_ACCOUNT_KEY titokban lévő kulcs sérült (a teljes JSON kulcsfájl kell bele, változtatás nélkül).')
     signature = private_key.sign(unsigned.encode(), padding.PKCS1v15(), hashes.SHA256())
     data = urllib.parse.urlencode({'grant_type': 'urn:ietf:params:oauth:grant-type:jwt-bearer',
                                    'assertion': unsigned + '.' + b64(signature)}).encode()
@@ -251,7 +238,7 @@ def main():
 
     with open(args.file or programs.SNAPSHOT, encoding='utf-8-sig') as handle:
         csv_text = handle.read()
-    with contextlib.redirect_stdout(io.StringIO()):   # its warnings were already shown by sync_programs.py
+    with common.quiet():   # its warnings were already reported by sync_programs.py
         rows, _ = programs.parse_rows(csv_text)
     wanted = build_events(rows)
     if args.show:
@@ -274,14 +261,16 @@ def main():
     if not wanted and not os.environ.get('ALLOW_EMPTY'):
         fail('Egyetlen program sincs a táblázatban, ezért nem ürítem ki a naptárat.')
 
-    calendar = Calendar(access_token(key), calendar_id)
     try:
+        calendar = Calendar(access_token(key), calendar_id)
         added, updated, deleted = sync(calendar, wanted, dry_run=args.dry_run)
     except urllib.error.HTTPError as error:
         if error.code in (401, 403, 404):
             fail(f'A naptár nem érhető el (HTTP {error.code}: {http_error_text(error)}). Jó a PROGRAM_CALENDAR_ID, '
                  'és meg van osztva a naptár a robotfiókkal?')
-        raise
+        fail(f'A Google Naptár most nem válaszolt rendesen (HTTP {error.code}); a következő futás újrapróbálja.')
+    except (urllib.error.URLError, TimeoutError, OSError) as error:
+        fail(f'A Google Naptár most nem érhető el ({getattr(error, "reason", error)}); a következő futás újrapróbálja.')
     if not args.dry_run:
         print(f'Google Naptár: {len(wanted)} program; új: {added}, frissített: {updated}, törölt: {deleted}.')
 

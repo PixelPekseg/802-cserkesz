@@ -181,14 +181,7 @@ def read_rows(rows, block_name, columns):
     return result
 
 
-def parse_date(text):
-    match = re.search(r'(\d{4})\D+(\d{1,2})\D+(\d{1,2})', text or '')
-    if not match:
-        return None
-    try:
-        return datetime.date(*map(int, match.groups()))
-    except ValueError:
-        return None
+parse_date = common.parse_date   # 2026.11.30., 2026-11-30 or 2026. november 30.
 
 
 def nice_date(text):
@@ -292,7 +285,7 @@ def render_pay(ecset_link):
 '''
 
 
-def render_form(form_link, deadline=''):
+def render_form(form_link, deadline='', now=None):
     """Support request: embedded form; script.js only loads its src when the tab is visible.
     At 23:59 on the day AFTER the deadline the form (with the deadline and the link) disappears and
     the .fee-form-closed message takes its place (script.js updateFees; here too, by the run time)."""
@@ -300,7 +293,8 @@ def render_form(form_link, deadline=''):
     embed = base + '?embedded=true' if base.endswith('/viewform') else form_link
     day = parse_date(deadline)
     until = f' data-until="{day.isoformat()}"' if day else ''
-    closed = bool(day) and datetime.datetime.now() >= datetime.datetime.combine(
+    now = now or datetime.datetime.now()
+    closed = bool(day) and now >= datetime.datetime.combine(
         day + datetime.timedelta(days=1), datetime.time(23, 59))
     deadline_line = (f'              <p class="fee-form-deadline">Igénylési határidő: <strong>{esc(nice_date(deadline))}</strong></p>\n'
                      if deadline else '')
@@ -325,7 +319,7 @@ def render_form(form_link, deadline=''):
 '''
 
 
-def render_tab(key, data, today):
+def render_tab(key, data, today, now=None):
     f = data['fields']
     empty = f['empty'] or DEFAULT_EMPTY.get(key, 'Jelenleg nincs tábordíj befizetési időszak!')
     start, end = parse_date(f['from']), parse_date(f['until'])
@@ -423,10 +417,10 @@ def render_tab(key, data, today):
             elif not parse_date(f['form_deadline']):
                 common.warn(f'{key}: a támogatás igénylésének határideje nem dátum ("{f["form_deadline"]}"), '
                             'ezért az űrlap nem zárul le magától. Írd így: 2026.11.15.')
-            out.append(render_form(f['form'], f['form_deadline']))
+            out.append(render_form(f['form'], f['form_deadline'], now))
         out[-1] = out[-1].rstrip('\n')
         out.append('        </div>')
-    out.append(f'        <p class="fee-empty"' + (' hidden' if active else '') + f'>{esc(empty)}</p>')
+    out.append('        <p class="fee-empty"' + (' hidden' if active else '') + f'>{esc(empty)}</p>')
     out.append('      </div>')
     return INDENT + '\n'.join(out)
 
@@ -457,6 +451,7 @@ def main():
     parser.add_argument('--today', help='for testing: YYYY-MM-DD')
     args = parser.parse_args()
     today = datetime.date.fromisoformat(args.today) if args.today else datetime.date.today()
+    now = datetime.datetime.combine(today, datetime.datetime.now().time())   # --today moves the form's closing too
 
     url = os.environ.get(ENV_NAME)
     if not args.file and not url:
@@ -475,7 +470,7 @@ def main():
             continue
         try:
             data = read_tab(sheet)
-            body = render_tab(key, data, today)
+            body = render_tab(key, data, today, now)
         except SheetError as error:
             errors.append(f'{sheet_name}: {error}')
             continue

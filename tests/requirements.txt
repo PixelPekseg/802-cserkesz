@@ -1,0 +1,4 @@
+# Test tools (installed by .github/workflows/tests.yml), on top of tools/requirements.txt.
+# Pinned to exact versions, like the sync packages.
+pytest==8.3.4
+coverage==7.6.10

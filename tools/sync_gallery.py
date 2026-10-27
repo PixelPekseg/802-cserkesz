@@ -19,7 +19,6 @@ by the Drive player (on click, in the lightbox). Uses the Python standard librar
 """
 import glob
 import html
-import json
 import os
 import re
 import sys
@@ -83,11 +82,9 @@ def program_groups():
     snapshot = os.path.join(common.ROOT, 'data', 'programs.csv')
     if not os.path.exists(snapshot):
         return []
-    try:
-        state = json.load(open(PROGRAM_STATE, encoding='utf-8'))
-    except (FileNotFoundError, json.JSONDecodeError):
-        state = {}
-    rows, _ = programs.parse_rows(open(snapshot, encoding='utf-8').read())
+    state = common.load_json(PROGRAM_STATE, {})
+    with common.quiet():   # its warnings were already reported by sync_programs.py
+        rows, _ = programs.parse_rows(open(snapshot, encoding='utf-8').read())
     folders = {}
     for row in rows:
         _, slug = folder_parts(row['image_folder'])

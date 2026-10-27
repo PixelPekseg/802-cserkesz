@@ -23,16 +23,14 @@ Usage:
 """
 import argparse
 import datetime as dt
-import json
 import os
 import re
-import smtplib
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import sync_common as common  # noqa: E402
 import sync_troops as troops  # noqa: E402
-from send_reminders import Mailer, SIGNATURE, test_mail, test_target, testing  # noqa: E402
+from mailing import SIGNATURE, periodic_reminder  # noqa: E402
 
 TO = ('802. sz. Szent Korona Cserkészcsapat', '802@cserkesz.hu')
 STATE = os.path.join(common.ROOT, 'data', 'troop_reminder.json')
@@ -84,67 +82,22 @@ def compose(today, problem, again):
     return subject, body
 
 
-def load_state():
-    try:
-        with open(STATE, encoding='utf-8') as handle:
-            return json.load(handle)
-    except (FileNotFoundError, json.JSONDecodeError):
-        return {}
-
-
 def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument('--file', help='local CSV export of the Rajok sheet (default: data/troops.csv)')
     parser.add_argument('--today', help='for testing: "YYYY-MM-DD"')
     args = parser.parse_args()
     today = dt.date.fromisoformat(args.today) if args.today else dt.date.today()
-    test_to = test_target('TROOP')
-    if test_to is None and testing():
-        print('Rajparancsnoki tesztlevél nem volt kérve (tesztfuttatás, rendes levél sem megy ki).')
-        return
 
-    state = load_state()
-    occasion = due_occasion(today, state)
-    if not occasion and test_to is None:
-        print('Ma nincs esedékes rajparancsnoki emlékeztető.')
-        return
-    with open(args.file or troops.SNAPSHOT, encoding='utf-8-sig') as handle:
-        problem = new_troop_problem(handle.read(), today)
-    if test_to is not None:
-        problem = problem or 'nincs hiány (ez csak egy tesztlevél)'
-    elif not problem:
-        print('Az új raj rajparancsnokainak elérhetősége megvan, nem kell levelet küldeni.')
-        if occasion:
-            common.save_snapshot(STATE, json.dumps({**state, occasion: 'nem kellett'}, ensure_ascii=False,
-                                                    indent=2, sort_keys=True) + '\n')
-        return
+    def build(test):
+        with open(args.file or troops.SNAPSHOT, encoding='utf-8-sig') as handle:
+            problem = new_troop_problem(handle.read(), today)
+        if not problem and not test:
+            return None
+        again = today.month == 10   # the October one is the second reminder
+        return ([TO], *compose(today, problem or 'nincs hiány (ez csak egy tesztlevél)', again))
 
-    subject, body = compose(today, problem, again=bool(occasion and occasion[5:7] == '10'))
-    mailer = Mailer()
-    if not mailer.enabled:
-        print(f'(SMTP nélkül nem küldöm el) {TO[1]}: {subject}\n\n{body}')
-        return
-    if not SHEET_LINK:
-        common.warn('Nincs beállítva a CSPK_WEBOLDAL_ADATOK_LINK titok, a levélből kimarad a táblázat linkje.')
-    to = [TO]
-    if test_to is not None:
-        to, subject, body = test_mail(test_to, to, subject, body, 'rajparancsnoki emlékeztető')
-    try:
-        mailer.send(to, subject, body)
-    except smtplib.SMTPAuthenticationError:
-        common.fail('Az SMTP bejelentkezés nem sikerült: ellenőrizd az ADMIN_EMAIL és ADMIN_JELSZO titkot.')
-    except (smtplib.SMTPException, OSError) as error:
-        common.warn(f'A rajparancsnoki emlékeztető nem ment el ({type(error).__name__}: {error}); '
-                    'a következő futáskor újrapróbálom.')
-        return
-    finally:
-        mailer.close()
-    if test_to is not None:
-        print(f'Tesztlevél elküldve ide: {", ".join(a for _, a in to)}: {subject}')
-        return
-    common.save_snapshot(STATE, json.dumps({**state, occasion: dt.datetime.now().isoformat(timespec='minutes')},
-                                           ensure_ascii=False, indent=2, sort_keys=True) + '\n')
-    print(f'Elküldve: {TO[1]}: {subject}')
+    periodic_reminder('TROOP', 'Rajparancsnoki emlékeztető', STATE, lambda state: due_occasion(today, state), build)
 
 
 if __name__ == '__main__':

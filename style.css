@@ -3317,6 +3317,13 @@ body:has(.main-nav.open) .upcoming-tab {
   font-size: 1.2rem;
 }
 
+/* Csatlakozom: a troop card without leaders yet */
+.leader-pending {
+  margin: 8px 0 0;
+  color: var(--color-text-muted);
+  font-size: 0.9rem;
+}
+
 /* passed deadline: red "Lejárt" label next to the title (the same shape as the programs' "Elmúlt") */
 .fee-past-label {
   padding: 4px 12px;

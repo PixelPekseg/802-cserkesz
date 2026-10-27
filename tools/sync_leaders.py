@@ -19,7 +19,6 @@ script.js show the hidden .person-bio content in a pop-up.
 On a broken sheet it stops with an error and changes nothing.
 """
 import os
-import re
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -57,11 +56,8 @@ def main():
             continue
         for key in COLUMNS:
             row.setdefault(key, '')
-        emails = [e for e in re.split(r'[,;\s]+', row['email']) if e]
-        if len(emails) > 1:
-            common.warn(f'{line_number}. sor: több e-mail cím van megadva, csak az elsőt használom.')
-        row['email'] = emails[0] if emails else ''
-        if row['email'] and '@' not in row['email']:
+        row['email'] = common.first_email(row['email'], f'{line_number}. sor')
+        if row['email'] and not common.EMAIL.fullmatch(row['email']):
             common.warn(f'{line_number}. sor: az e-mail cím nem tűnik érvényesnek, kihagyva: "{row["email"]}"')
             row['email'] = ''
         if any(slugify(p['name']) == slugify(row['name']) for p in people):

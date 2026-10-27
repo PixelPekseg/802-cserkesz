@@ -1,0 +1,59 @@
+# Unit tests of the sync scripts (tools/), with mocked sheets, Drive, Google Calendar and SMTP:
+# no secret and no network is needed. Runs on every push and pull request that changes the code or
+# the tests, and by hand (Actions tab -> "Egységtesztek" -> Run workflow).
+# It fails if a test fails, or if the tests cover less than 90% of the code.
+name: Egységtesztek
+
+on:
+  push:
+    paths:
+      - 'tools/**'
+      - 'tests/**'
+      - '.github/workflows/tests.yml'
+  pull_request:
+    paths:
+      - 'tools/**'
+      - 'tests/**'
+      - '.github/workflows/tests.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: tests-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      # the same time zone as the hourly sync (dates are evaluated in Hungarian time)
+      TZ: Europe/Budapest
+    steps:
+      # Actions are pinned to a full commit SHA (a tag can be moved, a SHA cannot): supply-chain safety.
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd   # v6.0.2
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405   # v6.2.0
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: |
+            tools/requirements.txt
+            tests/requirements.txt
+
+      - name: Csomagok telepítése
+        run: pip install --quiet --disable-pip-version-check -r tools/requirements.txt -r tests/requirements.txt
+
+      - name: Egységtesztek futtatása
+        run: python -m coverage run --rcfile=tests/.coveragerc -m pytest -c tests/pytest.ini
+
+      - name: Lefedettség (legalább 90%)
+        if: ${{ !cancelled() }}
+        run: |
+          python -m coverage report --rcfile=tests/.coveragerc --fail-under=90
+          # the table also on the run's summary page
+          { echo '```'; python -m coverage report --rcfile=tests/.coveragerc; echo '```'; } >> "$GITHUB_STEP_SUMMARY"

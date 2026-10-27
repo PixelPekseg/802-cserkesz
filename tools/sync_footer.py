@@ -12,26 +12,21 @@ Usage:
 import glob
 import html
 import os
-import re
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import sync_common as common  # noqa: E402
 
-EMAIL = re.compile(r'[^@\s<>"]+@[^@\s<>"]+\.[^@\s<>"]+')
-
 
 def footer_line(address):
-    # Hungarian article: "az admin@…", "a 802@…" ("1" and "5" are read with a vowel: egy, öt)
-    article = 'az' if address[:1].lower() in 'aáeéiíoóöőuúüű15' else 'a'
     safe = html.escape(address, quote=True)
-    return (f'      <p class="footer-report">Ha problémát tapasztal, kérjük, jelezze {article} '
+    return (f'      <p class="footer-report">Ha problémát tapasztal, kérjük, jelezze {common.article(address)} '
             f'<a href="mailto:{safe}">{safe}</a> e-mail címen.</p>')
 
 
 def main():
     address = os.environ.get('ADMIN_EMAIL', '').strip()
-    if not EMAIL.fullmatch(address):
+    if not common.EMAIL.fullmatch(address):
         common.warn('Nincs beállítva (vagy nem e-mail cím) az ADMIN_EMAIL titok, a lábléc hibabejelentő '
                     'sora változatlan marad.')
         return

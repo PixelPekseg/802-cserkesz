@@ -25,16 +25,14 @@ Usage:
 """
 import argparse
 import datetime as dt
-import json
 import os
-import smtplib
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import sync_common as common  # noqa: E402
 import sync_camps as camps  # noqa: E402
 import sync_leaders as leaders  # noqa: E402
-from send_reminders import Mailer, SIGNATURE, given_name, programs, test_mail, test_target, testing  # noqa: E402
+from mailing import SIGNATURE, greeting, periodic_reminder  # noqa: E402
 
 FALLBACK_TO = ('802. sz. Szent Korona Cserkészcsapat', '802@cserkesz.hu')
 STATE = os.path.join(common.ROOT, 'data', 'camp_reminder.json')
@@ -54,8 +52,9 @@ def due_month(today, state):
 
 
 def filled(value):
-    value = (value or '').strip()
-    return bool(value) and value.lower() != camps.PLACEHOLDER.lower()
+    """Not empty and not a placeholder ("Hamarosan frissítjük!", "hamarosan", "-", "?" …)."""
+    value = (value or '').strip().strip('.!?-–— ').lower()
+    return bool(value) and not value.startswith(('hamarosan', 'később', 'kesobb', 'tbd', 'nincs még', 'még nincs'))
 
 
 def camp_problems(csv_text):
@@ -87,14 +86,15 @@ def recipient():
     except (OSError, SystemExit):
         return None
     for _, row in table:
-        address = (row.get('email') or '').split(',')[0].split(';')[0].strip()
-        if ROLE_WORD in (row.get('role') or '').lower() and programs.EMAIL.fullmatch(address):
+        with common.quiet():   # sync_leaders.py already reported the sheet's problems
+            address = common.first_email(row.get('email'), '')
+        if ROLE_WORD in (row.get('role') or '').lower() and common.EMAIL.fullmatch(address):
             return row['name'], address
     return None
 
 
 def compose(person, problems):
-    hello = f'Kedves {given_name(person[0])}!' if person and given_name(person[0]) else 'Sziasztok!'
+    hello = greeting([person[0]] if person else [])
     lines = [f'- {name}: hiányzik {", ".join(missing)}' for name, missing in problems]
     link = f'\n\nweboldal-adatok táblázat: {SHEET_LINK}' if SHEET_LINK else ''
     subject = 'Hiányzó adatok a tábor kártyákon a weboldalon'
@@ -109,68 +109,26 @@ def compose(person, problems):
     return subject, body
 
 
-def save(state):
-    common.save_snapshot(STATE, json.dumps(state, ensure_ascii=False, indent=2, sort_keys=True) + '\n')
-
-
 def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument('--file', help='local CSV export of the Táborok sheet (default: data/camps.csv)')
     parser.add_argument('--today', help='for testing: "YYYY-MM-DD"')
     args = parser.parse_args()
     today = dt.date.fromisoformat(args.today) if args.today else dt.date.today()
-    test_to = test_target('CAMP')
-    if test_to is None and testing():
-        print('Tábori tesztlevél nem volt kérve (tesztfuttatás, rendes levél sem megy ki).')
-        return
 
-    try:
-        with open(STATE, encoding='utf-8') as handle:
-            state = json.load(handle)
-    except (FileNotFoundError, json.JSONDecodeError):
-        state = {}
-    month = due_month(today, state)
-    if not month and test_to is None:
-        print('Ma nincs esedékes tábori emlékeztető.')
-        return
-    with open(args.file or camps.SNAPSHOT, encoding='utf-8-sig') as handle:
-        problems = camp_problems(handle.read())
-    if not problems and test_to is None:
-        print('Minden tábor kártyán megvan a kötelező adat, nem kell levelet küldeni.')
-        save({**state, month: 'nem kellett'})
-        return
-    problems = problems or [('(teszt)', ['semmi, ez csak egy tesztlevél'])]
+    def build(test):
+        with open(args.file or camps.SNAPSHOT, encoding='utf-8-sig') as handle:
+            problems = camp_problems(handle.read())
+        if not problems and not test:
+            return None
+        person = recipient()
+        if not person:
+            common.warn('Nem találtam a Csapatvezetés lapon érvényes e-mail címmel azt, akinek a szerepében a '
+                        '„tábor” szó szerepel; a 802@cserkesz.hu-ra küldöm.')
+        problems = problems or [('(teszt)', ['semmi, ez csak egy tesztlevél'])]
+        return ([person or FALLBACK_TO], *compose(person, problems))
 
-    person = recipient()
-    if not person:
-        common.warn('Nem találtam a Csapatvezetés lapon érvényes e-mail címmel azt, akinek a szerepében a '
-                    '„tábor” szó szerepel; a 802@cserkesz.hu-ra küldöm.')
-    to = person or FALLBACK_TO
-    subject, body = compose(person, problems)
-    mailer = Mailer()
-    if not mailer.enabled:
-        print(f'(SMTP nélkül nem küldöm el) {to[1]}: {subject}\n\n{body}')
-        return
-    if not SHEET_LINK:
-        common.warn('Nincs beállítva a CSPK_WEBOLDAL_ADATOK_LINK titok, a levélből kimarad a táblázat linkje.')
-    try:
-        recipients = [to]
-        if test_to is not None:
-            recipients, subject, body = test_mail(test_to, recipients, subject, body, 'tábori emlékeztető')
-        mailer.send(recipients, subject, body)
-    except smtplib.SMTPAuthenticationError:
-        common.fail('Az SMTP bejelentkezés nem sikerült: ellenőrizd az ADMIN_EMAIL és ADMIN_JELSZO titkot.')
-    except (smtplib.SMTPException, OSError) as error:
-        common.warn(f'A tábori emlékeztető nem ment el ({type(error).__name__}: {error}); '
-                    'a következő futáskor újrapróbálom.')
-        return
-    finally:
-        mailer.close()
-    if test_to is not None:
-        print(f'Tesztlevél elküldve ide: {", ".join(a for _, a in recipients)}: {subject}')
-        return
-    save({**state, month: dt.datetime.now().isoformat(timespec='minutes')})
-    print(f'Elküldve: {to[1]}: {subject}')
+    periodic_reminder('CAMP', 'Tábori emlékeztető', STATE, lambda state: due_month(today, state), build)
 
 
 if __name__ == '__main__':

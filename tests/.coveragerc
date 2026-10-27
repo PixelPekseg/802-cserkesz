@@ -1,0 +1,11 @@
+# Coverage of the unit tests: the scripts in tools/ (tests/ itself is not measured).
+[run]
+source = tools
+data_file = /tmp/802-coverage
+
+[report]
+show_missing = true
+skip_covered = false
+exclude_lines =
+    pragma: no cover
+    if __name__ == .__main__.:

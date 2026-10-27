@@ -100,10 +100,10 @@ def main():
         for key in ('role', 'email', 'phone', 'filename'):
             row.setdefault(key, '')
         row['role'] = row['role'] or 'Kapcsolattartó'
-        emails = [e for e in re.split(r'[,;\s]+', row['email']) if e]
-        row['email'] = emails[0] if emails and '@' in emails[0] else ''
-        if emails and not row['email']:
-            common.warn(f'Kapcsolattartó, {line_number}. sor: az e-mail cím nem tűnik érvényesnek, kihagyva: "{emails[0]}"')
+        row['email'] = common.first_email(row['email'], f'Kapcsolattartó, {line_number}. sor')
+        if row['email'] and not common.EMAIL.fullmatch(row['email']):
+            common.warn(f'Kapcsolattartó, {line_number}. sor: az e-mail cím nem tűnik érvényesnek, kihagyva: "{row["email"]}"')
+            row['email'] = ''
         row['photo'] = photos.photo_for(row['name'], row['filename'], f'Kapcsolattartó, {line_number}. sor ({row["name"]})')
         contacts.append(row)
 

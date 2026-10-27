@@ -16,7 +16,6 @@ import datetime as dt
 import hashlib
 import html
 import os
-import re
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -34,14 +33,7 @@ COLUMNS = {
 }
 
 
-def parse_date(text):
-    match = re.search(r'(\d{4})\D+(\d{1,2})\D+(\d{1,2})', text or '')
-    if not match:
-        return None
-    try:
-        return dt.date(int(match.group(1)), int(match.group(2)), int(match.group(3)))
-    except ValueError:
-        return None
+parse_date = common.parse_date   # 2026.11.30., 2026-11-30 or 2026. november 30.
 
 
 def hungarian_date(date):
@@ -62,12 +54,13 @@ def build_notice(row, start, until, deadline):
     # The id is derived from the content: if the text changes, a dismissed notice shows up again.
     key = '\n'.join([row['title'], row['message'], deadline.isoformat() if deadline else ''])
     notice_id = hashlib.sha1(key.encode('utf-8')).hexdigest()[:10]
-    attrs = [f'class="notice"', f'data-id="{notice_id}"']
+    attrs = ['class="notice"', f'data-id="{notice_id}"']
     if start:
         attrs.append(f'data-from="{start.isoformat()}"')
     if until:
         attrs.append(f'data-until="{until.isoformat()}"')
-    text = [f'<strong class="notice-title">{html.escape(row["title"])}</strong>']
+    # a notice may have only a message (or only a title): no empty bold title then
+    text = [f'<strong class="notice-title">{html.escape(row["title"])}</strong>'] if row['title'] else []
     if deadline:
         text.append(f'<span class="notice-deadline">Határidő: {hungarian_date(deadline)}</span>')
     if row['message']:

@@ -79,6 +79,21 @@ jobs:
       LEADERS_SHEET_URL: https://docs.google.com/spreadsheets/d/e/2PACX-1vQqy5dHnLDdtxJCfwI1waOhfO-a1MHr933EVBTVl-jQiuuCHv94vU4f0UR3eCE48CXeYVfEN28QrZpo/pub?output=xlsx
       # Public id of the Drive "Képek és videók" folder (not a secret; only the API key is)
       DRIVE_IMAGES_FOLDER_ID: 13jB-lTr4Eqt1WOImYwWhMahGHwDTLALA
+      # every warning / error of the steps is collected here, the "Hibák jelentése" step e-mails them
+      SYNC_ISSUES_FILE: /tmp/sync_issues.jsonl
+      # each workbook is downloaded once per run and shared by the steps
+      SHEETS_CACHE_DIR: /tmp/sheets
+      # the test choices of the Run workflow form (empty on the hourly runs), passed through the
+      # environment, never pasted into a script
+      TEST_ORGANISER: ${{ inputs.test_organiser }}
+      TEST_ORGANISER_TO: ${{ inputs.test_organiser_to }}
+      TEST_MEDIA: ${{ inputs.test_media }}
+      TEST_MEDIA_TO: ${{ inputs.test_media_to }}
+      TEST_TROOP: ${{ inputs.test_troop }}
+      TEST_TROOP_TO: ${{ inputs.test_troop_to }}
+      TEST_CAMP: ${{ inputs.test_camp }}
+      TEST_CAMP_TO: ${{ inputs.test_camp_to }}
+      ONLY_TESTS: ${{ inputs.only_tests }}
     steps:
       # Actions are pinned to a full commit SHA (a tag can be moved, a SHA cannot): supply-chain safety.
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd   # v6.0.2
@@ -86,13 +101,18 @@ jobs:
       - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405   # v6.2.0
         with:
           python-version: '3.12'
+          # the downloaded packages are kept between runs (faster install; refreshed when the file changes)
+          cache: pip
+          cache-dependency-path: tools/requirements.txt
 
       # For processing the images from Drive (portraits, program images: WebP, iPhone HEIC) and the
       # xlsx workbooks; exact versions in tools/requirements.txt
       - name: Képkezelő csomagok telepítése
+        id: install
         run: pip install --quiet --disable-pip-version-check -r tools/requirements.txt
 
       - name: Programok (kártyák + képek a Drive-ról) frissítése
+        id: programs
         if: ${{ !cancelled() && !inputs.only_tests }}
         env:
           GOOGLE_API_KEY: ${{ secrets.GOOGLE_DRIVE_API_KEY }}
@@ -101,28 +121,34 @@ jobs:
       # The following steps run even if an earlier one failed (one broken sheet must not block the
       # others); the run is still shown as failed on GitHub.
       - name: Táborok letöltése és az oldal frissítése
+        id: camps
         if: ${{ !cancelled() && !inputs.only_tests }}
         run: python tools/sync_camps.py
 
       - name: Rajok letöltése és az oldal frissítése
+        id: troops
         if: ${{ !cancelled() && !inputs.only_tests }}
         run: python tools/sync_troops.py
 
       - name: Értesítők letöltése és az oldalak frissítése
+        id: notices
         if: ${{ !cancelled() && !inputs.only_tests }}
         run: python tools/sync_notices.py
 
       - name: Számlálók letöltése és az oldalak frissítése
+        id: counters
         if: ${{ !cancelled() && !inputs.only_tests }}
         run: python tools/sync_counters.py
 
       - name: Csapatvezetés (kártyák + fotók a Drive-ról) frissítése
+        id: leaders
         if: ${{ !cancelled() && !inputs.only_tests }}
         env:
           GOOGLE_API_KEY: ${{ secrets.GOOGLE_DRIVE_API_KEY }}
         run: python tools/sync_leaders.py
 
       - name: Eszközök letöltése és az oldal frissítése
+        id: equipment
         if: ${{ !cancelled() && !inputs.only_tests }}
         env:
           GOOGLE_API_KEY: ${{ secrets.GOOGLE_DRIVE_API_KEY }}
@@ -131,6 +157,7 @@ jobs:
       # Finance page: one workbook (sheets: Leírás, Tagdíj, Nagytábordíj, Kcs tábordíj), the WHOLE
       # document published in Excel (.xlsx) format. With an empty URL the page stays unchanged.
       - name: Pénzügyek (tagdíj, tábordíjak) frissítése
+        id: fees
         if: ${{ !cancelled() && !inputs.only_tests }}
         env:
           FEES_SHEET_URL: https://docs.google.com/spreadsheets/d/e/2PACX-1vREZYKdFMHLNs-HwpuiewPYAqNNDHxl4CbptmVv-s5eyC_npPp7znaZv0Ivick1HO-hGNs9XosqDmAL/pub?output=xlsx
@@ -138,6 +165,7 @@ jobs:
 
       # the gallery is built after the programs (and their images) are updated
       - name: Galéria összeállítása
+        id: gallery
         if: ${{ !cancelled() && !inputs.only_tests }}
         run: python tools/sync_gallery.py
 
@@ -145,24 +173,19 @@ jobs:
       # through the ADMIN_EMAIL / ADMIN_JELSZO secrets (an app password); without them only listed.
       # The sent ones are recorded in data/reminders.json, saved by the next step.
       - name: Emlékeztető levelek a szervezőknek és a médiásnak
+        id: reminders
         if: ${{ !cancelled() }}
         env:
           ADMIN_EMAIL: ${{ secrets.ADMIN_EMAIL }}
           ADMIN_JELSZO: ${{ secrets.ADMIN_JELSZO }}
           VEZETOK_WEBOLDAL_ADATOK_LINK: ${{ secrets.VEZETOK_WEBOLDAL_ADATOK_LINK }}
           PROGRAM_KEPEK_MAPPA_LINK: ${{ secrets.PROGRAM_KEPEK_MAPPA_LINK }}
-          # the test choices of the Run workflow form, passed through the environment (never pasted into the script)
-          TEST_ORGANISER: ${{ inputs.test_organiser }}
-          TEST_ORGANISER_TO: ${{ inputs.test_organiser_to }}
-          TEST_MEDIA: ${{ inputs.test_media }}
-          TEST_MEDIA_TO: ${{ inputs.test_media_to }}
-          TEST_TROOP: ${{ inputs.test_troop }}
-          TEST_CAMP: ${{ inputs.test_camp }}
         run: python tools/send_reminders.py
 
       # The public "802. Programok" Google Calendar follows the Programok sheet (people subscribe to it);
       # written through the service account the calendar is shared with
       - name: Google Naptár frissítése a programokból
+        id: calendar
         if: ${{ !cancelled() && !inputs.only_tests }}
         env:
           GOOGLE_SERVICE_ACCOUNT_KEY: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_KEY }}
@@ -173,39 +196,49 @@ jobs:
       # On September 15 and October 15: an e-mail to 802@cserkesz.hu if the new (4th-grade) troop's
       # leaders are not on the Rajok sheet yet; recorded in data/troop_reminder.json.
       - name: Emlékeztető az új raj rajparancsnokainak elérhetőségéről
+        id: troop_reminder
         if: ${{ !cancelled() }}
         env:
           ADMIN_EMAIL: ${{ secrets.ADMIN_EMAIL }}
           ADMIN_JELSZO: ${{ secrets.ADMIN_JELSZO }}
           CSPK_WEBOLDAL_ADATOK_LINK: ${{ secrets.CSPK_WEBOLDAL_ADATOK_LINK }}
-          TEST_ORGANISER: ${{ inputs.test_organiser }}
-          TEST_MEDIA: ${{ inputs.test_media }}
-          TEST_TROOP: ${{ inputs.test_troop }}
-          TEST_TROOP_TO: ${{ inputs.test_troop_to }}
-          TEST_CAMP: ${{ inputs.test_camp }}
         run: python tools/troop_reminder.py
 
       # From March 1 to August 1, monthly: an e-mail to the deputy responsible for camps if a camp card
       # misses its time, place, two main organisers or a contact; recorded in data/camp_reminder.json.
       - name: Emlékeztető a tábor kártyák hiányzó adatairól
+        id: camp_reminder
         if: ${{ !cancelled() }}
         env:
           ADMIN_EMAIL: ${{ secrets.ADMIN_EMAIL }}
           ADMIN_JELSZO: ${{ secrets.ADMIN_JELSZO }}
           CSPK_WEBOLDAL_ADATOK_LINK: ${{ secrets.CSPK_WEBOLDAL_ADATOK_LINK }}
-          TEST_ORGANISER: ${{ inputs.test_organiser }}
-          TEST_MEDIA: ${{ inputs.test_media }}
-          TEST_TROOP: ${{ inputs.test_troop }}
-          TEST_CAMP: ${{ inputs.test_camp }}
-          TEST_CAMP_TO: ${{ inputs.test_camp_to }}
         run: python tools/camp_reminder.py
 
       # The footer's "report a problem" line on every page: the address of the ADMIN_EMAIL secret
       - name: Lábléc hibabejelentő címének frissítése
+        id: footer
         if: ${{ !cancelled() && !inputs.only_tests }}
         env:
           ADMIN_EMAIL: ${{ secrets.ADMIN_EMAIL }}
         run: python tools/sync_footer.py
+
+      # checks the generated pages (complete generated parts, no sheet error values, no broken links,
+      # valid dates, no empty lists); only reports, changes nothing
+      - name: Az oldalak ellenőrzése
+        id: check
+        if: ${{ !cancelled() && !inputs.only_tests }}
+        run: python tools/check_site.py
+
+      # e-mails the admin about the warnings and errors of this run (new ones at once, the same ones
+      # daily, and once when all is fine again); data/sync_issues.json is saved by the next steps
+      - name: Hibák jelentése e-mailben
+        if: ${{ always() && !inputs.only_tests }}
+        env:
+          ADMIN_EMAIL: ${{ secrets.ADMIN_EMAIL }}
+          ADMIN_JELSZO: ${{ secrets.ADMIN_JELSZO }}
+          STEPS_JSON: ${{ toJSON(steps) }}
+        run: python tools/report_issues.py
 
       - name: Havi életjel
         if: ${{ !cancelled() && !inputs.only_tests }}

@@ -26,7 +26,6 @@ import io
 import os
 import re
 import sys
-import unicodedata
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import sync_common as common  # noqa: E402
@@ -69,7 +68,7 @@ FACEBOOK_HOSTS = {'facebook.com', 'www.facebook.com', 'm.facebook.com', 'web.fac
 INSTAGRAM_HOSTS = {'instagram.com', 'www.instagram.com', 'instagr.am'}
 
 warn, fail = common.warn, common.fail
-EMAIL = re.compile(r'[^@\s]+@[^@\s]+\.[^@\s]+')
+EMAIL = common.EMAIL
 
 
 def missing_contact_email(row):
@@ -89,14 +88,7 @@ def missing_contact_email(row):
     return ''
 
 
-def parse_date(text):
-    match = re.search(r'(\d{4})\D+(\d{1,2})\D+(\d{1,2})', text or '')
-    if not match:
-        return None
-    try:
-        return dt.date(int(match.group(1)), int(match.group(2)), int(match.group(3)))
-    except ValueError:
-        return None
+parse_date = common.parse_date   # 2026.11.30., 2026-11-30 or 2026. november 30.
 
 
 def parse_time(text):
@@ -110,9 +102,7 @@ def parse_time(text):
 
 
 def slugify(text):
-    ascii_text = unicodedata.normalize('NFKD', text).encode('ascii', 'ignore').decode()
-    slug = re.sub(r'[^a-z0-9]+', '-', ascii_text.lower()).strip('-')
-    return slug[:40].strip('-') or 'program'
+    return common.slugify(text, 'program', limit=40)
 
 
 def display_date(start, end):
@@ -146,16 +136,30 @@ def contact_html(name, email, phone):
     return text
 
 
-def build_card(row, used_ids):
-    start, end = row['start'], row['end']
-    base = f"{slugify(row['name'])}-{start:%Y%m%d}"
-    card_id, n = base, 2
-    while card_id in used_ids:
-        card_id = f'{base}-{n}'
-        n += 1
-    used_ids.add(card_id)
+def card_ids(rows):
+    """The cards' ids (also the link targets: programok.html#<id>, and the Google Calendar events'
+    base): name-date, and -2, -3 … for programs with the same name on the same day."""
+    used, ids = set(), []
+    for row in rows:
+        base = f"{slugify(row['name'])}-{row['start']:%Y%m%d}"
+        card_id, n = base, 2
+        while card_id in used:
+            card_id = f'{base}-{n}'
+            n += 1
+        used.add(card_id)
+        ids.append(card_id)
+    return ids
 
-    end_attr = f' data-end-date="{end.isoformat()}"' if end and end > start else ''
+
+def build_card(row, card_id):
+    start, end = row['start'], row['end']
+
+    # the last day for the page (archive, calendar): a program running past midnight (e.g. 22:00–02:00)
+    # ends the next day, so its card moves to the archive only after that day
+    last = end if end and end > start else start
+    if last == start and row['start_time'] and row['end_time'] and row['end_time'] <= row['start_time']:
+        last += dt.timedelta(days=1)
+    end_attr = f' data-end-date="{last.isoformat()}"' if last > start else ''
     lines = [
         f'        <article class="news-card" id="{card_id}" data-date="{start.isoformat()}"{end_attr}>',
         f'          <div class="news-meta"><span class="news-date">{display_date(start, end)}</span></div>',
@@ -301,9 +305,18 @@ def parse_rows(csv_text):
             'c2_name': cell(row, 'c2_name'), 'c2_email': cell(row, 'c2_email'), 'c2_phone': cell(row, 'c2_phone'),
             'facebook': facebook, **posts, 'image_folder': cell(row, 'images'), 'label': label,
         }
+        for number in ('1', '2'):
+            record[f'c{number}_email'] = common.first_email(record[f'c{number}_email'],
+                                                            f'{label}, {number}. kapcsolattartó')
         # the contact e-mail is required, but only checked for programs that have not ended yet
         # (an old row is not worth fixing; it stays on the page as before)
-        problem = missing_contact_email(record) if (end or start) >= dt.date.today() else ''
+        upcoming = (end or start) >= dt.date.today()
+        problem = missing_contact_email(record) if upcoming else ''
+        if upcoming and not problem:
+            missing = [what for what, key in (('helyszín', 'place'), ('leírás', 'description')) if not record[key]]
+            if missing:
+                warn(f'{label}: nincs megadva {" és ".join(missing)} (a program így is megjelenik, de érdemes '
+                     'pótolni).')
         if problem:
             warn(f'{label}: {problem}, ezért a program nem jelenik meg. Pótold a táblázatban.')
             continue
@@ -331,8 +344,7 @@ def main():
         warn('A táblázatban nincs "Képek" oszlop, ezért a programképeket most nem törlöm (a meglévők maradnak).')
     images.finish(allow_delete=has_image_column)
 
-    used_ids = set()
-    cards = '\n\n'.join(build_card(row, used_ids) for row in rows)
+    cards = '\n\n'.join(build_card(row, card_id) for row, card_id in zip(rows, card_ids(rows)))
 
     changed = common.replace_block(PAGE, 'PROGRAMS', cards, ' ' * 8)
     common.save_snapshot(SNAPSHOT, csv_text)

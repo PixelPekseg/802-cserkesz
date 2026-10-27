@@ -36,29 +36,20 @@ Usage:
     python tools/send_reminders.py --media-file m.csv         # media person from a local CSV export
 """
 import argparse
-import contextlib
 import datetime as dt
-import email.message
-import email.utils
-import io
-import json
 import os
-import re
-import smtplib
-import ssl
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import sync_common as common  # noqa: E402
 import sync_programs as programs  # noqa: E402
+from mailing import SIGNATURE, Mailer, greeting, join_and, test_mail, test_target, testing  # noqa: E402
 
 STATE = os.path.join(common.ROOT, 'data', 'reminders.json')
 # The edit link of the sheet and the link of the image folder are GitHub Secrets as well: the
 # repository is public, and they may give edit access to whoever has them.
 SHEET_LINK = os.environ.get('VEZETOK_WEBOLDAL_ADATOK_LINK', '').strip()
 IMAGES_LINK = os.environ.get('PROGRAM_KEPEK_MAPPA_LINK', '').strip()
-SENDER_NAME = '802. sz. Szent Korona Cserkészcsapat'
-SIGNATURE = '802. sz. Szent Korona Cserkészcsapat'
 
 PHOTOS_AHEAD = dt.timedelta(hours=24)
 REPORT_AFTER = dt.timedelta(days=1)
@@ -71,12 +62,6 @@ MEDIA_SHEET = 'Médiás kapcsolat'
 MEDIA_COLUMNS = {'name': 'név', 'role': 'szerep', 'email': 'e-mail', 'phone': 'telefon'}
 
 warn = common.warn
-
-
-def given_name(full_name):
-    """Hungarian name order: family name first, so "Pálinkás Péter" → "Péter"."""
-    words = [w for w in full_name.split() if w.lower().rstrip('.') not in ('dr', 'ifj', 'id')]
-    return words[1] if len(words) > 1 else (words[0] if words else '')
 
 
 def start_of(row):
@@ -103,7 +88,7 @@ def recipients(row):
     result = []
     for number in ('1', '2'):
         name, address = row[f'c{number}_name'], row[f'c{number}_email']
-        if address and programs.EMAIL.fullmatch(address) and address.lower() not in [a.lower() for _, a in result]:
+        if address and common.EMAIL.fullmatch(address) and address.lower() not in [a.lower() for _, a in result]:
             result.append((name, address))
     return result
 
@@ -113,7 +98,7 @@ def media_people(csv_text):
     result = []
     for line_number, row in common.read_table(csv_text, MEDIA_COLUMNS, required=['name', 'email']):
         address = row['email'].strip()
-        if not row['name'] or not programs.EMAIL.fullmatch(address):
+        if not row['name'] or not common.EMAIL.fullmatch(address):
             warn(f'{MEDIA_SHEET}, {line_number}. sor: hiányzik a név vagy az érvényes e-mail cím, kihagyva.')
             continue
         result.append((row['name'], address, common.fix_phone(row.get('phone', '')).strip()))
@@ -126,14 +111,7 @@ def person_text(people, with_phone=False):
     for person in people:
         details = [person[1]] + ([person[2]] if with_phone and len(person) > 2 and person[2] else [])
         parts.append(f'{person[0] or person[1]} ({", ".join(details)})')
-    return ' és '.join([', '.join(parts[:-1]), parts[-1]]) if len(parts) > 1 else (parts[0] if parts else '')
-
-
-def greeting(people, fallback='Kapcsolattartó'):
-    names = [given_name(person[0]) for person in people if given_name(person[0])]
-    if not names:
-        return f'Kedves {fallback}!'
-    return 'Kedves ' + (' és '.join([', '.join(names[:-1]), names[-1]]) if len(names) > 1 else names[0]) + '!'
+    return join_and(parts)
 
 
 def when_text(row):
@@ -149,39 +127,9 @@ LINKS = '\n'.join(line for line in (f'Programos táblázat: {SHEET_LINK}' if SHE
                                     f'Program képek mappa: {IMAGES_LINK}' if IMAGES_LINK else '') if line)
 
 
-# ---------- test e-mails (Run workflow form: a checkbox and an address per e-mail kind) ----------
-
-TEST_KINDS = ('ORGANISER', 'MEDIA', 'TROOP', 'CAMP')
-
-
-def test_target(kind):
-    """None if the test of this kind was not asked for, otherwise the test address ('' = the real
-    recipients)."""
-    if os.environ.get(f'TEST_{kind}', '').strip().lower() not in ('true', '1'):
-        return None
-    address = os.environ.get(f'TEST_{kind}_TO', '').strip()
-    if address and not programs.EMAIL.fullmatch(address):
-        common.fail(f'A teszt e-mail cím nem érvényes: "{address}".')
-    return address
-
-
-def testing():
-    """True if any test e-mail was asked for: then the scripts only send the tests."""
-    return any(test_target(kind) is not None for kind in TEST_KINDS)
-
-
-def test_mail(target, real, subject, body, who):
-    """(recipients, subject, body) of a test e-mail: to the test address, or to the real recipients."""
-    names = ', '.join(f'{name} ({address})' if name else address for name, address in real)
-    note = f'[Tesztlevél. Élesben ezt kapná: {names}.]\n\n'
-    return ([('', target)] if target else real), f'[TESZT – {who}] {subject}', note + body
-
-
 def with_article(name):
     """The name with its Hungarian definite article: "az Őszi portya", "a Cserkészmise"."""
-    first = name.strip()[:1].lower()
-    vowel = first in 'aáeéiíoóöőuúüű' or first in '15'   # "1" (egy) and "5" (öt) are read with a vowel
-    return f"{'az' if vowel else 'a'} {name}"
+    return f'{common.article(name)} {name}'
 
 
 def compose_organiser(kind, row, people, media):
@@ -200,7 +148,7 @@ def compose_organiser(kind, row, people, media):
         text = (f'Reméljük, jól sikerült {the_name} ({date})! Kérünk, írj róla néhány mondatos beszámolót, '
                 f'és a programon készült képekkel együtt küldd el {to_media}. Ő teszi fel őket a weboldalra.\n\n'
                 'Ha már elküldted, ezt a levelet nyugodtan hagyd figyelmen kívül.')
-    return finish(subject, f'{greeting(people)}\n\n{text}\n\n', '')
+    return finish(subject, f'{greeting([p[0] for p in people], "Kedves Kapcsolattartó!")}\n\n{text}\n\n', '')
 
 
 def compose_media(kind, row, people, media):
@@ -236,12 +184,11 @@ def compose_media(kind, row, people, media):
         text = (f'Egy hete volt {the_name} ({date}), de a honlapra még nem került fel róla beszámoló. '
                 f'{organisers}\n\nKérünk, keresd meg {whom}, és ha megkaptad {ask} a beszámolót és a képeket, '
                 'töltsd fel őket, hogy kitehessük a weboldalra.\n' + upload)
-    return finish(subject, f'{greeting(media, "Médiás")}\n\n{text}\n\n', f'{LINKS}\n\n' if LINKS else '')
+    return finish(subject, f'{greeting([p[0] for p in media], "Kedves Médiás!")}\n\n{text}\n\n', f'{LINKS}\n\n' if LINKS else '')
 
 
 def finish(subject, text, links):
-    body = f'{text}{links}Jó munkát!\n{SIGNATURE}\n'
-    return re.sub(r'[\r\n]+', ' ', subject), body
+    return subject, f'{text}{links}Jó munkát!\n{SIGNATURE}\n'
 
 
 # (state key, who gets it) of the e-mails of each stage
@@ -280,45 +227,13 @@ def due(row, now, sent):
     return None
 
 
-class Mailer:
-    def __init__(self):
-        self.user = os.environ.get('ADMIN_EMAIL', '').strip()
-        self.password = os.environ.get('ADMIN_JELSZO', '').replace(' ', '')
-        self.host = os.environ.get('SMTP_HOST', '').strip() or 'smtp.gmail.com'
-        self.port = int(os.environ.get('SMTP_PORT', '').strip() or 465)
-        self.enabled = bool(self.user and self.password)
-        self.server = None
-
-    def send(self, to, subject, body):
-        message = email.message.EmailMessage()
-        message['From'] = email.utils.formataddr((SENDER_NAME, self.user))
-        message['To'] = ', '.join(email.utils.formataddr(person) for person in to)
-        message['Subject'] = subject
-        message['Date'] = email.utils.formatdate(localtime=True)
-        message['Message-ID'] = email.utils.make_msgid(domain=self.user.split('@')[-1])
-        message.set_content(body)
-        if self.server is None:
-            self.server = smtplib.SMTP_SSL(self.host, self.port, context=ssl.create_default_context(), timeout=30)
-            self.server.login(self.user, self.password)
-        self.server.send_message(message)
-
-    def close(self):
-        if self.server is not None:
-            with contextlib.suppress(Exception):
-                self.server.quit()
-
-
 # Before the media person was added, "photos" / "report" meant the e-mail to the organisers: those
 # are not sent again (the media person does not get them for such a program either).
 MEDIA_SINCE = '2026-10-27T12:00'
 
 
 def load_state():
-    try:
-        with open(STATE, encoding='utf-8') as handle:
-            state = json.load(handle)
-    except (FileNotFoundError, json.JSONDecodeError):
-        return {}
+    state = common.load_json(STATE, {})
     for sent in state.values():
         for stage in ('photos', 'report'):
             if sent.get(stage, '9999') < MEDIA_SINCE:
@@ -327,7 +242,7 @@ def load_state():
 
 
 def save_state(state):
-    common.save_snapshot(STATE, json.dumps(state, ensure_ascii=False, indent=2, sort_keys=True) + '\n')
+    common.save_json(STATE, state)
 
 
 def main():
@@ -341,7 +256,7 @@ def main():
 
     with open(args.file or programs.SNAPSHOT, encoding='utf-8-sig') as handle:
         csv_text = handle.read()
-    with contextlib.redirect_stdout(io.StringIO()):   # its warnings were already shown by sync_programs.py
+    with common.quiet():   # its warnings were already reported by sync_programs.py
         rows, _ = programs.parse_rows(csv_text)
 
     try:
@@ -350,23 +265,17 @@ def main():
         media = media_people(media_csv)
     except SystemExit:   # the sheet is missing or broken: the error was printed already
         media = []
-    mailer = Mailer()
-    if testing():
-        try:
+    with Mailer() as mailer:
+        if testing():
             test(rows, now, mailer, media)
-        finally:
-            mailer.close()
-        return
-    if not media:
-        warn(f'Nincs érvényes médiás a „{MEDIA_SHEET}” lapon (név + e-mail cím), ezért most egy emlékeztetőt '
-             'sem küldök; a következő futáskor újrapróbálom.')
-        return
-    if mailer.enabled and not SHEET_LINK:
-        warn('Nincs beállítva a VEZETOK_WEBOLDAL_ADATOK_LINK titok, a médiás leveleiből kimarad a táblázat linkje.')
-    try:
+            return
+        if not media:
+            warn(f'Nincs érvényes médiás a „{MEDIA_SHEET}” lapon (név + e-mail cím), ezért most egy emlékeztetőt '
+                 'sem küldök; a következő futáskor újrapróbálom.')
+            return
+        if mailer.enabled and not SHEET_LINK:
+            warn('Nincs beállítva a VEZETOK_WEBOLDAL_ADATOK_LINK titok, a médiás leveleiből kimarad a táblázat linkje.')
         run(rows, now, mailer, media)
-    finally:
-        mailer.close()
 
 
 def test(rows, now, mailer, media):
@@ -396,9 +305,9 @@ def test(rows, now, mailer, media):
                 continue
             to, subject, body = test_mail(target, real, subject, body,
                                           'médiásnak' if kind == 'media' else 'szervezőnek')
-            mailer.send(to, subject, body)
-            count += 1
-            print(f'Tesztlevél elküldve ide: {", ".join(a for _, a in to)}: {subject}')
+            if mailer.deliver(to, subject, body, f'Tesztlevél ({subject})'):
+                count += 1
+                print(f'Tesztlevél elküldve ide: {", ".join(a for _, a in to)}: {subject}')
     print(f'{count} tesztlevél elküldve (a "{row["name"]}" program alapján); semmit nem rögzítettem.')
 
 
@@ -421,16 +330,7 @@ def run(rows, now, mailer, media):
             if not mailer.enabled:
                 print(f'(SMTP nélkül nem küldöm el) {addresses}: {subject}')
                 continue
-            try:
-                mailer.send(people, subject, body)
-            except smtplib.SMTPAuthenticationError:
-                save_state(state)   # keep what was sent before
-                common.fail('Az SMTP bejelentkezés nem sikerült: ellenőrizd az ADMIN_EMAIL és ADMIN_JELSZO '
-                            'titkot (Google-fióknál alkalmazásjelszó kell).')
-            except (smtplib.SMTPException, OSError) as error:
-                warn(f'{row["label"]}: az emlékeztető nem ment el ({type(error).__name__}: {error}); a következő futáskor újrapróbálom.')
-                mailer.close()
-                mailer.server = None
+            if not mailer.deliver(people, subject, body, row['label'], on_auth_error=lambda: save_state(state)):
                 continue
             sent = {**sent, message_key: now.isoformat(timespec='minutes'), 'end': end_of(row).date().isoformat()}
             state[key] = sent

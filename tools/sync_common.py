@@ -4,15 +4,20 @@ Used by most tools/sync_*.py scripts (sync_programs.py has its own copy of the b
 follows the same rules). Log messages stay in Hungarian: they are read by the sheet editors.
 """
 import argparse
+import contextlib
 import csv
+import datetime
+import hashlib
 import html
 import io
+import json
 import os
 import re
 import ssl
 import sys
 import tempfile
 import time
+import unicodedata
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -30,12 +35,47 @@ def _log_text(message):
     return text
 
 
+# Every warning and error of the run is also collected in this file (one JSON line each), and the
+# last step of the workflow (tools/report_issues.py) e-mails them to the admin.
+ISSUES_FILE = os.environ.get('SYNC_ISSUES_FILE', '')
+
+
+_quiet = False
+
+
+@contextlib.contextmanager
+def quiet():
+    """Re-reading data another step has already checked (e.g. the programs snapshot): its warnings
+    are neither printed nor reported again."""
+    global _quiet
+    before, _quiet = _quiet, True
+    try:
+        yield
+    finally:
+        _quiet = before
+
+
+def _record(level, message):
+    if not ISSUES_FILE:
+        return
+    entry = {'level': level, 'script': os.path.basename(sys.argv[0]), 'message': str(message)}
+    try:
+        with open(ISSUES_FILE, 'a', encoding='utf-8') as handle:
+            handle.write(json.dumps(entry, ensure_ascii=False) + '\n')
+    except OSError:
+        pass   # the report is a help, it must never break the sync itself
+
+
 def warn(message):
+    if _quiet:
+        return
     print(('::warning::' if in_actions else 'FIGYELEM: ') + _log_text(message))
+    _record('warning', message)
 
 
 def fail(message):
     print(('::error::' if in_actions else 'HIBA: ') + _log_text(message))
+    _record('error', message)
     sys.exit(1)
 
 
@@ -129,7 +169,6 @@ def get_args():
 
 
 def _cell_csv(value):
-    import datetime
     if value is None:
         return ''
     if isinstance(value, datetime.datetime):
@@ -153,11 +192,14 @@ def xlsx_sheet_as_csv(data, sheet_name):
         import openpyxl
     except ImportError:
         fail('Hiányzik az openpyxl csomag (pip install openpyxl).')
-    try:
-        book = openpyxl.load_workbook(io.BytesIO(data), data_only=True, read_only=True)
-    except Exception as error:
-        fail(f'A közös táblázat nem olvasható Excel-fájlként ({error}). A TELJES dokumentum van közzétéve, '
-             'Microsoft Excel (.xlsx) formátumban?')
+    book = _OPENED.get(id(data))
+    if book is None:
+        try:
+            book = openpyxl.load_workbook(io.BytesIO(data), data_only=True, read_only=True)
+        except Exception as error:
+            fail(f'A közös táblázat nem olvasható Excel-fájlként ({error}). A TELJES dokumentum van közzétéve, '
+                 'Microsoft Excel (.xlsx) formátumban?')
+        _OPENED[id(data)] = book   # several sheets of the same workbook in one script: opened once
     sheet = next((ws for ws in book.worksheets if ws.title.strip().lower() == sheet_name.lower()), None)
     if sheet is None:
         fail(f'A közös táblázatban nincs "{sheet_name}" lap. Valaki átnevezte vagy törölte?')
@@ -170,11 +212,28 @@ def xlsx_sheet_as_csv(data, sheet_name):
 
 
 _BOOKS = {}
+_OPENED = {}
+# The workflow sets this: each workbook is downloaded once per run and shared by the steps (every step
+# is a separate script, and the leaders' and the team's workbook are read by 4 steps each).
+CACHE_DIR = os.environ.get('SHEETS_CACHE_DIR', '')
+
+
+def _cached_download(url):
+    path = os.path.join(CACHE_DIR, hashlib.sha256(url.encode()).hexdigest()[:16] + '.xlsx') if CACHE_DIR else ''
+    if path and os.path.exists(path):
+        with open(path, 'rb') as handle:
+            return handle.read()
+    data = download(url)
+    if path:
+        os.makedirs(CACHE_DIR, exist_ok=True)
+        write_bytes(path, data)
+    return data
 
 
 def shared_sheet_csv(args, sheet, book_env):
     """One sheet of the shared workbook (local --xlsx file or the URL in book_env) as CSV text, or
-    None when no shared workbook is configured. The download is reused within one run."""
+    None when no shared workbook is configured. The download is reused within one run (and between
+    the steps of the workflow, see CACHE_DIR)."""
     if getattr(args, 'file', None):
         return None
     path, url = getattr(args, 'xlsx', None), os.environ.get(book_env)
@@ -187,7 +246,7 @@ def shared_sheet_csv(args, sheet, book_env):
                 _BOOKS[key] = handle.read()
         else:
             try:
-                _BOOKS[key] = download(url)
+                _BOOKS[key] = _cached_download(url)
             except DownloadError as error:
                 fail(f'A közös táblázat letöltése nem sikerült: {error}')
     return xlsx_sheet_as_csv(_BOOKS[key], sheet)
@@ -281,6 +340,60 @@ def read_table(csv_text, columns, required):
     return result
 
 
+_MONTH_PREFIXES = ('jan', 'feb', 'már', 'ápr', 'máj', 'jún', 'júl', 'aug', 'sze', 'okt', 'nov', 'dec')
+
+
+def parse_date(text):
+    """A date typed into a sheet: 2026.11.30., 2026-11-30, 2026/11/30 or 2026. november 30. (also
+    abbreviated: 2026. nov. 30.). None if it is not a (real) date."""
+    text = (text or '').strip()
+    match = re.search(r'(\d{4})\D+(\d{1,2})\D+(\d{1,2})', text)
+    if match:
+        year, month, day = (int(g) for g in match.groups())
+    else:
+        match = re.search(r'(\d{4})\.?\s*([a-záéíóöőúüű]+)\.?\s*(\d{1,2})', text.lower())
+        if not match:
+            return None
+        name = match.group(2).replace('marc', 'márc').replace('apr', 'ápr').replace('maj', 'máj') \
+            .replace('jun', 'jún').replace('jul', 'júl')
+        month = next((i for i, prefix in enumerate(_MONTH_PREFIXES, start=1) if name.startswith(prefix)), None)
+        if not month:
+            return None
+        year, day = int(match.group(1)), int(match.group(3))
+    try:
+        return datetime.date(year, month, day)
+    except ValueError:
+        return None
+
+
+# an e-mail address typed into a sheet (one address, no spaces)
+EMAIL = re.compile(r'[^@\s<>"]+@[^@\s<>"]+\.[^@\s<>"]+')
+
+
+def first_email(text, where):
+    """The first address of a cell that may hold several ("a@x.hu, b@x.hu"), '' if empty; warns if
+    there were more (only the first one is used). Its validity is checked by the caller."""
+    addresses = [a for a in re.split(r'[\s,;]+', text or '') if a]
+    if len(addresses) > 1:
+        warn(f'{where}: több e-mail cím van megadva, csak az elsőt használom ({addresses[0]}).')
+    return addresses[0] if addresses else ''
+
+
+def article(word):
+    """The Hungarian definite article for a word: "az" before a vowel (and "1", "5": egy, öt), else "a"."""
+    first = word.strip()[:1].lower()
+    return 'az' if first and first in 'aáeéiíoóöőuúüű15' else 'a'
+
+
+def slugify(text, fallback='x', limit=None):
+    """ASCII, lowercase, hyphenated form of a name for file names and ids: "Őszi portya" → "oszi-portya"."""
+    ascii_text = unicodedata.normalize('NFKD', text).encode('ascii', 'ignore').decode()
+    slug = re.sub(r'[^a-z0-9]+', '-', ascii_text.lower()).strip('-')
+    if limit:
+        slug = slug[:limit].strip('-')
+    return slug or fallback
+
+
 def fix_phone(phone):
     """A Hungarian number written without spaces (+36707582659, 06707582659, or 36707582659 when the
     sheet turned "+36 …" into a number) in readable form: +36 70 758 2659. Any other input (e.g.
@@ -326,6 +439,20 @@ def replace_block(page_path, marker, body, indent):
         write_text(page_path, new_page)
         return True
     return False
+
+
+def load_json(path, default):
+    """The JSON file's content (a state file in data/), or default if it is missing or broken."""
+    try:
+        with open(path, encoding='utf-8') as handle:
+            return json.load(handle)
+    except (FileNotFoundError, ValueError):
+        return default
+
+
+def save_json(path, data):
+    """Saves a state file (only if it changed, so an unchanged run commits nothing)."""
+    save_snapshot(path, json.dumps(data, ensure_ascii=False, indent=2, sort_keys=True) + '\n')
 
 
 def save_snapshot(path, text):
