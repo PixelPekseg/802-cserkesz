@@ -3254,8 +3254,27 @@ body:has(.main-nav.open) .upcoming-tab {
 }
 
 .fee-item h3 {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
   margin: 0 0 12px;
   font-size: 1.2rem;
+}
+
+/* passed deadline: red "Lejárt" label next to the title (the same shape as the programs' "Elmúlt") */
+.fee-past-label {
+  padding: 4px 12px;
+  border-radius: 20px;
+  background: var(--color-alert);
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  font-weight: bold;
+  color: #fff;
+}
+
+.fee-past-label[hidden] {
+  display: none;
 }
 
 .fee-facts {

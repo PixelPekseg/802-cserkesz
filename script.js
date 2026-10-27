@@ -1423,6 +1423,19 @@ function updateFees(now = new Date()) {
     if (message) message.hidden = !closed;
     if (closed) form.querySelectorAll('iframe').forEach(frame => frame.remove());
   });
+  // Instalments: a red "Lejárt" label next to the title after the day of the deadline
+  document.querySelectorAll('.fee-item[data-deadline]').forEach(item => {
+    const title = item.querySelector('h3');
+    const past = now > new Date(`${item.dataset.deadline}T23:59:59`);
+    let label = title?.querySelector('.fee-past-label');
+    if (past && title && !label) {
+      label = document.createElement('span');
+      label.className = 'fee-past-label';
+      label.textContent = 'Lejárt';
+      title.append(label);
+    }
+    if (label) label.hidden = !past;
+  });
 }
 
 // 23:59 on the day after the deadline

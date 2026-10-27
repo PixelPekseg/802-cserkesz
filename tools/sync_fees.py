@@ -379,7 +379,10 @@ def render_tab(key, data, today):
             out.append('          <div class="fee-items">')
             for row in data['items']:
                 note = f'\n              <p class="fee-item-note">{rich(row["note"])}</p>' if row.get('note') else ''
-                out.append(f'''            <div class="fee-item">
+                # the deadline as an ISO date: script.js adds a red "Lejárt" label once it has passed
+                day = parse_date(row.get('deadline', ''))
+                deadline_attr = f' data-deadline="{day.isoformat()}"' if day else ''
+                out.append(f'''            <div class="fee-item"{deadline_attr}>
               <h3>{esc(row["title"])}</h3>
               <dl class="fee-facts">
                 <div><dt>Befizetési határidő</dt><dd>{esc(nice_date(row.get("deadline", "")))}</dd></div>
