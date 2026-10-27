@@ -143,7 +143,6 @@ def when_text(row):
 
 LINKS = '\n'.join(line for line in (f'Programos táblázat: {SHEET_LINK}' if SHEET_LINK else '',
                                     f'Program képek mappa: {IMAGES_LINK}' if IMAGES_LINK else '') if line)
-NO_REPLY = 'Ez egy automatikus üzenet, kérlek, ne válaszolj rá! Ha kérdésed van, keresd a csapatparancsnokot!'
 
 
 def with_article(name):
@@ -204,12 +203,12 @@ def compose_media(kind, row, people, media):
         subject = f'Emlékeztető: még hiányzik {the_name} beszámolója'
         text = (f'Egy hete volt {the_name} ({date}), de a honlapra még nem került fel róla beszámoló. '
                 f'{organisers}\n\nKérünk, keresd meg {whom}, és ha megkaptad {ask} a beszámolót és a képeket, '
-                'tedd fel őket.\n' + upload)
+                'töltsd fel őket, hogy kitehessük a weboldalra.\n' + upload)
     return finish(subject, f'{greeting(media, "Médiás")}\n\n{text}\n\n', f'{LINKS}\n\n' if LINKS else '')
 
 
 def finish(subject, text, links):
-    body = f'{text}{links}{NO_REPLY}\n\nJó munkát!\n{SIGNATURE}\n'
+    body = f'{text}{links}Jó munkát!\n{SIGNATURE}\n'
     return re.sub(r'[\r\n]+', ' ', subject), body
 
 
