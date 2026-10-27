@@ -2019,7 +2019,7 @@ body:has(.main-nav.open) .upcoming-tab {
 
 /* red warning card below the camp cards (same shape as the payment reference warning) */
 .camp-alert {
-  max-width: 820px;
+  max-width: 960px;   /* as wide as the two camp cards together (.camp-cards) */
   margin: 32px auto 0;
   padding: 22px 24px;
   background: #fdecea;

@@ -194,6 +194,10 @@ def parse_date(text):
 def nice_date(text):
     """2026.11.30. -> 2026. november 30. (returns the input unchanged if it is not a date)."""
     day = parse_date(text)
+    if not day and re.search(r'\d{4}\D+\d{1,2}\D+\d{1,2}', text or ''):
+        # looks like a date but is not one (e.g. 2026.11.31.): shown as typed, which stands out
+        common.warn(f'Nem létező dátum: "{text}" (pl. a novembernek csak 30 napja van). Így írom ki, '
+                    'ahogy a táblázatban áll; javítsd a táblázatban.')
     return f'{day.year}. {MONTHS[day.month - 1]} {day.day}.' if day else text
 
 
