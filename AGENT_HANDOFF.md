@@ -171,7 +171,7 @@ Egy fül-lapon egymás alatt négy blokk; a blokkot az A oszlopba írt, egyedül
 - A kiinduló sablon (a jelenlegi tartalommal) a repón kívül van: `../penzugy-tablazatok/Pénzügyek.xlsx`; a tulajdonos ebből hozza létre a Google Táblázatot.
 
 ### 4.13 Biztonság és működésbiztonság (a tulajdonos kérése: „ahol lehet, biztonságosabbra”)
-- **Workflow:** az actionök teljes commit-SHA-ra rögzítve (`actions/checkout@…  # v4.4.0`, `actions/setup-python@…  # v5.6.0`), a pip-csomagok pontos verzióra (`tools/requirements.txt`) – frissítés csak tudatosan, helyi teszt után. `timeout-minutes: 20`. Az API-kulcs (`secrets.GOOGLE_API_KEY`) csak a három, képet töltő lépés kapja meg; a Drive-mappa azonosítója nem titok.
+- **Workflow:** az actionök teljes commit-SHA-ra rögzítve (`actions/checkout@…  # v6.0.2`, `actions/setup-python@…  # v6.2.0`, mindkettő Node.js 24-en fut; 2026-10-27-én frissítve a Node.js 20 elavulási figyelmeztetés miatt, a figyelő repójában is), a pip-csomagok pontos verzióra (`tools/requirements.txt`) – frissítés csak tudatosan, helyi teszt után. `timeout-minutes: 20`. Az API-kulcs (`secrets.GOOGLE_API_KEY`) csak a három, képet töltő lépés kapja meg; a Drive-mappa azonosítója nem titok.
 - **Táblázatból jövő adat:** minden szöveg HTML-escape-elve kerül az oldalra; a linkek csak engedélyezett címre mutathatnak (`common.safe_url`): Facebook-esemény → facebook.com/fb.me, ECSET-lista → drive/docs.google.com, támogatási űrlap → `https://docs.google.com/forms/…` (más esetben figyelmeztetés, a link kimarad). A naplóüzenetek a cellatartalmat GitHub-módon escape-elik (`%`, CR, LF), így egy cella nem tud workflow-parancsot befecskendezni.
 - **Letöltés:** `common.download` – csak https, `User-Agent`, 30 s időkorlát, 30 MB méretkorlát, átmeneti hibánál (hálózat, 5xx, 429) 3 próbálkozás, maradandónál (4xx, SSL) azonnal hiba; a hibaüzenet soha nem tartalmazza a címet (abban API-kulcs lehet).
 - **Írás:** minden oldal-, kép- és állapotfájl atomikusan íródik (`common.write_text/write_bytes`: ideiglenes fájl + `os.replace`), így egy megszakadt futás nem hagy félkész fájlt.
@@ -223,11 +223,13 @@ Egy fül-lapon egymás alatt négy blokk; a blokkot az A oszlopba írt, egyedül
 
 ## 8. Nyitott feladatok (állapot: 2026-10-11)
 
+A tulajdonos aktuális teendőlistája a `TODO.md`-ben van (2026-10-27; csak helyben, a `.gitignore` kizárja a repóból); az alábbi a régebbi állapot.
+
 - **Domain megvásárlása**, majd a `YOUR-DOMAIN-HERE` placeholderek lecserélése, `CNAME`, Search Console, sitemap beküldése. (Az ügyfél-modell szerint a domain a szervezet nevén lenne – ez itt a tulajdonossal egyeztetendő.)
 - **Tábor adatok** (időpont, helyszín, főszervezők) – a Táblázatban kell kitölteni; a README szerinti `@example.com` helyőrzők ellenőrzendők.
 - **Adatkezelési tájékoztató:** megírva a `drafts/adatkezeles.html`-ben (nem publikálva, a kép-kezelést a tulajdonos már papíron lerendezte; a Google Maps és a GitHub hosting miatt szerepel). Publikáláskor linkelni kell a láblécből.
 - **Fotószinkron élesítése** (6. pont): új, Drive API-ra korlátozott API-kulcs a GitHub Secretsbe (`GOOGLE_API_KEY`); a régi, kiszivárgott kulcs törlése. Amíg nincs kulcs, a vezetők kártyái frissülnek, a fotók nem. PDF-ek Drive-ról: később.
-- Lehetséges bővítések, amiket felajánlottunk: a Programok lapon külön e-mail/telefon oszlop; „Szövegek” és „Beállítások” lap a Táblázatban (szöveges blokkok soronként egy bekezdéssel, linkek/térkép a Táblázatból); a felugró „Közelgő programok” fül telefonos átfedésének javítása; a workflow-ban használt action-verziók frissítése (`actions/checkout@v4`, `setup-python@v5`).
+- Lehetséges bővítések, amiket felajánlottunk: a Programok lapon külön e-mail/telefon oszlop; „Szövegek” és „Beállítások” lap a Táblázatban (szöveges blokkok soronként egy bekezdéssel, linkek/térkép a Táblázatból); a felugró „Közelgő programok” fül telefonos átfedésének javítása.
 - **Függő helyi módosítások:** a legutóbbi munkamenet végén vannak commitolatlan változások; ellenőrizd `git status`-szal, és a tulajdonos döntse el, mikor commitol/pusholja.
 
 ---

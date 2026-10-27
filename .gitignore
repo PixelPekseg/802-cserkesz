@@ -6,3 +6,6 @@ drafts/
 
 # original / uncompressed images (the site uses the images/webp/ folder)
 images/originals/
+
+# the owner's personal to-do list (local only)
+TODO.md
