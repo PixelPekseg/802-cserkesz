@@ -8,14 +8,14 @@
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-ILmEoDmaDFn/JUVySfZHBvQvwyPFL4ER1KanXS+sU4k='; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-src https://docs.google.com https://drive.google.com https://www.google.com https://maps.google.com; object-src 'none'; base-uri 'self'; form-action 'none'; upgrade-insecure-requests">
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Tábor – 802. sz. Szent Korona Cserkészcsapat</title>
+  <title>Táboraink – 802. sz. Szent Korona Cserkészcsapat</title>
   <meta name="description" content="Nyári táboraink: kiscserkésztábor (5 nap) és nagytábor (6–10 nap). Nomádtábor, sokszínű programok, keretmese. Időpontok, helyszín, felszerelési lista.">
 
   <!-- IMPORTANT: replace the "https://www.YOUR-DOMAIN-HERE.com" placeholder with the real domain (see index.html) -->
   <link rel="canonical" href="https://www.YOUR-DOMAIN-HERE.com/tabor.html">
 
   <meta property="og:type" content="website">
-  <meta property="og:title" content="Tábor – 802. sz. Szent Korona Cserkészcsapat">
+  <meta property="og:title" content="Táboraink – 802. sz. Szent Korona Cserkészcsapat">
   <meta property="og:description" content="Kiscserkésztábor és nagytábor: nomádtábor, sokszínű programok, keretmese.">
   <meta property="og:url" content="https://www.YOUR-DOMAIN-HERE.com/tabor.html">
   <meta property="og:image" content="https://www.YOUR-DOMAIN-HERE.com/images/webp/kozos/share.jpg">
@@ -28,7 +28,7 @@
 
   <link rel="icon" type="image/jpeg" href="images/webp/kozos/logo_green.jpg?v=1">
   <link rel="apple-touch-icon" href="images/webp/kozos/logo_green.jpg?v=1">
-  <link rel="stylesheet" href="style.css?v=120">
+  <link rel="stylesheet" href="style.css?v=122">
 </head>
 <body>
 
@@ -70,9 +70,8 @@
           <li class="has-sub is-current">
             <button class="nav-sub-toggle" type="button" aria-expanded="false" aria-controls="subPrograms">Események</button>
             <ul class="sub-nav" id="subPrograms">
-              <li><a href="programok.html">Programok</a></li>
-              <li><a href="naptar.html">Naptár</a></li>
-              <li><a href="tabor.html" aria-current="page">Tábor</a></li>
+              <li><a href="programok.html">Programjaink</a></li>
+              <li><a href="tabor.html" aria-current="page">Táboraink</a></li>
             </ul>
           </li>
           <li><a href="csapatotthon.html">Csapatotthonunk</a></li>
@@ -95,7 +94,7 @@
 
   <!-- Title banner + introduction in one banner -->
   <section class="page-banner camp-banner">
-    <h1>Tábor</h1>
+    <h1>Táboraink</h1>
     <p>
       Évente két tábort szervezünk. A <strong>kiscserkésztábor</strong> azoknak szól, akik most
       fejezték be a 4. osztályt, és 5 napos. A <strong>nagytábor</strong> mindenki másnak van:
@@ -114,7 +113,7 @@
     team's Google Sheet (hourly, GitHub Actions). New card = new row in the
     sheet. The "Általános információk" part is fixed text. The images are in the images/webp/tabor/ folder
     (the small thumbnails in the thumb/ subfolder; the original, large photos in the images/originals/tabor/
-    folder, which .gitignore excludes). The downloadable PDFs are in the pdf/ folder.
+    folder, which .gitignore excludes).
   -->
   <!-- The two camps' details: time, place, main organisers -->
   <section class="section">
@@ -154,6 +153,11 @@
         </div>
 
         <!-- CAMPS:END -->
+      </div>
+      <!-- Fixed warning below the camp cards (not from the sheet) -->
+      <div class="camp-alert" role="note">
+        <h3>Fontos!</h3>
+        <p>A táborokkal kapcsolatos minden információt e-mailben küldünk ki. Ha nem kapják meg ezeket, kérjük, keressék gyermekük őrsvezetőjét!</p>
       </div>
     </div>
   </section>
@@ -195,10 +199,6 @@
             <li>Fontos tudnunk, ha gyermekének van betegsége, allergiája vagy érzékenysége, amelyre figyelnünk kell. Kérjük ezért, hogy az egészségügyi nyilatkozatot kitöltve hozzák magukkal.</li>
             <li>Kérjük, hogy a gyerekkel együtt pakoljanak be a táskába, hogy a tábor során biztosan mindent megtaláljanak.</li>
           </ul>
-          <div class="camp-downloads">
-            <a class="btn btn-primary" href="pdf/felszereles_lista.pdf" download>Felszerelési lista (PDF)</a>
-            <a class="btn btn-primary" href="pdf/eu_nyilatkozat.pdf" download>Egészségügyi nyilatkozat (PDF)</a>
-          </div>
         </div>
       </div>
 
@@ -249,6 +249,6 @@
     </div>
   </footer>
 
-  <script src="script.js?v=74"></script>
+  <script src="script.js?v=75"></script>
 </body>
 </html>

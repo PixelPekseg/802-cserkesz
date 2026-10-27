@@ -196,9 +196,8 @@ function applyPastState(card, isPast) {
 }
 
 function updateNews(now = new Date()) {
-  const grid = document.getElementById('newsGrid') || document.getElementById('calendarSource');
-  const onCalendarPage = grid?.id === 'calendarSource';   // naptar.html: hidden cards, no sorting
-  const archive = onCalendarPage ? null : document.getElementById('archiveGrid');
+  const grid = document.getElementById('newsGrid');
+  const archive = document.getElementById('archiveGrid');
   const archiveSection = document.getElementById('archivum');
   const emptyMessage = document.getElementById('newsEmpty');
   if (!grid) return;
@@ -216,7 +215,6 @@ function updateNews(now = new Date()) {
     card.hidden = false;
     const isPast = isPastCard(card, now);
     applyPastState(card, isPast);
-    if (onCalendarPage) return;
     ((isPast && archive) ? past : upcoming).push(card);
   });
 
@@ -246,7 +244,6 @@ function updateNews(now = new Date()) {
   const byDate = (a, b) =>
     (a.dataset.date || '9999-12-31').localeCompare(b.dataset.date || '9999-12-31') ||
     Number(a.dataset.order) - Number(b.dataset.order);
-  if (onCalendarPage) return;
   upcoming.sort(byDate);
   past.sort((a, b) => byDate(b, a));   // archive: the most recent first
   upcoming.forEach(card => grid.append(card));
@@ -583,7 +580,7 @@ function initCalendar() {
   const dayKey = (y, m, d) => `${y}-${pad(m + 1)}-${pad(d)}`;
 
   const events = [...document.querySelectorAll(
-    '#newsGrid .news-card[data-date], #archiveGrid .news-card[data-date], #calendarSource .news-card[data-date]')]
+    '#newsGrid .news-card[data-date], #archiveGrid .news-card[data-date]')]
     .map(card => ({
       card,
       start: card.dataset.date,
@@ -798,7 +795,7 @@ document.querySelectorAll('a[href^="mailto:"]').forEach(link => {
 // Also works on the (copied) cards shown below the calendar.
 // ==========================================================
 (function initProgramModal() {
-  if (!document.getElementById('newsGrid') && !document.getElementById('calendarSource')) return;
+  if (!document.getElementById('newsGrid')) return;
   const CARDS = '#newsGrid .news-card, #archiveGrid .news-card, #calendarDetail .news-card';
 
   const overlay = document.createElement('div');
@@ -933,7 +930,7 @@ document.querySelectorAll('a[href^="mailto:"]').forEach(link => {
 (function initLightbox() {
   const SELECTOR = '.camp-col img, .camp-media-3 img, .side-photos img, .home-gallery img, .team-split-image img, .program-modal-gallery img, .site-gallery img';
   // on the programs page the images only appear later in the pop-up, so they are needed there too
-  if (!document.querySelector(SELECTOR) && !document.querySelector('#newsGrid, #calendarSource')) return;
+  if (!document.querySelector(SELECTOR) && !document.getElementById('newsGrid')) return;
 
   const overlay = document.createElement('div');
   overlay.className = 'lightbox';
@@ -1152,8 +1149,7 @@ function buildCalendarLink(card) {
 
 const programsUrl = id => `${location.origin}${location.pathname.replace(/[^/]*$/, '')}programok.html#${id}`;
 
-document.querySelectorAll('#newsGrid .news-card[id], #calendarSource .news-card[id]').forEach(card => {
-  if (card.closest('#calendarSource') && isPastCard(card)) return;   // not needed for a past program
+document.querySelectorAll('#newsGrid .news-card[id]').forEach(card => {
   const actions = document.createElement('div');
   actions.className = 'news-actions';
   const button = document.createElement('button');

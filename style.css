@@ -965,18 +965,21 @@ section[id] {
 /* ==========================================================
    Programs – calendar
    ========================================================== */
+/* Order on the page: upcoming (light) → calendar (alternate background) → Program Archívum (light),
+   so the backgrounds alternate even while the archive is hidden */
 .calendar-section {
-  border-top: 1px solid var(--color-border);
-}
-
-/* Program Archívum: past programs in their own strip, between the upcoming ones and the calendar */
-.archive-section {
   background: var(--color-bg-alt);
   border-top: 1px solid var(--color-border);
 }
 
-.archive-section .news-card {
+/* the cards of the selected day would blend into the alternate background */
+.calendar-section .news-card {
   background: var(--color-bg);
+}
+
+/* Program Archívum: past programs in their own strip, below the calendar */
+.archive-section {
+  border-top: 1px solid var(--color-border);
 }
 
 /* Program images at the bottom of the card: 2 images at a time, paged with arrows on both sides (script.js).
@@ -2014,10 +2017,25 @@ body:has(.main-nav.open) .upcoming-tab {
   margin-bottom: 10px;
 }
 
-.camp-downloads {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
+/* red warning card below the camp cards (same shape as the payment reference warning) */
+.camp-alert {
+  max-width: 820px;
+  margin: 32px auto 0;
+  padding: 22px 24px;
+  background: #fdecea;
+  border: 1px solid #f3b4ad;
+  border-left: 5px solid var(--color-alert);
+  border-radius: 12px;
+}
+
+.camp-alert h3 {
+  margin: 0 0 8px;
+  color: var(--color-alert);
+  font-size: 1.15rem;
+}
+
+.camp-alert p {
+  margin: 0;
 }
 
 @media (max-width: 860px) {

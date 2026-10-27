@@ -8,14 +8,14 @@
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-ILmEoDmaDFn/JUVySfZHBvQvwyPFL4ER1KanXS+sU4k='; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-src https://docs.google.com https://drive.google.com https://www.google.com https://maps.google.com; object-src 'none'; base-uri 'self'; form-action 'none'; upgrade-insecure-requests">
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Programok – 802. sz. Szent Korona Cserkészcsapat</title>
+  <title>Programjaink – 802. sz. Szent Korona Cserkészcsapat</title>
   <meta name="description" content="A 802. sz. Szent Korona Cserkészcsapat programjai és eseményei, naptárral: toborzó nap, cserkészmise, október 23-i megemlékezés.">
 
   <!-- IMPORTANT: replace the "https://www.YOUR-DOMAIN-HERE.com" placeholder with the real domain (see index.html) -->
   <link rel="canonical" href="https://www.YOUR-DOMAIN-HERE.com/programok.html">
 
   <meta property="og:type" content="website">
-  <meta property="og:title" content="Programok – 802. sz. Szent Korona Cserkészcsapat">
+  <meta property="og:title" content="Programjaink – 802. sz. Szent Korona Cserkészcsapat">
   <meta property="og:description" content="Programjaink és eseményeink.">
   <meta property="og:url" content="https://www.YOUR-DOMAIN-HERE.com/programok.html">
   <meta property="og:image" content="https://www.YOUR-DOMAIN-HERE.com/images/webp/kozos/share.jpg">
@@ -28,7 +28,7 @@
 
   <link rel="icon" type="image/jpeg" href="images/webp/kozos/logo_green.jpg?v=1">
   <link rel="apple-touch-icon" href="images/webp/kozos/logo_green.jpg?v=1">
-  <link rel="stylesheet" href="style.css?v=120">
+  <link rel="stylesheet" href="style.css?v=122">
 </head>
 <body>
 
@@ -70,9 +70,8 @@
           <li class="has-sub is-current">
             <button class="nav-sub-toggle" type="button" aria-expanded="false" aria-controls="subPrograms">Események</button>
             <ul class="sub-nav" id="subPrograms">
-              <li><a href="programok.html" aria-current="page">Programok</a></li>
-              <li><a href="naptar.html">Naptár</a></li>
-              <li><a href="tabor.html">Tábor</a></li>
+              <li><a href="programok.html" aria-current="page">Programjaink</a></li>
+              <li><a href="tabor.html">Táboraink</a></li>
             </ul>
           </li>
           <li><a href="csapatotthon.html">Csapatotthonunk</a></li>
@@ -95,7 +94,7 @@
 
   <!-- Title banner -->
   <section class="page-banner">
-    <h1>Programok</h1>
+    <h1>Programjaink</h1>
   </section>
 
   <!--
@@ -106,7 +105,7 @@
 
     - The cards sort themselves by date; past events move after the event day, by
       script.js, to the "Program Archívum" strip below (the most recent first). The
-      calendar view is on its own page (naptar.html), built from the same cards.
+      calendar at the bottom of the page is built from the same cards.
     - The images of the Drive folder given in the "Képek" column (Képek/Program képek/<folder>)
       go to the bottom of the card (2 images visible, paged with arrows). Clicking the card
       opens it enlarged in a pop-up (text + multi-column image gallery, script.js).
@@ -256,7 +255,19 @@
   </section>
 
   <!--
-    Program Archívum: script.js moves the past programs from above into here (the most recent
+    Naptár: script.js fills it from the program cards above (data-date / data-end-date);
+    clicking a day shows that day's programs below it. There is nothing to edit here.
+  -->
+  <section class="section calendar-section" id="naptar">
+    <div class="container">
+      <h2 class="section-title">Naptár</h2>
+      <div class="calendar" id="calendar"></div>
+      <div class="calendar-detail" id="calendarDetail" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <!--
+    Program Archívum: script.js moves the past programs from the upcoming ones into here (the most recent
     first). Without past programs the strip stays hidden. There is nothing to edit here.
   -->
   <section class="section archive-section" id="archivum" hidden>
@@ -284,6 +295,6 @@
     </div>
   </footer>
 
-  <script src="script.js?v=74"></script>
+  <script src="script.js?v=75"></script>
 </body>
 </html>

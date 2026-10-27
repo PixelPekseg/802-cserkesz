@@ -6,8 +6,7 @@ Usage:
     python tools/sync_programs.py --xlsx v.xlsx   # from a local copy of the shared workbook
     python tools/sync_programs.py --file x.csv    # from a local CSV file (for testing)
 
-Rewrites the section between two comments in programok.html and naptar.html (hidden there, for
-the calendar view):
+Rewrites the section between two comments in programok.html:
     <!-- PROGRAMS:START ... -->  ...  <!-- PROGRAMS:END -->
 If the download or the validation fails (e.g. the header changed, or there is no valid row at all),
 the script stops with an error and changes nothing: the page keeps its last good state.
@@ -35,7 +34,6 @@ from program_images import ProgramImages  # noqa: E402  (Drive images; PIL is on
 
 ROOT = common.ROOT
 PAGE = os.path.join(ROOT, 'programok.html')
-PAGES = [PAGE, os.path.join(ROOT, 'naptar.html')]   # the calendar page, hidden, for the calendar view
 SNAPSHOT = os.path.join(ROOT, 'data', 'programs.csv')
 
 MONTHS = ['január', 'február', 'március', 'április', 'május', 'június',
@@ -319,14 +317,11 @@ def main():
     used_ids = set()
     cards = '\n\n'.join(build_card(row, used_ids) for row in rows)
 
-    # the same cards on the Programok page and (hidden, for the calendar) on the Naptár page
-    changed = False
-    for path in PAGES:
-        changed |= common.replace_block(path, 'PROGRAMS', cards, ' ' * 8)
+    changed = common.replace_block(PAGE, 'PROGRAMS', cards, ' ' * 8)
     common.save_snapshot(SNAPSHOT, csv_text)
 
     print(f'{len(rows)} program; frissített képek: {len(images.updated)}; '
-          f'programok.html/naptar.html {"frissítve" if changed else "változatlan"}.')
+          f'programok.html {"frissítve" if changed else "változatlan"}.')
 
 
 if __name__ == '__main__':
