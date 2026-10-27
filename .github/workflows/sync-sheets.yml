@@ -14,11 +14,46 @@ on:
   schedule:
     - cron: '23 * * * *'
   workflow_dispatch:
+    # Test e-mails: a checkbox per automatic e-mail; with an address below it the test goes only there,
+    # without one to the real recipients (marked [TESZT]). Nothing is recorded as sent. If any test is
+    # ticked, the reminder steps send only the tests.
     inputs:
-      reminder_test_to:
-        description: 'Teszt: az emlékeztető levelek mintáját csak erre a címre küldi (üresen hagyva a szokásos futás)'
+      test_organiser:
+        description: 'Teszt: programos emlékeztető a szervezőnek (2 levél)'
+        type: boolean
+        default: false
+      test_organiser_to:
+        description: '↳ címzett (üresen: a valódi szervező)'
         required: false
         default: ''
+      test_media:
+        description: 'Teszt: programos emlékeztető a médiásnak (3 levél)'
+        type: boolean
+        default: false
+      test_media_to:
+        description: '↳ címzett (üresen: a valódi médiás)'
+        required: false
+        default: ''
+      test_troop:
+        description: 'Teszt: rajparancsnoki emlékeztető (szept. 15. / okt. 15.)'
+        type: boolean
+        default: false
+      test_troop_to:
+        description: '↳ címzett (üresen: 802@cserkesz.hu)'
+        required: false
+        default: ''
+      test_camp:
+        description: 'Teszt: tábori emlékeztető (márc.–aug., havonta)'
+        type: boolean
+        default: false
+      test_camp_to:
+        description: '↳ címzett (üresen: a táborért felelős cspk-helyettes)'
+        required: false
+        default: ''
+      only_tests:
+        description: 'Csak a tesztlevelek (az oldalt most ne frissítse)'
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -58,7 +93,7 @@ jobs:
         run: pip install --quiet --disable-pip-version-check -r tools/requirements.txt
 
       - name: Programok (kártyák + képek a Drive-ról) frissítése
-        if: ${{ !cancelled() }}
+        if: ${{ !cancelled() && !inputs.only_tests }}
         env:
           GOOGLE_API_KEY: ${{ secrets.GOOGLE_DRIVE_API_KEY }}
         run: python tools/sync_programs.py
@@ -66,29 +101,29 @@ jobs:
       # The following steps run even if an earlier one failed (one broken sheet must not block the
       # others); the run is still shown as failed on GitHub.
       - name: Táborok letöltése és az oldal frissítése
-        if: ${{ !cancelled() }}
+        if: ${{ !cancelled() && !inputs.only_tests }}
         run: python tools/sync_camps.py
 
       - name: Rajok letöltése és az oldal frissítése
-        if: ${{ !cancelled() }}
+        if: ${{ !cancelled() && !inputs.only_tests }}
         run: python tools/sync_troops.py
 
       - name: Értesítők letöltése és az oldalak frissítése
-        if: ${{ !cancelled() }}
+        if: ${{ !cancelled() && !inputs.only_tests }}
         run: python tools/sync_notices.py
 
       - name: Számlálók letöltése és az oldalak frissítése
-        if: ${{ !cancelled() }}
+        if: ${{ !cancelled() && !inputs.only_tests }}
         run: python tools/sync_counters.py
 
       - name: Csapatvezetés (kártyák + fotók a Drive-ról) frissítése
-        if: ${{ !cancelled() }}
+        if: ${{ !cancelled() && !inputs.only_tests }}
         env:
           GOOGLE_API_KEY: ${{ secrets.GOOGLE_DRIVE_API_KEY }}
         run: python tools/sync_leaders.py
 
       - name: Eszközök letöltése és az oldal frissítése
-        if: ${{ !cancelled() }}
+        if: ${{ !cancelled() && !inputs.only_tests }}
         env:
           GOOGLE_API_KEY: ${{ secrets.GOOGLE_DRIVE_API_KEY }}
         run: python tools/sync_equipment.py
@@ -96,14 +131,14 @@ jobs:
       # Finance page: one workbook (sheets: Leírás, Tagdíj, Nagytábordíj, Kcs tábordíj), the WHOLE
       # document published in Excel (.xlsx) format. With an empty URL the page stays unchanged.
       - name: Pénzügyek (tagdíj, tábordíjak) frissítése
-        if: ${{ !cancelled() }}
+        if: ${{ !cancelled() && !inputs.only_tests }}
         env:
           FEES_SHEET_URL: https://docs.google.com/spreadsheets/d/e/2PACX-1vREZYKdFMHLNs-HwpuiewPYAqNNDHxl4CbptmVv-s5eyC_npPp7znaZv0Ivick1HO-hGNs9XosqDmAL/pub?output=xlsx
         run: python tools/sync_fees.py
 
       # the gallery is built after the programs (and their images) are updated
       - name: Galéria összeállítása
-        if: ${{ !cancelled() }}
+        if: ${{ !cancelled() && !inputs.only_tests }}
         run: python tools/sync_gallery.py
 
       # Reminder e-mails to the program organisers and the media person (photos before, report after), sent
@@ -116,14 +151,19 @@ jobs:
           ADMIN_JELSZO: ${{ secrets.ADMIN_JELSZO }}
           VEZETOK_WEBOLDAL_ADATOK_LINK: ${{ secrets.VEZETOK_WEBOLDAL_ADATOK_LINK }}
           PROGRAM_KEPEK_MAPPA_LINK: ${{ secrets.PROGRAM_KEPEK_MAPPA_LINK }}
-          # passed through the environment, never pasted into the script
-          REMINDER_TEST_TO: ${{ inputs.reminder_test_to }}
+          # the test choices of the Run workflow form, passed through the environment (never pasted into the script)
+          TEST_ORGANISER: ${{ inputs.test_organiser }}
+          TEST_ORGANISER_TO: ${{ inputs.test_organiser_to }}
+          TEST_MEDIA: ${{ inputs.test_media }}
+          TEST_MEDIA_TO: ${{ inputs.test_media_to }}
+          TEST_TROOP: ${{ inputs.test_troop }}
+          TEST_CAMP: ${{ inputs.test_camp }}
         run: python tools/send_reminders.py
 
       # The public "802. Programok" Google Calendar follows the Programok sheet (people subscribe to it);
       # written through the service account the calendar is shared with
       - name: Google Naptár frissítése a programokból
-        if: ${{ !cancelled() }}
+        if: ${{ !cancelled() && !inputs.only_tests }}
         env:
           GOOGLE_SERVICE_ACCOUNT_KEY: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_KEY }}
           PROGRAM_CALENDAR_ID: 1d4d47e601ab2742f5b416c326ea0225611f94615da56c10c8e86c4911c9d752@group.calendar.google.com
@@ -138,22 +178,41 @@ jobs:
           ADMIN_EMAIL: ${{ secrets.ADMIN_EMAIL }}
           ADMIN_JELSZO: ${{ secrets.ADMIN_JELSZO }}
           CSPK_WEBOLDAL_ADATOK_LINK: ${{ secrets.CSPK_WEBOLDAL_ADATOK_LINK }}
-          REMINDER_TEST_TO: ${{ inputs.reminder_test_to }}
+          TEST_ORGANISER: ${{ inputs.test_organiser }}
+          TEST_MEDIA: ${{ inputs.test_media }}
+          TEST_TROOP: ${{ inputs.test_troop }}
+          TEST_TROOP_TO: ${{ inputs.test_troop_to }}
+          TEST_CAMP: ${{ inputs.test_camp }}
         run: python tools/troop_reminder.py
+
+      # From March 1 to August 1, monthly: an e-mail to the deputy responsible for camps if a camp card
+      # misses its time, place, two main organisers or a contact; recorded in data/camp_reminder.json.
+      - name: Emlékeztető a tábor kártyák hiányzó adatairól
+        if: ${{ !cancelled() }}
+        env:
+          ADMIN_EMAIL: ${{ secrets.ADMIN_EMAIL }}
+          ADMIN_JELSZO: ${{ secrets.ADMIN_JELSZO }}
+          CSPK_WEBOLDAL_ADATOK_LINK: ${{ secrets.CSPK_WEBOLDAL_ADATOK_LINK }}
+          TEST_ORGANISER: ${{ inputs.test_organiser }}
+          TEST_MEDIA: ${{ inputs.test_media }}
+          TEST_TROOP: ${{ inputs.test_troop }}
+          TEST_CAMP: ${{ inputs.test_camp }}
+          TEST_CAMP_TO: ${{ inputs.test_camp_to }}
+        run: python tools/camp_reminder.py
 
       # The footer's "report a problem" line on every page: the address of the ADMIN_EMAIL secret
       - name: Lábléc hibabejelentő címének frissítése
-        if: ${{ !cancelled() }}
+        if: ${{ !cancelled() && !inputs.only_tests }}
         env:
           ADMIN_EMAIL: ${{ secrets.ADMIN_EMAIL }}
         run: python tools/sync_footer.py
 
       - name: Havi életjel
-        if: ${{ !cancelled() }}
+        if: ${{ !cancelled() && !inputs.only_tests }}
         run: date +%Y-%m > data/keepalive.txt
 
       - name: Változások mentése
-        if: ${{ !cancelled() }}
+        if: ${{ !cancelled() && !inputs.only_tests }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"

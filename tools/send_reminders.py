@@ -23,8 +23,10 @@ Sends through SMTP (Gmail / Google Workspace: an app password):
     VEZETOK_WEBOLDAL_ADATOK_LINK  the edit link of the leaders' sheet, put into the media person's
                                   e-mails (GitHub Secret)
     PROGRAM_KEPEK_MAPPA_LINK      the link of the Drive image folder (GitHub Secret)
-    REMINDER_TEST_TO              test: sends the five e-mails of the next program only to this
-                                  address (nothing else is sent, nothing is recorded)
+    TEST_ORGANISER, TEST_MEDIA    test ("true", from the Run workflow form): sends the organisers' (2)
+    TEST_ORGANISER_TO, …_TO       or the media person's (3) e-mails of the next program, marked
+                                  [TESZT], to the given address, or without one to the real
+                                  recipients; nothing else is sent, nothing is recorded
 
 Usage:
     python tools/send_reminders.py
@@ -145,6 +147,34 @@ def when_text(row):
 
 LINKS = '\n'.join(line for line in (f'Programos táblázat: {SHEET_LINK}' if SHEET_LINK else '',
                                     f'Program képek mappa: {IMAGES_LINK}' if IMAGES_LINK else '') if line)
+
+
+# ---------- test e-mails (Run workflow form: a checkbox and an address per e-mail kind) ----------
+
+TEST_KINDS = ('ORGANISER', 'MEDIA', 'TROOP', 'CAMP')
+
+
+def test_target(kind):
+    """None if the test of this kind was not asked for, otherwise the test address ('' = the real
+    recipients)."""
+    if os.environ.get(f'TEST_{kind}', '').strip().lower() not in ('true', '1'):
+        return None
+    address = os.environ.get(f'TEST_{kind}_TO', '').strip()
+    if address and not programs.EMAIL.fullmatch(address):
+        common.fail(f'A teszt e-mail cím nem érvényes: "{address}".')
+    return address
+
+
+def testing():
+    """True if any test e-mail was asked for: then the scripts only send the tests."""
+    return any(test_target(kind) is not None for kind in TEST_KINDS)
+
+
+def test_mail(target, real, subject, body, who):
+    """(recipients, subject, body) of a test e-mail: to the test address, or to the real recipients."""
+    names = ', '.join(f'{name} ({address})' if name else address for name, address in real)
+    note = f'[Tesztlevél. Élesben ezt kapná: {names}.]\n\n'
+    return ([('', target)] if target else real), f'[TESZT – {who}] {subject}', note + body
 
 
 def with_article(name):
@@ -320,41 +350,56 @@ def main():
         media = media_people(media_csv)
     except SystemExit:   # the sheet is missing or broken: the error was printed already
         media = []
+    mailer = Mailer()
+    if testing():
+        try:
+            test(rows, now, mailer, media)
+        finally:
+            mailer.close()
+        return
     if not media:
         warn(f'Nincs érvényes médiás a „{MEDIA_SHEET}” lapon (név + e-mail cím), ezért most egy emlékeztetőt '
              'sem küldök; a következő futáskor újrapróbálom.')
         return
-
-    mailer = Mailer()
     if mailer.enabled and not SHEET_LINK:
         warn('Nincs beállítva a VEZETOK_WEBOLDAL_ADATOK_LINK titok, a médiás leveleiből kimarad a táblázat linkje.')
-    test_to = os.environ.get('REMINDER_TEST_TO', '').strip()
     try:
-        if test_to:
-            test(rows, now, mailer, test_to, media)
-        else:
-            run(rows, now, mailer, media)
+        run(rows, now, mailer, media)
     finally:
         mailer.close()
 
 
-def test(rows, now, mailer, test_to, media):
-    if not programs.EMAIL.fullmatch(test_to):
-        common.fail(f'A teszt e-mail cím nem érvényes: "{test_to}".')
+def test(rows, now, mailer, media):
+    """The test e-mails asked for on the Run workflow form, about the next program."""
+    targets = {'organiser': test_target('ORGANISER'), 'media': test_target('MEDIA')}
+    if all(target is None for target in targets.values()):
+        print('Programos tesztlevél nem volt kérve; most rendes emlékeztető sem megy ki.')
+        return
     if not mailer.enabled:
         common.fail('Nincs beállítva az ADMIN_EMAIL / ADMIN_JELSZO titok, a tesztlevelek nem küldhetők el.')
     upcoming = [row for row in rows if start_of(row) > now] or rows
     if not upcoming:
         common.fail('Nincs program a táblázatban, amiből tesztlevelet lehetne írni.')
     row = upcoming[0]
+    if not media:
+        warn(f'Nincs érvényes médiás a „{MEDIA_SHEET}” lapon; a szervezői levélben helyőrző áll, a médiás '
+             'levelei csak teszt címre mehetnek.')
+    shown_media = media or [('(a médiás még nincs megadva)', '-', '')]
     count = 0
     for stage in MESSAGES:
-        for key, to, subject, body in messages(stage, row, media):
-            who = 'médiásnak' if key in ('photos', 'report', 'report_again') else 'szervezőnek'
-            mailer.send([('', test_to)], f'[TESZT, {who}] {subject}', body)
+        for key, real, subject, body in messages(stage, row, shown_media):
+            kind = 'media' if key in ('photos', 'report', 'report_again') else 'organiser'
+            target = targets[kind]
+            if target is None:
+                continue
+            if not target and kind == 'media' and not media:
+                continue
+            to, subject, body = test_mail(target, real, subject, body,
+                                          'médiásnak' if kind == 'media' else 'szervezőnek')
+            mailer.send(to, subject, body)
             count += 1
-            print(f'Tesztlevél elküldve ({who}): {subject}')
-    print(f'{count} tesztlevél elküldve (a "{row["name"]}" program alapján), a valódi címzettek nem kaptak levelet.')
+            print(f'Tesztlevél elküldve ide: {", ".join(a for _, a in to)}: {subject}')
+    print(f'{count} tesztlevél elküldve (a "{row["name"]}" program alapján); semmit nem rögzítettem.')
 
 
 def run(rows, now, mailer, media):

@@ -12,8 +12,9 @@ Environment:
     ADMIN_EMAIL, ADMIN_JELSZO   GitHub Secrets (the same account as send_reminders.py); without
                                 them the e-mail is only printed (and not recorded)
     CSPK_WEBOLDAL_ADATOK_LINK   the edit link of the team's sheet (GitHub Secret)
-    REMINDER_TEST_TO            test: sends the e-mail to this address only, whatever the date
-                                (nothing is recorded)
+    TEST_TROOP, TEST_TROOP_TO   test (Run workflow form): sends the e-mail, marked [TESZT], to the
+                                given address or without one to the real recipient, whatever the
+                                date (nothing is recorded)
 
 Usage:
     python tools/troop_reminder.py
@@ -31,7 +32,7 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import sync_common as common  # noqa: E402
 import sync_troops as troops  # noqa: E402
-from send_reminders import Mailer, SIGNATURE, programs  # noqa: E402
+from send_reminders import Mailer, SIGNATURE, test_mail, test_target, testing  # noqa: E402
 
 TO = ('802. sz. Szent Korona Cserkészcsapat', '802@cserkesz.hu')
 STATE = os.path.join(common.ROOT, 'data', 'troop_reminder.json')
@@ -97,16 +98,19 @@ def main():
     parser.add_argument('--today', help='for testing: "YYYY-MM-DD"')
     args = parser.parse_args()
     today = dt.date.fromisoformat(args.today) if args.today else dt.date.today()
-    test_to = os.environ.get('REMINDER_TEST_TO', '').strip()
+    test_to = test_target('TROOP')
+    if test_to is None and testing():
+        print('Rajparancsnoki tesztlevél nem volt kérve (tesztfuttatás, rendes levél sem megy ki).')
+        return
 
     state = load_state()
     occasion = due_occasion(today, state)
-    if not occasion and not test_to:
+    if not occasion and test_to is None:
         print('Ma nincs esedékes rajparancsnoki emlékeztető.')
         return
     with open(args.file or troops.SNAPSHOT, encoding='utf-8-sig') as handle:
         problem = new_troop_problem(handle.read(), today)
-    if test_to:
+    if test_to is not None:
         problem = problem or 'nincs hiány (ez csak egy tesztlevél)'
     elif not problem:
         print('Az új raj rajparancsnokainak elérhetősége megvan, nem kell levelet küldeni.')
@@ -122,10 +126,11 @@ def main():
         return
     if not SHEET_LINK:
         common.warn('Nincs beállítva a CSPK_WEBOLDAL_ADATOK_LINK titok, a levélből kimarad a táblázat linkje.')
-    if test_to and not programs.EMAIL.fullmatch(test_to):
-        common.fail(f'A teszt e-mail cím nem érvényes: "{test_to}".')
+    to = [TO]
+    if test_to is not None:
+        to, subject, body = test_mail(test_to, to, subject, body, 'rajparancsnoki emlékeztető')
     try:
-        mailer.send([('', test_to)] if test_to else [TO], f'[TESZT] {subject}' if test_to else subject, body)
+        mailer.send(to, subject, body)
     except smtplib.SMTPAuthenticationError:
         common.fail('Az SMTP bejelentkezés nem sikerült: ellenőrizd az ADMIN_EMAIL és ADMIN_JELSZO titkot.')
     except (smtplib.SMTPException, OSError) as error:
@@ -134,8 +139,8 @@ def main():
         return
     finally:
         mailer.close()
-    if test_to:
-        print(f'Tesztlevél elküldve ide: {test_to}: {subject}')
+    if test_to is not None:
+        print(f'Tesztlevél elküldve ide: {", ".join(a for _, a in to)}: {subject}')
         return
     common.save_snapshot(STATE, json.dumps({**state, occasion: dt.datetime.now().isoformat(timespec='minutes')},
                                            ensure_ascii=False, indent=2, sort_keys=True) + '\n')
