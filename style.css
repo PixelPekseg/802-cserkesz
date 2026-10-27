@@ -560,6 +560,13 @@ img {
   border-bottom: 1px solid var(--color-highlight);
 }
 
+/* clicked on the card: copied, "Másolva!" for a moment (script.js) */
+.person-card > .person-email.is-copied,
+.person-card > .person-phone.is-copied {
+  color: var(--color-primary);
+  font-weight: bold;
+}
+
 a.person-phone:hover {
   color: var(--color-accent);
 }

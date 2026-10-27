@@ -282,9 +282,12 @@ def read_table(csv_text, columns, required):
 
 
 def fix_phone(phone):
-    """If the sheet turned "+36 …" into a number (e.g. 36707582659), returns it in readable form
-    (+36 70 758 2659). Any other input is returned unchanged."""
+    """A Hungarian number written without spaces (+36707582659, 06707582659, or 36707582659 when the
+    sheet turned "+36 …" into a number) in readable form: +36 70 758 2659. Any other input (e.g.
+    already spaced, or foreign) is returned unchanged."""
     raw = phone.strip()
+    if re.fullmatch(r'(?:\+36|06)\d{8,9}', raw):
+        raw = '36' + raw[3:] if raw.startswith('+') else '36' + raw[2:]
     if re.fullmatch(r'36\d{9}', raw):          # mobile / regional: 36 + 2-digit area code + 7 digits
         return f'+36 {raw[2:4]} {raw[4:7]} {raw[7:]}'
     if re.fullmatch(r'361\d{7}', raw):         # Budapest: 36 1 + 7 digits

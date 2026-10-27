@@ -764,7 +764,8 @@ document.addEventListener('click', async event => {
 // ==========================================================
 document.querySelectorAll('a[href^="mailto:"]').forEach(link => {
   const address = link.getAttribute('href').slice('mailto:'.length).split('?')[0];
-  if (!address || link.closest('.email-copy, .site-footer, .news-card')) return;
+  // on the person cards themselves a click copies the address (below), the pop-up keeps its button
+  if (!address || link.closest('.email-copy, .site-footer, .news-card') || link.matches('.person-card > a')) return;
 
   const wrapper = document.createElement('span');
   wrapper.className = 'email-copy';
@@ -782,6 +783,36 @@ document.querySelectorAll('a[href^="mailto:"]').forEach(link => {
     '<svg class="icon-copy" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/></svg>' +
     '<svg class="icon-check" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 13l4 4L19 7"/></svg>';
   wrapper.append(button);
+});
+
+// ==========================================================
+// Person cards: clicking the e-mail address or the phone number copies it (instead of opening the
+// mail or phone app) and shows "Másolva!" in its place for a moment; the card's pop-up does not open.
+// If copying fails, the link works as usual.
+// ==========================================================
+document.querySelectorAll('.person-card > a.person-email, .person-card > a.person-phone').forEach(link => {
+  link.title = 'Kattints a másoláshoz';
+  link.addEventListener('click', async event => {
+    event.preventDefault();
+    if (link.classList.contains('is-copied')) return;
+    const href = link.getAttribute('href');
+    const value = link.classList.contains('person-email')
+      ? href.slice('mailto:'.length).split('?')[0]
+      : link.textContent.trim();
+    if (!await copyToClipboard(value)) {
+      window.location.href = href;
+      return;
+    }
+    const original = link.innerHTML;
+    link.style.minWidth = `${link.offsetWidth}px`;   // the shorter text must not move the card's lines
+    link.classList.add('is-copied');
+    link.textContent = 'Másolva!';
+    setTimeout(() => {
+      link.innerHTML = original;
+      link.classList.remove('is-copied');
+      link.style.minWidth = '';
+    }, 1500);
+  });
 });
 
 // ==========================================================
