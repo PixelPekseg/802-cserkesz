@@ -116,7 +116,7 @@ def write_bytes(path, data):
 # the scripts read their own sheet from it and ignore the old per-sheet CSV URLs.
 #   TEAM_SHEET_URL    – "Csapat adatai" (edited by a small group): Csapatvezetés, Rajok, Számlálók, Táborok
 #   LEADERS_SHEET_URL – "Vezetői táblázat" (edited by every leader): Programok, Értesítők, Eszközök,
-#                       Eszközök kapcsolattartója
+#                       Eszközök kapcsolattartója, Médiás kapcsolat (the latter only for the reminder e-mails)
 TEAM_SHEET_ENV = 'TEAM_SHEET_URL'
 LEADERS_SHEET_ENV = 'LEADERS_SHEET_URL'
 

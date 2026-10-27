@@ -55,14 +55,18 @@ COLUMNS = {
     'c2_name': 'kapcsolattartó 2 neve',
     'c2_email': 'kapcsolattartó 2 e-mail',
     'c2_phone': 'kapcsolattartó 2 telefon',
-    'facebook': 'facebook',
+    # the event link (its own column; the post columns below start with "facebook-poszt" / "instagram")
+    'facebook': ('facebook-esemény', 'facebook esemény', 'facebook-event'),
+    'fb_post': ('facebook-poszt', 'facebook poszt', 'facebook-bejegyzés'),
+    'ig_post': 'instagram',
     'report': 'beszámoló',
     'images': 'képek',
     'visible': 'megjelenjen',
 }
 REQUIRED = ['name', 'start_date', 'visible']
-# Facebook event links typed into the sheet must point to Facebook (checked before publishing)
+# Facebook / Instagram links typed into the sheet must point there (checked before publishing)
 FACEBOOK_HOSTS = {'facebook.com', 'www.facebook.com', 'm.facebook.com', 'web.facebook.com', 'fb.me', 'fb.com'}
+INSTAGRAM_HOSTS = {'instagram.com', 'www.instagram.com', 'instagr.am'}
 
 warn, fail = common.warn, common.fail
 EMAIL = re.compile(r'[^@\s]+@[^@\s]+\.[^@\s]+')
@@ -201,6 +205,13 @@ def build_card(row, used_ids):
         lines.append('            ' + '<br>\n            '.join(contacts))
         lines.append('          </p>')
 
+    # the program's Facebook / Instagram posts (shown in the archive too)
+    posts = [f'<a class="inline-link" href="{html.escape(url, quote=True)}" target="_blank" '
+             f'rel="noopener noreferrer">{label}</a>'
+             for url, label in ((row.get('fb_post'), 'Facebook'), (row.get('ig_post'), 'Instagram')) if url]
+    if posts:
+        lines.append(f'          <p class="news-detail news-posts"><strong>Posztjaink:</strong> {" · ".join(posts)}</p>')
+
     if row.get('images'):
         # images at the bottom of the card (above "Üzenet másolása"): 2 visible at a time, with more
         # images arrows on both sides; clicking opens the lightbox (script.js)
@@ -275,6 +286,12 @@ def parse_rows(csv_text):
         if facebook and not common.safe_url(facebook, FACEBOOK_HOSTS):
             warn(f'{label}: a Facebook-link nem https://…facebook.com/ cím, kihagyva a linket.')
             facebook = ''
+        posts = {}
+        for key, hosts, site in (('fb_post', FACEBOOK_HOSTS, 'Facebook'), ('ig_post', INSTAGRAM_HOSTS, 'Instagram')):
+            posts[key] = cell(row, key)
+            if posts[key] and not common.safe_url(posts[key], hosts):
+                warn(f'{label}: {"az" if site == "Instagram" else "a"} {site}-poszt linkje nem https://…{site.lower()}.com/ cím, kihagyva a linket.')
+                posts[key] = ''
         record = {
             'name': cell(row, 'name'), 'start': start, 'end': end,
             'start_time': start_time, 'end_time': end_time,
@@ -282,7 +299,7 @@ def parse_rows(csv_text):
             'description': cell(row, 'description'), 'report': cell(row, 'report'),
             'c1_name': cell(row, 'c1_name'), 'c1_email': cell(row, 'c1_email'), 'c1_phone': cell(row, 'c1_phone'),
             'c2_name': cell(row, 'c2_name'), 'c2_email': cell(row, 'c2_email'), 'c2_phone': cell(row, 'c2_phone'),
-            'facebook': facebook, 'image_folder': cell(row, 'images'), 'label': label,
+            'facebook': facebook, **posts, 'image_folder': cell(row, 'images'), 'label': label,
         }
         # the contact e-mail is required, but only checked for programs that have not ended yet
         # (an old row is not worth fixing; it stays on the page as before)

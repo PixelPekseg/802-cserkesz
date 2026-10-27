@@ -37,10 +37,10 @@ jobs:
       TZ: Europe/Budapest
       # The shared "Csapat adatai" workbook (Csapatvezetés, Rajok, Számlálók, Táborok sheets), published
       # as a whole in Excel (.xlsx) format.
-      TEAM_SHEET_URL: https://docs.google.com/spreadsheets/d/e/2PACX-1vSNyNpdFavNXNehYPeRSQPIFVAoJvAnhYHvsccsap6jcOZuWMf_JlW2MbptfsoMhiPl4FPGKrzf5fjc/pub?output=xlsx
-      # The shared "Vezetői táblázat" workbook (Programok, Értesítők, Eszközök, Eszközök kapcsolattartója
-      # sheets), edited by every leader; published as a whole in Excel (.xlsx) format.
-      LEADERS_SHEET_URL: https://docs.google.com/spreadsheets/d/e/2PACX-1vRP5XgBM0ai_DzoDBPQTH5-OgK9hiTGr7opLP4V0sr58ONPOaMQw3xPKiUwGaCTiSBMBtApZIo893Vk/pub?output=xlsx
+      TEAM_SHEET_URL: https://docs.google.com/spreadsheets/d/e/2PACX-1vTDCunLKMOrsGGCt7n-UYNShBdSBMySY41vzQLMdDF0Gh0AWJHII-JcYm34YG572SUXkhcwhhnsCFf5/pub?output=xlsx
+      # The shared "Vezetői táblázat" workbook (Programok, Értesítők, Eszközök, Eszközök kapcsolattartója,
+      # Médiás kapcsolat sheets), edited by every leader; published as a whole in Excel (.xlsx) format.
+      LEADERS_SHEET_URL: https://docs.google.com/spreadsheets/d/e/2PACX-1vQqy5dHnLDdtxJCfwI1waOhfO-a1MHr933EVBTVl-jQiuuCHv94vU4f0UR3eCE48CXeYVfEN28QrZpo/pub?output=xlsx
       # Public id of the Drive "Képek és videók" folder (not a secret; only the API key is)
       DRIVE_IMAGES_FOLDER_ID: 13jB-lTr4Eqt1WOImYwWhMahGHwDTLALA
     steps:
@@ -97,7 +97,7 @@ jobs:
       - name: Pénzügyek (tagdíj, tábordíjak) frissítése
         if: ${{ !cancelled() }}
         env:
-          FEES_SHEET_URL: https://docs.google.com/spreadsheets/d/e/2PACX-1vTmwEh1GFTMCfIMrSvbzqmpOvSVEzkmSHXjkG8UyG5B1xIrlfCnrqojRWDlFNdFPSyfdQYDSeInzSqX/pub?output=xlsx
+          FEES_SHEET_URL: https://docs.google.com/spreadsheets/d/e/2PACX-1vREZYKdFMHLNs-HwpuiewPYAqNNDHxl4CbptmVv-s5eyC_npPp7znaZv0Ivick1HO-hGNs9XosqDmAL/pub?output=xlsx
         run: python tools/sync_fees.py
 
       # the gallery is built after the programs (and their images) are updated
@@ -105,10 +105,10 @@ jobs:
         if: ${{ !cancelled() }}
         run: python tools/sync_gallery.py
 
-      # Reminder e-mails to the program contacts (photos before, report after the program), sent
+      # Reminder e-mails to the program organisers and the media person (photos before, report after), sent
       # through the SMTP_USER / SMTP_PASSWORD secrets (an app password); without them only listed.
       # The sent ones are recorded in data/reminders.json, saved by the next step.
-      - name: Emlékeztető levelek a programok kapcsolattartóinak
+      - name: Emlékeztető levelek a szervezőknek és a médiásnak
         if: ${{ !cancelled() }}
         env:
           SMTP_USER: ${{ secrets.SMTP_USER }}
