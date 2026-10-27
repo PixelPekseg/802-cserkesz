@@ -16,13 +16,15 @@ their given name. Each e-mail is sent only once: the sent ones are recorded in d
 Reads data/programs.csv, the snapshot that sync_programs.py has just saved, so the sheet is not
 downloaded twice; the media person is read from the leaders' workbook (LEADERS_SHEET_URL).
 Sends through SMTP (Gmail / Google Workspace: an app password):
-    SMTP_USER, SMTP_PASSWORD   GitHub Secrets; without them nothing is sent, the would-be e-mails
-                               are only listed (and not recorded)
-    SMTP_HOST, SMTP_PORT       optional, default smtp.gmail.com:465 (SSL)
-    REMINDER_SHEET_LINK        the edit link of the sheet, put into the e-mails (GitHub Secret)
-    REMINDER_IMAGES_LINK       the link of the Drive image folder (GitHub Secret)
-    REMINDER_TEST_TO           test: sends the five e-mails of the next program only to this
-                               address (nothing else is sent, nothing is recorded)
+    ADMIN_EMAIL, ADMIN_JELSZO     GitHub Secrets: the sending account and its app password; without
+                                  them nothing is sent, the would-be e-mails are only listed
+                                  (and not recorded)
+    SMTP_HOST, SMTP_PORT          optional, default smtp.gmail.com:465 (SSL)
+    VEZETOK_WEBOLDAL_ADATOK_LINK  the edit link of the leaders' sheet, put into the media person's
+                                  e-mails (GitHub Secret)
+    PROGRAM_KEPEK_MAPPA_LINK      the link of the Drive image folder (GitHub Secret)
+    REMINDER_TEST_TO              test: sends the five e-mails of the next program only to this
+                                  address (nothing else is sent, nothing is recorded)
 
 Usage:
     python tools/send_reminders.py
@@ -51,8 +53,8 @@ import sync_programs as programs  # noqa: E402
 STATE = os.path.join(common.ROOT, 'data', 'reminders.json')
 # The edit link of the sheet and the link of the image folder are GitHub Secrets as well: the
 # repository is public, and they may give edit access to whoever has them.
-SHEET_LINK = os.environ.get('REMINDER_SHEET_LINK', '').strip()
-IMAGES_LINK = os.environ.get('REMINDER_IMAGES_LINK', '').strip()
+SHEET_LINK = os.environ.get('VEZETOK_WEBOLDAL_ADATOK_LINK', '').strip()
+IMAGES_LINK = os.environ.get('PROGRAM_KEPEK_MAPPA_LINK', '').strip()
 SENDER_NAME = '802. sz. Szent Korona Cserkészcsapat'
 SIGNATURE = '802. sz. Szent Korona Cserkészcsapat'
 
@@ -250,8 +252,8 @@ def due(row, now, sent):
 
 class Mailer:
     def __init__(self):
-        self.user = os.environ.get('SMTP_USER', '').strip()
-        self.password = os.environ.get('SMTP_PASSWORD', '').replace(' ', '')
+        self.user = os.environ.get('ADMIN_EMAIL', '').strip()
+        self.password = os.environ.get('ADMIN_JELSZO', '').replace(' ', '')
         self.host = os.environ.get('SMTP_HOST', '').strip() or 'smtp.gmail.com'
         self.port = int(os.environ.get('SMTP_PORT', '').strip() or 465)
         self.enabled = bool(self.user and self.password)
@@ -325,7 +327,7 @@ def main():
 
     mailer = Mailer()
     if mailer.enabled and not SHEET_LINK:
-        warn('Nincs beállítva a REMINDER_SHEET_LINK titok, a médiás leveleiből kimarad a táblázat linkje.')
+        warn('Nincs beállítva a VEZETOK_WEBOLDAL_ADATOK_LINK titok, a médiás leveleiből kimarad a táblázat linkje.')
     test_to = os.environ.get('REMINDER_TEST_TO', '').strip()
     try:
         if test_to:
@@ -340,7 +342,7 @@ def test(rows, now, mailer, test_to, media):
     if not programs.EMAIL.fullmatch(test_to):
         common.fail(f'A teszt e-mail cím nem érvényes: "{test_to}".')
     if not mailer.enabled:
-        common.fail('Nincs beállítva az SMTP_USER / SMTP_PASSWORD titok, a tesztlevelek nem küldhetők el.')
+        common.fail('Nincs beállítva az ADMIN_EMAIL / ADMIN_JELSZO titok, a tesztlevelek nem küldhetők el.')
     upcoming = [row for row in rows if start_of(row) > now] or rows
     if not upcoming:
         common.fail('Nincs program a táblázatban, amiből tesztlevelet lehetne írni.')
@@ -378,7 +380,7 @@ def run(rows, now, mailer, media):
                 mailer.send(people, subject, body)
             except smtplib.SMTPAuthenticationError:
                 save_state(state)   # keep what was sent before
-                common.fail('Az SMTP bejelentkezés nem sikerült: ellenőrizd az SMTP_USER és SMTP_PASSWORD '
+                common.fail('Az SMTP bejelentkezés nem sikerült: ellenőrizd az ADMIN_EMAIL és ADMIN_JELSZO '
                             'titkot (Google-fióknál alkalmazásjelszó kell).')
             except (smtplib.SMTPException, OSError) as error:
                 warn(f'{row["label"]}: az emlékeztető nem ment el ({type(error).__name__}: {error}); a következő futáskor újrapróbálom.')
@@ -396,7 +398,7 @@ def run(rows, now, mailer, media):
     if mailer.enabled:
         save_state(state)
     print(f'{sent_count} emlékeztető elküldve.' if mailer.enabled else
-          'Nincs beállítva az SMTP_USER / SMTP_PASSWORD titok, ezért levelet nem küldtem.')
+          'Nincs beállítva az ADMIN_EMAIL / ADMIN_JELSZO titok, ezért levelet nem küldtem.')
 
 
 if __name__ == '__main__':

@@ -1451,6 +1451,17 @@ section[id] {
   margin: 4px 0;
 }
 
+/* "Ha problémát tapasztal…" line (tools/sync_footer.py), above the copyright */
+.footer-report {
+  font-size: 0.85rem;
+  opacity: 0.9;
+}
+
+.footer-report a {
+  color: inherit;
+  text-decoration: underline;
+}
+
 /* ==========================================================
    Responsiveness
    ========================================================== */

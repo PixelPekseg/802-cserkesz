@@ -1,7 +1,8 @@
 # Updates the generated parts of the site from the team's Google Sheets: program, camp and troop
 # cards, the notice bar on every page, the counters on the home and Rólunk pages, the equipment
 # page, the leader cards (with photos), the finance page and the gallery; and sends the reminder
-# e-mails to the program contacts (tools/send_reminders.py).
+# e-mails to the program organisers and the media person (tools/send_reminders.py) and, in autumn,
+# about the new troop's leaders (tools/troop_reminder.py).
 # Runs hourly and can be started by hand (Actions tab -> "Oldal frissítése a táblázatból" -> Run workflow).
 # If a sheet is broken or unreachable, that step fails and the page keeps its last good state.
 # Once a month a tiny "keepalive" change is committed, because GitHub disables scheduled
@@ -106,18 +107,36 @@ jobs:
         run: python tools/sync_gallery.py
 
       # Reminder e-mails to the program organisers and the media person (photos before, report after), sent
-      # through the SMTP_USER / SMTP_PASSWORD secrets (an app password); without them only listed.
+      # through the ADMIN_EMAIL / ADMIN_JELSZO secrets (an app password); without them only listed.
       # The sent ones are recorded in data/reminders.json, saved by the next step.
       - name: Emlékeztető levelek a szervezőknek és a médiásnak
         if: ${{ !cancelled() }}
         env:
-          SMTP_USER: ${{ secrets.SMTP_USER }}
-          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
-          REMINDER_SHEET_LINK: ${{ secrets.REMINDER_SHEET_LINK }}
-          REMINDER_IMAGES_LINK: ${{ secrets.REMINDER_IMAGES_LINK }}
+          ADMIN_EMAIL: ${{ secrets.ADMIN_EMAIL }}
+          ADMIN_JELSZO: ${{ secrets.ADMIN_JELSZO }}
+          VEZETOK_WEBOLDAL_ADATOK_LINK: ${{ secrets.VEZETOK_WEBOLDAL_ADATOK_LINK }}
+          PROGRAM_KEPEK_MAPPA_LINK: ${{ secrets.PROGRAM_KEPEK_MAPPA_LINK }}
           # passed through the environment, never pasted into the script
           REMINDER_TEST_TO: ${{ inputs.reminder_test_to }}
         run: python tools/send_reminders.py
+
+      # On September 15 and October 15: an e-mail to 802@cserkesz.hu if the new (4th-grade) troop's
+      # leaders are not on the Rajok sheet yet; recorded in data/troop_reminder.json.
+      - name: Emlékeztető az új raj rajparancsnokainak elérhetőségéről
+        if: ${{ !cancelled() }}
+        env:
+          ADMIN_EMAIL: ${{ secrets.ADMIN_EMAIL }}
+          ADMIN_JELSZO: ${{ secrets.ADMIN_JELSZO }}
+          CSPK_WEBOLDAL_ADATOK_LINK: ${{ secrets.CSPK_WEBOLDAL_ADATOK_LINK }}
+          REMINDER_TEST_TO: ${{ inputs.reminder_test_to }}
+        run: python tools/troop_reminder.py
+
+      # The footer's "report a problem" line on every page: the address of the ADMIN_EMAIL secret
+      - name: Lábléc hibabejelentő címének frissítése
+        if: ${{ !cancelled() }}
+        env:
+          ADMIN_EMAIL: ${{ secrets.ADMIN_EMAIL }}
+        run: python tools/sync_footer.py
 
       - name: Havi életjel
         if: ${{ !cancelled() }}
