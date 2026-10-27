@@ -1,14 +1,22 @@
 {
   "pelda-program-2-20261026": {
     "end": "2026-10-30",
-    "photos": "2026-10-25T14:23"
+    "photos": "2026-10-25T14:23",
+    "photos_organiser": "2026-10-25T14:23"
   },
   "teszt-program-1-20261024": {
     "end": "2026-10-24",
-    "report": "2026-10-25T23:38"
+    "report": "2026-10-25T23:38",
+    "report_organiser": "2026-10-25T23:38"
   },
   "teszt-program-2-20261026": {
     "end": "2026-10-30",
-    "photos": "2026-10-25T15:42"
+    "photos": "2026-10-25T15:42",
+    "photos_organiser": "2026-10-25T15:42"
+  },
+  "teszt-program-20261028": {
+    "end": "2026-10-28",
+    "photos": "2026-10-27T10:51",
+    "photos_organiser": "2026-10-27T10:51"
   }
 }
