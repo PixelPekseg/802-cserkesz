@@ -1,4 +1,4 @@
-# Python packages of the sync scripts (installed by .github/workflows/sync-sheets.yml).
+# Python packages of the sync scripts (installed by .github/workflows/sync-sheets.yml and test-emails.yml).
 # Pinned to exact, already proven versions so a new release cannot change or break the run
 # unnoticed; update them deliberately (and test locally) instead.
 pillow==12.1.0        # image processing (WebP output)

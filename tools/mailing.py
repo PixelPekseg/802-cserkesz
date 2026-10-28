@@ -2,8 +2,8 @@
 
   - Mailer: SMTP sending from the admin account (ADMIN_EMAIL / ADMIN_JELSZO, a Google app password),
     with one connection per run and the same error handling everywhere (deliver);
-  - test e-mails: the Run workflow form has a checkbox and an address per e-mail kind
-    (TEST_<KIND>, TEST_<KIND>_TO) and "Csak a tesztlevelek" (ONLY_TESTS);
+  - test e-mails: the "Tesztlevelek küldése" workflow form has a checkbox and an address per e-mail
+    kind (TEST_<KIND>, TEST_<KIND>_TO); that workflow also sets ONLY_TESTS;
   - periodic_reminder: the common flow of the seasonal reminders (troops, camps);
   - small Hungarian text helpers (given name, "X és Y" lists).
 """
@@ -119,7 +119,7 @@ def test_target(kind):
 
 
 def testing():
-    """True if any test e-mail was asked for, or "Csak a tesztlevelek" is ticked: then the scripts only
+    """True if any test e-mail was asked for, or ONLY_TESTS is set (test-emails.yml): then the scripts only
     send the tests (a test-only run does not save the state, so a real reminder would go out twice)."""
     return _ticked('ONLY_TESTS') or any(_ticked(f'TEST_{kind}') for kind in TEST_KINDS)
 
@@ -139,7 +139,7 @@ def periodic_reminder(kind, label, state_path, due_key, build):
     due_key(state) → the key of the occasion due now ("2026-09-15"), or None;
     build(test) → (recipients, subject, body), or None when nothing is missing (with test=True it
     must always return an e-mail). Each occasion is handled once (recorded in state_path); the test
-    from the Run workflow form ignores the date and records nothing."""
+    from the test-emails.yml form ignores the date and records nothing."""
     test_to = test_target(kind)
     if test_to is None and testing():
         print(f'{label}: tesztlevél nem volt kérve (tesztfuttatás, rendes levél sem megy ki).')

@@ -76,7 +76,7 @@ def test_close_ignores_errors(smtp):
     assert mailer.server is None
 
 
-# ---------- tests from the Run workflow form ----------
+# ---------- tests from the test-emails.yml form ----------
 
 def test_test_target(monkeypatch, issues):
     assert mailing.test_target('CAMP') is None

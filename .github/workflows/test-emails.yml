@@ -1,0 +1,106 @@
+# Sends test versions of the automatic e-mails, started by hand only (Actions tab -> "Tesztlevelek
+# küldése" -> Run workflow). A checkbox per e-mail kind; with an address below it the test goes only
+# there, without one to the real recipients (marked [TESZT]). Nothing is recorded as sent and the site
+# is not changed: the tests are written from the data the hourly sync saved (data/*.csv) and the
+# media person's sheet. The real reminders are sent by the hourly sync (sync-sheets.yml).
+# Step names stay in Hungarian: the site's editors read them.
+name: Tesztlevelek küldése
+
+on:
+  workflow_dispatch:
+    inputs:
+      test_organiser:
+        description: 'Programos emlékeztető a szervezőnek (2 levél)'
+        type: boolean
+        default: false
+      test_organiser_to:
+        description: '↳ címzett (üresen: a valódi szervező)'
+        required: false
+        default: ''
+      test_media:
+        description: 'Programos emlékeztető a médiásnak (3 levél)'
+        type: boolean
+        default: false
+      test_media_to:
+        description: '↳ címzett (üresen: a valódi médiás)'
+        required: false
+        default: ''
+      test_troop:
+        description: 'Rajparancsnoki emlékeztető (szept. 15. / okt. 15.)'
+        type: boolean
+        default: false
+      test_troop_to:
+        description: '↳ címzett (üresen: 802@cserkesz.hu)'
+        required: false
+        default: ''
+      test_camp:
+        description: 'Tábori emlékeztető (márc.–aug., havonta)'
+        type: boolean
+        default: false
+      test_camp_to:
+        description: '↳ címzett (üresen: a táborért felelős cspk-helyettes)'
+        required: false
+        default: ''
+
+permissions:
+  contents: read
+
+jobs:
+  send:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      TZ: Europe/Budapest
+      # the leaders' workbook, for the media person's sheet (same URL as in sync-sheets.yml)
+      LEADERS_SHEET_URL: https://docs.google.com/spreadsheets/d/e/2PACX-1vQqy5dHnLDdtxJCfwI1waOhfO-a1MHr933EVBTVl-jQiuuCHv94vU4f0UR3eCE48CXeYVfEN28QrZpo/pub?output=xlsx
+      SHEETS_CACHE_DIR: /tmp/sheets
+      # test mode even for a kind that is not ticked: no real reminder can go out from this workflow
+      ONLY_TESTS: 'true'
+      # the form's choices, passed through the environment, never pasted into a script
+      TEST_ORGANISER: ${{ inputs.test_organiser }}
+      TEST_ORGANISER_TO: ${{ inputs.test_organiser_to }}
+      TEST_MEDIA: ${{ inputs.test_media }}
+      TEST_MEDIA_TO: ${{ inputs.test_media_to }}
+      TEST_TROOP: ${{ inputs.test_troop }}
+      TEST_TROOP_TO: ${{ inputs.test_troop_to }}
+      TEST_CAMP: ${{ inputs.test_camp }}
+      TEST_CAMP_TO: ${{ inputs.test_camp_to }}
+      ADMIN_EMAIL: ${{ secrets.ADMIN_EMAIL }}
+      ADMIN_JELSZO: ${{ secrets.ADMIN_JELSZO }}
+    steps:
+      - name: Van-e bepipált tesztlevél
+        if: ${{ !inputs.test_organiser && !inputs.test_media && !inputs.test_troop && !inputs.test_camp }}
+        run: |
+          echo "::error::Egy tesztlevél sincs bepipálva, nincs mit elküldeni."
+          exit 1
+
+      # Actions are pinned to a full commit SHA (a tag can be moved, a SHA cannot): supply-chain safety.
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd   # v6.0.2
+
+      - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405   # v6.2.0
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: tools/requirements.txt
+
+      - name: Csomagok telepítése
+        run: pip install --quiet --disable-pip-version-check -r tools/requirements.txt
+
+      - name: Programos tesztlevelek (szervező, médiás)
+        if: ${{ !cancelled() && (inputs.test_organiser || inputs.test_media) }}
+        env:
+          VEZETOK_WEBOLDAL_ADATOK_LINK: ${{ secrets.VEZETOK_WEBOLDAL_ADATOK_LINK }}
+          PROGRAM_KEPEK_MAPPA_LINK: ${{ secrets.PROGRAM_KEPEK_MAPPA_LINK }}
+        run: python tools/send_reminders.py
+
+      - name: Rajparancsnoki tesztlevél
+        if: ${{ !cancelled() && inputs.test_troop }}
+        env:
+          CSPK_WEBOLDAL_ADATOK_LINK: ${{ secrets.CSPK_WEBOLDAL_ADATOK_LINK }}
+        run: python tools/troop_reminder.py
+
+      - name: Tábori tesztlevél
+        if: ${{ !cancelled() && inputs.test_camp }}
+        env:
+          CSPK_WEBOLDAL_ADATOK_LINK: ${{ secrets.CSPK_WEBOLDAL_ADATOK_LINK }}
+        run: python tools/camp_reminder.py

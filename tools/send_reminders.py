@@ -23,7 +23,7 @@ Sends through SMTP (Gmail / Google Workspace: an app password):
     VEZETOK_WEBOLDAL_ADATOK_LINK  the edit link of the leaders' sheet, put into the media person's
                                   e-mails (GitHub Secret)
     PROGRAM_KEPEK_MAPPA_LINK      the link of the Drive image folder (GitHub Secret)
-    TEST_ORGANISER, TEST_MEDIA    test ("true", from the Run workflow form): sends the organisers' (2)
+    TEST_ORGANISER, TEST_MEDIA    test ("true", from the test-emails.yml form): sends the organisers' (2)
     TEST_ORGANISER_TO, …_TO       or the media person's (3) e-mails of the next program, marked
                                   [TESZT], to the given address, or without one to the real
                                   recipients; nothing else is sent, nothing is recorded
@@ -275,7 +275,7 @@ def main():
 
 
 def test(rows, now, mailer, media):
-    """The test e-mails asked for on the Run workflow form, about the next program."""
+    """The test e-mails asked for on the test-emails.yml form, about the next program."""
     targets = {'organiser': test_target('ORGANISER'), 'media': test_target('MEDIA')}
     if all(target is None for target in targets.values()):
         print('Programos tesztlevél nem volt kérve; most rendes emlékeztető sem megy ki.')

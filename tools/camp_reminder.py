@@ -14,7 +14,7 @@ Environment:
     ADMIN_EMAIL, ADMIN_JELSZO   GitHub Secrets (the same account as send_reminders.py); without
                                 them the e-mail is only printed (and not recorded)
     CSPK_WEBOLDAL_ADATOK_LINK   the edit link of the team's sheet (GitHub Secret)
-    TEST_CAMP, TEST_CAMP_TO     test (Run workflow form): sends the e-mail, marked [TESZT], to the
+    TEST_CAMP, TEST_CAMP_TO     test (test-emails.yml form): sends the e-mail, marked [TESZT], to the
                                 given address or without one to the real recipient, whatever the
                                 date (nothing is recorded)
 
