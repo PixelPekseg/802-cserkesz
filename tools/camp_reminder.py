@@ -96,10 +96,10 @@ def recipient():
 def compose(person, problems):
     hello = greeting([person[0]] if person else [])
     lines = [f'- {name}: hiányzik {", ".join(missing)}' for name, missing in problems]
-    link = f'\n\nweboldal-adatok táblázat: {SHEET_LINK}' if SHEET_LINK else ''
-    subject = 'Hiányzó adatok a tábor kártyákon a weboldalon'
+    link = f'\n\nWeboldal-adatok táblázat: {SHEET_LINK}' if SHEET_LINK else ''
+    subject = 'Hiányzó tábor adatok a weboldalon'
     body = (f'{hello}\n\n'
-            'A weboldal Táboraink oldalán még nem teljesek a tábor kártyák. Minden táborhoz kötelező: '
+            'A weboldal „Táboraink” fülén még nem teljesek a tábor kártyák. Minden táborhoz kötelező: '
             'az időpont, a helyszín, legalább két főszervező és legalább egy elérhetőség (e-mail cím vagy '
             'telefonszám).\n\n'
             'Ezek hiányoznak:\n' + '\n'.join(lines) + '\n\n'

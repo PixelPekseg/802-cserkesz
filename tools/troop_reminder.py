@@ -68,16 +68,15 @@ def new_troop_problem(csv_text, today):
 
 def compose(today, problem, again):
     year = troops.school_year(today)
-    subject = (f'{"Emlékeztető: hiányzik" if again else "Hiányzik"} az új raj rajparancsnokainak '
-               'elérhetősége a weboldalról')
-    link = f'\n\nweboldal-adatok táblázat: {SHEET_LINK}' if SHEET_LINK else ''
+    subject = f'{"Emlékeztető: hiányoznak" if again else "Hiányoznak"} az új rajparancsnokok a weboldalról'
+    link = f'\n\nWeboldal-adatok táblázat: {SHEET_LINK}' if SHEET_LINK else ''
     body = (f'Sziasztok!\n\n'
-            f'A weboldal Csatlakozom oldalán még nem szerepel a {year}/{str(year + 1)[-2:]}-es tanévben '
-            f'induló új raj (a 4. osztályosok) rajparancsnokainak elérhetősége: {problem}.\n\n'
+            f'A weboldal „Csatlakozom” fülén még nem szerepel a {year}/{str(year + 1)[-2:]}-es tanévben '
+            f'induló új raj rajparancsnokainak elérhetősége: {problem}.\n\n'
             'Kérünk, töltsétek ki a „weboldal-adatok” táblázat „Rajok” lapján az új raj sorát: a raj nevét, '
             f'az indulás évét ({year}) és legalább egy rajparancsnok nevét és e-mail címét (a telefonszám '
-            'opcionális), hogy megjelenjen a weboldalon. A változás pár órán belül kikerül a Csatlakozom '
-            f'oldalra és a Pénzügyek oldal Kcs tábordíj fülére.{link}\n\n'
+            'opcionális), hogy megjelenjen a weboldalon. A változás pár órán belül kikerül a „Csatlakozom” '
+            f'fülre és a „Pénzügyek” fül „Kcs tábordíj” részébe.{link}\n\n'
             f'Jó munkát!\n{SIGNATURE}\n')
     return subject, body
 

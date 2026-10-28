@@ -49,8 +49,10 @@ def test_new_troop_problem(rows, problem):
 
 def test_troop_compose():
     subject, body = troops.compose(dt.date(2026, 9, 15), 'hiányzik X', again=False)
-    assert subject.startswith('Hiányzik') and '2026/27-es tanévben' in body and 'hiányzik X.' in body
-    assert troops.compose(dt.date(2026, 10, 15), 'x', again=True)[0].startswith('Emlékeztető: hiányzik')
+    assert subject == 'Hiányoznak az új rajparancsnokok a weboldalról'
+    assert '2026/27-es tanévben' in body and 'hiányzik X.' in body and 'A weboldal „Csatlakozom” fülén' in body
+    assert troops.compose(dt.date(2026, 10, 15), 'x', again=True)[0] == \
+        'Emlékeztető: hiányoznak az új rajparancsnokok a weboldalról'
 
 
 def test_troop_main(tmp_path, monkeypatch, smtp):
