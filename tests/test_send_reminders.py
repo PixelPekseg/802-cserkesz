@@ -207,10 +207,13 @@ def test_test_mode_nothing_asked(capsys):
     assert 'nem volt kérve' in capsys.readouterr().out
 
 
+FIXED_NOW = '2026-03-10 10:00'
+
+
 @pytest.fixture
 def main_files(site, tmp_path, monkeypatch, state_file):
     snapshot = tmp_path / 'programs.csv'
-    future = (dt.datetime.now() + dt.timedelta(hours=12)).strftime('%Y.%m.%d.')
+    future = '2026.03.11.'   # all-day, so it starts at 8:00: within 24 hours of FIXED_NOW
     line = dict.fromkeys(HEADER, '')
     line.update({'Név': 'Holnapi', 'Kezdő dátum': future, 'Kapcsolattartó 1 neve': 'Kiss Anna',
                  'Kapcsolattartó 1 e-mail (kötelező)': 'anna@cserkesz.hu', 'Helyszín': 'x', 'Leírás': 'y'})
@@ -222,7 +225,8 @@ def main_files(site, tmp_path, monkeypatch, state_file):
 
 def test_main_full_run(main_files, smtp, monkeypatch, issues):
     snapshot, media = main_files
-    monkeypatch.setattr('sys.argv', ['send_reminders.py', '--file', str(snapshot), '--media-file', str(media)])
+    monkeypatch.setattr('sys.argv', ['send_reminders.py', '--file', str(snapshot), '--media-file', str(media),
+                                     '--now', FIXED_NOW])
     reminders.main()
     subjects = sorted(m['Subject'] for m in smtp.sent)
     assert len(subjects) == 2 and all('Holnapi' in s for s in subjects)
