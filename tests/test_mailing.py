@@ -60,9 +60,37 @@ def test_deliver_other_error_is_a_warning_and_reconnects(smtp, issues):
     smtp.fail_send = smtplib.SMTPRecipientsRefused({'a@x.hu': (550, b'nincs')})
     assert mailer.deliver([('', 'a@x.hu')], 'T', 'B', 'Program X') is False
     assert mailer.server is None
-    assert issues()[0]['message'].startswith('Program X: a levél nem ment el (SMTPRecipientsRefused')
+    assert issues()[0]['message'].startswith('Program X: a levél nem ment el (küldéskor: SMTPRecipientsRefused')
     smtp.fail_send = None
     assert mailer.deliver([('', 'a@x.hu')], 'T', 'B', 'Program X') is True
+
+
+def test_dropped_connection_is_retried_once(smtp, issues, monkeypatch):
+    drops = [smtplib.SMTPServerDisconnected('Connection unexpectedly closed')]
+    original = smtp.send_message
+
+    def flaky(self, message):
+        if drops:
+            raise drops.pop()
+        original(self, message)
+    monkeypatch.setattr(smtp, 'send_message', flaky)
+    assert mailing.Mailer().deliver([('', 'a@x.hu')], 'T', 'B', 'X') is True
+    assert len(smtp.sent) == 1 and issues() == []
+
+
+def test_dropped_connection_twice_names_the_stage(smtp, issues, monkeypatch):
+    def drop(self, user, password):
+        raise smtplib.SMTPServerDisconnected('Connection unexpectedly closed')
+    monkeypatch.setattr(smtp, 'login', drop)
+    mailer = mailing.Mailer()
+    assert mailer.deliver([('', 'a@x.hu')], 'T', 'B', 'X') is False
+    assert mailer.server is None
+    assert issues()[0]['message'].startswith('X: a levél nem ment el (bejelentkezéskor: SMTPServerDisconnected')
+
+
+def test_password_whitespace_and_line_breaks_are_ignored(smtp, monkeypatch):
+    monkeypatch.setenv('ADMIN_JELSZO', 'abcd efgh\nijkl mnop\n')
+    assert mailing.Mailer().password == 'abcdefghijklmnop'
 
 
 def test_close_ignores_errors(smtp):

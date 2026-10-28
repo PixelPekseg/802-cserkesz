@@ -95,6 +95,9 @@ class FakeSMTP:
     def quit(self):
         pass
 
+    def close(self):
+        pass
+
 
 @pytest.fixture
 def smtp(monkeypatch):

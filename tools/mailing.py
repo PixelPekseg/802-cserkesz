@@ -49,11 +49,13 @@ class Mailer:
 
     def __init__(self):
         self.user = os.environ.get('ADMIN_EMAIL', '').strip()
-        self.password = os.environ.get('ADMIN_JELSZO', '').replace(' ', '')
+        # an app password is shown in groups of four; a pasted line break must not count either
+        self.password = ''.join(os.environ.get('ADMIN_JELSZO', '').split())
         self.host = os.environ.get('SMTP_HOST', '').strip() or 'smtp.gmail.com'
         self.port = int(os.environ.get('SMTP_PORT', '').strip() or 465)
         self.enabled = bool(self.user and self.password)
         self.server = None
+        self.stage = 'kapcsolódáskor'   # where the last attempt got to, for the error message
 
     def __enter__(self):
         return self
@@ -71,10 +73,30 @@ class Mailer:
         message['Date'] = email.utils.formatdate(localtime=True)
         message['Message-ID'] = email.utils.make_msgid(domain=self.user.split('@')[-1])
         message.set_content(body)
-        if self.server is None:
-            self.server = smtplib.SMTP_SSL(self.host, self.port, context=ssl.create_default_context(), timeout=30)
-            self.server.login(self.user, self.password)
-        self.server.send_message(message)
+        try:
+            self._connect()
+            self.stage = 'küldéskor'
+            self.server.send_message(message)
+        except smtplib.SMTPServerDisconnected:
+            # the server may drop a connection (idle, or a passing hiccup): one fresh try
+            self.close()
+            self._connect()
+            self.stage = 'küldéskor'
+            self.server.send_message(message)
+
+    def _connect(self):
+        if self.server is not None:
+            return
+        self.stage = 'kapcsolódáskor'
+        server = smtplib.SMTP_SSL(self.host, self.port, context=ssl.create_default_context(), timeout=30)
+        self.stage = 'bejelentkezéskor'
+        try:
+            server.login(self.user, self.password)
+        except Exception:
+            with contextlib.suppress(Exception):
+                server.close()
+            raise
+        self.server = server
 
     def deliver(self, to, subject, body, label, on_auth_error=None):
         """Sends with the usual error handling: True if sent. A failed sign-in stops the script (after
@@ -89,8 +111,8 @@ class Mailer:
             common.fail('Az SMTP bejelentkezés nem sikerült: ellenőrizd az ADMIN_EMAIL és ADMIN_JELSZO titkot '
                         '(Google-fióknál alkalmazásjelszó kell).')
         except (smtplib.SMTPException, OSError) as error:
-            common.warn(f'{label}: a levél nem ment el ({type(error).__name__}: {error}); a következő futáskor '
-                        'újrapróbálom.')
+            common.warn(f'{label}: a levél nem ment el ({self.stage}: {type(error).__name__}: {error}); a '
+                        'következő futáskor újrapróbálom.')
             self.close()
             return False
 
