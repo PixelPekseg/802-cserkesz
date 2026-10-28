@@ -1,6 +1,4 @@
 {
-  "alerted": "2026-10-27T22:22",
-  "issues": [
-    "warning|Programok|6. sor (Cserkészmise): nincs megadva kapcsolattartó (név és e-mail cím kötelező), ezért a program nem jelenik meg. Pótold a táblázatban."
-  ]
+  "alerted": null,
+  "issues": []
 }
