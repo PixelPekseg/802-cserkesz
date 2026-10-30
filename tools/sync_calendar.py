@@ -43,7 +43,7 @@ SOURCE = '802-weboldal'
 TIME_ZONE = 'Europe/Budapest'
 COLOR = '10'    # "Basil" (dark green) in Google Calendar's event colours
 DEFAULT_LENGTH = dt.timedelta(hours=1)   # a program with only a start time (as for "Google Naptárba")
-SITE_URL = os.environ.get('SITE_URL', 'https://pixelpekseg.github.io/802-cserkesz/').rstrip('/') + '/'
+SITE_URL = os.environ.get('SITE_URL', 'https://www.802szentkorona.com/').rstrip('/') + '/'
 
 warn, fail = common.warn, common.fail
 

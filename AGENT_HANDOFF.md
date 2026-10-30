@@ -14,8 +14,7 @@ A tulajdonos magyarul kommunikál; magyarul válaszolj neki. Az oldal **csak mag
 - Az oldal célja: toborzás (4–8. osztályos gyerekek és szüleik), a közelgő programok és táborok bemutatása, rajparancsnokok elérhetősége, a Bezsilla csapatotthon bemutatása, támogatás (SZJA 1%, palackvisszaváltás, banki átutalás).
 - Szerkesztők: a csapat több tagja **nem programozó**. Ezért a gyakran változó tartalom (programok, táborok, rajok) **Google Táblázatból** kerül az oldalra automatikusan; a többi tartalmat a tulajdonos szerkeszti a kódban.
 - Hosting: **GitHub Pages**, repo `PixelPekseg/802-cserkesz`, ág: `main`, gyökér.
-  Élő cím: `https://pixelpekseg.github.io/802-cserkesz/`.
-  **Saját domain még nincs megvásárolva**; addig mindenhol a `https://www.YOUR-DOMAIN-HERE.com` placeholder áll (minden HTML-ben, `robots.txt`, `sitemap.xml`). Domain után: keresés-csere az egész projektben (`grep -R "YOUR-DOMAIN-HERE" .`), `CNAME` fájl, Pages → Custom domain, Search Console.
+  Saját domain (2026-10-30): **`https://www.802szentkorona.com/`** (a `802szentkorona.com` a www-re irányít). A kanonikus, Open Graph és JSON-LD linkek, a `robots.txt`, a `sitemap.xml` és a naptáresemények linkje (`SITE_URL` a workflow-ban és a `sync_calendar.py`-ban) erre mutat. A domain a Pages → Custom domain beállításban van (a GitHub ehhez `CNAME` fájlt commitol a repóba – ne töröld). A régi `https://pixelpekseg.github.io/802-cserkesz/` cím a domainre irányít.
 - Git: remote `git@github-pixelpekseg:PixelPekseg/802-cserkesz.git` (SSH alias a Pixelpékség kulcsához). Git felhasználó: `kissgergely12`. **Csak a tulajdonos pusholja** – ne commitolj/pusholj, amíg nem kéri.
   `pull.rebase=true` be van állítva, mert a robot (GitHub Actions) is commitol a `main`-re. Push előtt mindig `git pull`.
 
@@ -198,7 +197,7 @@ Egy fül-lapon egymás alatt négy blokk; a blokkot az A oszlopba írt, egyedül
 - **Másolás gombok:** kis, ikon-stílusú gombok minden e-mail mellett (kivéve a láblécben és az eseménykártyákon).
 - **Dokumentumok:** a `pdf/` fájljai; csak a láblécből érhető el.
 - **404.html:** egyedi hibaoldal.
-- **SEO:** `robots.txt`, `sitemap.xml` (jelenleg `YOUR-DOMAIN-HERE`), `share.jpg` (1200×630) megosztási kép, JSON-LD logó: `logo_white.jpg`.
+- **SEO:** `robots.txt`, `sitemap.xml` (a saját domainnel), `share.jpg` (1200×630) megosztási kép, JSON-LD logó: `logo_white.jpg`.
 
 ---
 
@@ -222,7 +221,7 @@ Egy fül-lapon egymás alatt négy blokk; a blokkot az A oszlopba írt, egyedül
 7. Korábbi CSS-hiba: a `index('.camp-media {')` típusú szövegcsere hosszabb szelektort is eltalált és levágta a CSS-t – szerkesztéskor ellenőrizd, hogy a fájl végig megvan.
 8. A WhatsApp-megosztás csak linket visz át; ne építsd vissza.
 9. Beágyazott harmadik féltől származó tartalom (Facebook/Instagram widget) szándékosan nincs.
-10. A lenti „Még placeholder” lista a README-ben is szerepel; ne publikáld élesen a `@example.com` és `YOUR-DOMAIN-HERE` értékekkel.
+10. A lenti „Még placeholder” lista a README-ben is szerepel; ne publikáld élesen a `@example.com` értékekkel.
 
 ---
 
@@ -230,7 +229,7 @@ Egy fül-lapon egymás alatt négy blokk; a blokkot az A oszlopba írt, egyedül
 
 A tulajdonos aktuális teendőlistája a `TODO.md`-ben van (2026-10-27; csak helyben, a `.gitignore` kizárja a repóból); az alábbi a régebbi állapot.
 
-- **Domain megvásárlása**, majd a `YOUR-DOMAIN-HERE` placeholderek lecserélése, `CNAME`, Search Console, sitemap beküldése. (Az ügyfél-modell szerint a domain a szervezet nevén lenne – ez itt a tulajdonossal egyeztetendő.)
+- ~~Domain~~: kész (802szentkorona.com, 2026-10-30); hátra van a Search Console és a sitemap beküldése.
 - **Tábor adatok** (időpont, helyszín, főszervezők) – a Táblázatban kell kitölteni; a README szerinti `@example.com` helyőrzők ellenőrzendők.
 - **Adatkezelési tájékoztató:** megírva a `drafts/adatkezeles.html`-ben (nem publikálva, a kép-kezelést a tulajdonos már papíron lerendezte; a Google Maps és a GitHub hosting miatt szerepel). Publikáláskor linkelni kell a láblécből.
 - **Fotószinkron élesítése** (6. pont): új, Drive API-ra korlátozott API-kulcs a GitHub Secretsbe (`GOOGLE_API_KEY`); a régi, kiszivárgott kulcs törlése. Amíg nincs kulcs, a vezetők kártyái frissülnek, a fotók nem. PDF-ek Drive-ról: később.
