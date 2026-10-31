@@ -90,7 +90,7 @@ def fail(message):
 # ---------- downloads ----------
 
 MAX_DOWNLOAD = 30 * 1024 * 1024   # a workbook or an image is far smaller; protects against runaway responses
-USER_AGENT = '802-cserkesz-sync (+https://github.com/PixelPekseg/802-cserkesz)'
+USER_AGENT = '802-weboldal-sync (+https://github.com/802weboldal/802-weboldal)'
 
 
 class DownloadError(Exception):
