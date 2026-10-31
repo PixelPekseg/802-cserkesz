@@ -66,6 +66,7 @@ def test_drive_api_listing_paging_and_errors(monkeypatch, issues):
     assert [f['id'] for f in drive.children('ROOT')] == ['1', '2']
     assert drive.children('ROOT')[0]['id'] == '1' and len(urls) == 2          # cached
     assert 'pageToken=N' in urls[1] and 'key=KEY' in urls[0]
+    assert 'supportsAllDrives=true' in urls[0] and 'includeItemsFromAllDrives=true' in urls[0]
 
     def broken(url, **k):
         raise common.DownloadError('HTTP 403')
@@ -81,7 +82,7 @@ def test_drive_api_download_url(monkeypatch):
     seen = []
     monkeypatch.setattr(common, 'download', lambda url, **k: seen.append((url, k)) or b'x')
     drive_photos.Drive().download({'id': 'a/b'})
-    assert seen[0][0].endswith('/files/a%2Fb?alt=media&key=K%20Y') and seen[0][1] == {'timeout': 60}
+    assert seen[0][0].endswith('/files/a%2Fb?alt=media&supportsAllDrives=true&key=K%20Y') and seen[0][1] == {'timeout': 60}
 
 
 # ---------- portraits ----------

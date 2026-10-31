@@ -118,6 +118,9 @@ class Drive:
                     'q': f"'{folder_id}' in parents and trashed = false",
                     'fields': 'nextPageToken, files(id, name, mimeType, modifiedTime, thumbnailLink)',
                     'pageSize': '1000',
+                    # the folders are on a shared drive: without these, the API silently returns nothing
+                    'supportsAllDrives': 'true',
+                    'includeItemsFromAllDrives': 'true',
                     'key': self.api_key,
                 }
                 if token:
@@ -145,7 +148,7 @@ class Drive:
         if self.local_dir:
             with open(item['id'], 'rb') as handle:
                 return handle.read()
-        url = f'{API}/{urllib.parse.quote(item["id"], safe="")}?alt=media&key={urllib.parse.quote(self.api_key)}'
+        url = f'{API}/{urllib.parse.quote(item["id"], safe="")}?alt=media&supportsAllDrives=true&key={urllib.parse.quote(self.api_key)}'
         return common.download(url, timeout=60)
 
     @staticmethod
@@ -209,7 +212,7 @@ class PhotoSync:
         from PIL import UnidentifiedImageError
         matches = self._files().get(filename.strip().lower())
         if not matches:
-            common.warn(f'{where}: a(z) "{filename}" nem található a Képek mappában (pontosan egyezik a név, '
+            common.warn(f'{where}: a(z) "{filename}" nem található a Csapatvezetés mappában (pontosan egyezik a név, '
                         'a kiterjesztéssel együtt?). Monogram jelenik meg.')
             return False
         if len(matches) > 1:
