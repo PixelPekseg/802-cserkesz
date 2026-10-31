@@ -127,7 +127,7 @@ jobs:
         env:
           ADMIN_EMAIL: ${{ secrets.ADMIN_EMAIL }}
           ADMIN_JELSZO: ${{ secrets.ADMIN_JELSZO }}
-          CSPK_WEBOLDAL_ADATOK_LINK: ${{ secrets.CSPK_WEBOLDAL_ADATOK_LINK }}
+          WEBOLDAL_ADATOK_LINK: ${{ secrets.WEBOLDAL_ADATOK_LINK }}
           PROGRAM_KEPEK_MAPPA_LINK: ${{ secrets.PROGRAM_KEPEK_MAPPA_LINK }}
         run: python tools/send_reminders.py
 
@@ -150,7 +150,7 @@ jobs:
         env:
           ADMIN_EMAIL: ${{ secrets.ADMIN_EMAIL }}
           ADMIN_JELSZO: ${{ secrets.ADMIN_JELSZO }}
-          CSPK_WEBOLDAL_ADATOK_LINK: ${{ secrets.CSPK_WEBOLDAL_ADATOK_LINK }}
+          WEBOLDAL_ADATOK_LINK: ${{ secrets.WEBOLDAL_ADATOK_LINK }}
         run: python tools/troop_reminder.py
 
       # From March 1 to August 1, monthly: an e-mail to the deputy responsible for camps if a camp card
@@ -161,7 +161,7 @@ jobs:
         env:
           ADMIN_EMAIL: ${{ secrets.ADMIN_EMAIL }}
           ADMIN_JELSZO: ${{ secrets.ADMIN_JELSZO }}
-          CSPK_WEBOLDAL_ADATOK_LINK: ${{ secrets.CSPK_WEBOLDAL_ADATOK_LINK }}
+          WEBOLDAL_ADATOK_LINK: ${{ secrets.WEBOLDAL_ADATOK_LINK }}
         run: python tools/camp_reminder.py
 
       # The footer's "report a problem" line on every page: the address of the ADMIN_EMAIL secret

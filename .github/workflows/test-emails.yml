@@ -89,18 +89,18 @@ jobs:
       - name: Programos tesztlevelek (szervező, médiás)
         if: ${{ !cancelled() && (inputs.test_organiser || inputs.test_media) }}
         env:
-          CSPK_WEBOLDAL_ADATOK_LINK: ${{ secrets.CSPK_WEBOLDAL_ADATOK_LINK }}
+          WEBOLDAL_ADATOK_LINK: ${{ secrets.WEBOLDAL_ADATOK_LINK }}
           PROGRAM_KEPEK_MAPPA_LINK: ${{ secrets.PROGRAM_KEPEK_MAPPA_LINK }}
         run: python tools/send_reminders.py
 
       - name: Rajparancsnoki tesztlevél
         if: ${{ !cancelled() && inputs.test_troop }}
         env:
-          CSPK_WEBOLDAL_ADATOK_LINK: ${{ secrets.CSPK_WEBOLDAL_ADATOK_LINK }}
+          WEBOLDAL_ADATOK_LINK: ${{ secrets.WEBOLDAL_ADATOK_LINK }}
         run: python tools/troop_reminder.py
 
       - name: Tábori tesztlevél
         if: ${{ !cancelled() && inputs.test_camp }}
         env:
-          CSPK_WEBOLDAL_ADATOK_LINK: ${{ secrets.CSPK_WEBOLDAL_ADATOK_LINK }}
+          WEBOLDAL_ADATOK_LINK: ${{ secrets.WEBOLDAL_ADATOK_LINK }}
         run: python tools/camp_reminder.py

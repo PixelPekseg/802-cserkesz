@@ -11,7 +11,7 @@ occasion is sent once a year: recorded in data/troop_reminder.json (committed by
 Environment:
     ADMIN_EMAIL, ADMIN_JELSZO   GitHub Secrets (the same account as send_reminders.py); without
                                 them the e-mail is only printed (and not recorded)
-    CSPK_WEBOLDAL_ADATOK_LINK   the edit link of the team's sheet (GitHub Secret)
+    WEBOLDAL_ADATOK_LINK   the edit link of the team's sheet (GitHub Secret)
     TEST_TROOP, TEST_TROOP_TO   test (test-emails.yml form): sends the e-mail, marked [TESZT], to the
                                 given address or without one to the real recipient, whatever the
                                 date (nothing is recorded)
@@ -34,7 +34,7 @@ from mailing import SIGNATURE, periodic_reminder  # noqa: E402
 
 TO = ('802. sz. Szent Korona Cserkészcsapat', '802@cserkesz.hu')
 STATE = os.path.join(common.ROOT, 'data', 'troop_reminder.json')
-SHEET_LINK = os.environ.get('CSPK_WEBOLDAL_ADATOK_LINK', '').strip()
+SHEET_LINK = os.environ.get('WEBOLDAL_ADATOK_LINK', '').strip()
 OCCASIONS = ((9, 15), (10, 15))   # (month, day)
 WINDOW = dt.timedelta(days=14)
 

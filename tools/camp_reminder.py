@@ -13,7 +13,7 @@ is handled once: recorded in data/camp_reminder.json (committed by the workflow)
 Environment:
     ADMIN_EMAIL, ADMIN_JELSZO   GitHub Secrets (the same account as send_reminders.py); without
                                 them the e-mail is only printed (and not recorded)
-    CSPK_WEBOLDAL_ADATOK_LINK   the edit link of the team's sheet (GitHub Secret)
+    WEBOLDAL_ADATOK_LINK   the edit link of the team's sheet (GitHub Secret)
     TEST_CAMP, TEST_CAMP_TO     test (test-emails.yml form): sends the e-mail, marked [TESZT], to the
                                 given address or without one to the real recipient, whatever the
                                 date (nothing is recorded)
@@ -36,7 +36,7 @@ from mailing import SIGNATURE, greeting, periodic_reminder  # noqa: E402
 
 FALLBACK_TO = ('802. sz. Szent Korona Cserkészcsapat', '802@cserkesz.hu')
 STATE = os.path.join(common.ROOT, 'data', 'camp_reminder.json')
-SHEET_LINK = os.environ.get('CSPK_WEBOLDAL_ADATOK_LINK', '').strip()
+SHEET_LINK = os.environ.get('WEBOLDAL_ADATOK_LINK', '').strip()
 MONTHS = range(3, 9)               # March 1 … August 1
 WINDOW = dt.timedelta(days=14)
 ROLE_WORD = 'tábor'                # "Tábor és programok"
