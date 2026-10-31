@@ -13,9 +13,9 @@ the script stops with an error and changes nothing: the page keeps its last good
 Broken single rows are skipped with a warning ("::warning::" in GitHub Actions).
 A program that has not ended yet needs a contact with a name and an e-mail address (the reminder
 e-mails go there); without one it is skipped with a warning.
-The images and videos of the Drive folder given in the "Képek" column (Képek és videók/Program
-képek/<folder>) go onto the card (videos are played by the Drive player)
-(program_images.py; needs GOOGLE_API_KEY, DRIVE_IMAGES_FOLDER_ID and Pillow – without them the
+The images and videos of the Drive folder given in the "Képek" column (a subfolder of the Drive
+"Program képek" folder) go onto the card (videos are played by the Drive player)
+(program_images.py; needs GOOGLE_API_KEY, DRIVE_PROGRAMS_FOLDER_ID and Pillow – without them the
 existing images stay).
 """
 import argparse

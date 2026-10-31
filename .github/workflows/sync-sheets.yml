@@ -32,14 +32,13 @@ jobs:
       # Dates (expired notices, closed forms, the September 1 troop step-up) are evaluated in
       # Hungarian time, not in the runner's UTC
       TZ: Europe/Budapest
-      # The shared "Csapat adatai" workbook (Csapatvezetés, Rajok, Számlálók, Táborok sheets), published
-      # as a whole in Excel (.xlsx) format.
-      TEAM_SHEET_URL: https://docs.google.com/spreadsheets/d/e/2PACX-1vTDCunLKMOrsGGCt7n-UYNShBdSBMySY41vzQLMdDF0Gh0AWJHII-JcYm34YG572SUXkhcwhhnsCFf5/pub?output=xlsx
-      # The shared "Vezetői táblázat" workbook (Programok, Értesítők, Eszközök, Eszközök kapcsolattartója,
-      # Médiás kapcsolat sheets), edited by every leader; published as a whole in Excel (.xlsx) format.
-      LEADERS_SHEET_URL: https://docs.google.com/spreadsheets/d/e/2PACX-1vQqy5dHnLDdtxJCfwI1waOhfO-a1MHr933EVBTVl-jQiuuCHv94vU4f0UR3eCE48CXeYVfEN28QrZpo/pub?output=xlsx
-      # Public id of the Drive "Képek és videók" folder (not a secret; only the API key is)
-      DRIVE_IMAGES_FOLDER_ID: 13jB-lTr4Eqt1WOImYwWhMahGHwDTLALA
+      # The shared workbook (every sheet of the site; edited by the Ginzeng and the media person),
+      # published as a whole in Excel (.xlsx) format.
+      TEAM_SHEET_URL: https://docs.google.com/spreadsheets/d/e/2PACX-1vRmUbSRypUONm5iMrqiFU_ZqhMEEZAGu9cH-N5VEaYZOdePgTvD-3fjhac2w6qKi0yGXdN6Y8rLuaKa/pub?output=xlsx
+      # Public ids of the Drive folders (not secrets; only the API key is): the portraits
+      # ("Csapatvezetés") and the programs' images ("Program képek", one subfolder per program)
+      DRIVE_LEADERS_FOLDER_ID: 1PYPnEW8ylJvzcRYkRAQSscebslm3nPrq
+      DRIVE_PROGRAMS_FOLDER_ID: 1A-ZlCVWMnECNaOmWOXhiDhBNkEvabRNA
       # every warning / error of the steps is collected here, the "Hibák jelentése" step e-mails them
       SYNC_ISSUES_FILE: /tmp/sync_issues.jsonl
       # each workbook is downloaded once per run and shared by the steps
@@ -128,7 +127,7 @@ jobs:
         env:
           ADMIN_EMAIL: ${{ secrets.ADMIN_EMAIL }}
           ADMIN_JELSZO: ${{ secrets.ADMIN_JELSZO }}
-          VEZETOK_WEBOLDAL_ADATOK_LINK: ${{ secrets.VEZETOK_WEBOLDAL_ADATOK_LINK }}
+          CSPK_WEBOLDAL_ADATOK_LINK: ${{ secrets.CSPK_WEBOLDAL_ADATOK_LINK }}
           PROGRAM_KEPEK_MAPPA_LINK: ${{ secrets.PROGRAM_KEPEK_MAPPA_LINK }}
         run: python tools/send_reminders.py
 

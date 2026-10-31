@@ -72,7 +72,7 @@ def test_drive_api_listing_paging_and_errors(monkeypatch, issues):
     monkeypatch.setattr(common, 'download', broken)
     with pytest.raises(SystemExit):
         drive_photos.Drive().children('OTHER')
-    assert 'Képek" mappa olvasása nem sikerült' in issues()[0]['message']
+    assert 'képes mappa olvasása nem sikerült' in issues()[0]['message']
 
 
 def test_drive_api_download_url(monkeypatch):
@@ -277,3 +277,31 @@ def test_gallery_sections_alts_and_program_groups(paths, drive, monkeypatch):
 def test_gallery_without_programs_snapshot(paths, monkeypatch):
     monkeypatch.setattr(sync_gallery.common, 'ROOT', str(paths))
     assert sync_gallery.program_groups() == []
+
+
+def test_separate_portrait_and_program_folders(paths, monkeypatch):
+    monkeypatch.setenv('GOOGLE_API_KEY', 'K')
+    monkeypatch.setenv('DRIVE_LEADERS_FOLDER_ID', 'LEAD')
+    monkeypatch.setenv('DRIVE_PROGRAMS_FOLDER_ID', 'PROG')
+    jpg = {'mimeType': 'image/jpeg', 'modifiedTime': '1'}
+    tree = {'LEAD': [{'id': 'L1', 'name': 'lili.jpg', **jpg},
+                     {'id': 'SUB', 'name': 'Program régi', 'mimeType': drive_photos.FOLDER_MIME}],
+            'SUB': [{'id': 'L2', 'name': 'anna.jpg', **jpg}],
+            'PROG': [{'id': 'F', 'name': 'okt_23', 'mimeType': drive_photos.FOLDER_MIME}],
+            'F': [{'id': 'I1', 'name': 'a.jpg', **jpg}]}
+    monkeypatch.setattr(drive_photos.Drive, 'children', lambda self, folder: tree[folder])
+    monkeypatch.setattr(drive_photos.Drive, 'download', lambda self, item: image_bytes())
+    photos = drive_photos.PhotoSync()
+    assert photos.photo_for('Lili', 'lili.jpg', 'x') and photos.photo_for('Anna', 'anna.jpg', 'x')   # subfolder too
+    assert len(program_images.ProgramImages().images_for('okt_23', 'x')) == 1
+
+
+def test_only_one_of_the_two_folders(paths, monkeypatch, issues):
+    monkeypatch.setenv('GOOGLE_API_KEY', 'K')
+    monkeypatch.setenv('DRIVE_PROGRAMS_FOLDER_ID', 'PROG')
+    assert not drive_photos.PhotoSync().enabled and program_images.ProgramImages().enabled
+    monkeypatch.delenv('DRIVE_PROGRAMS_FOLDER_ID')
+    monkeypatch.setenv('DRIVE_LEADERS_FOLDER_ID', 'LEAD')
+    images = program_images.ProgramImages()
+    assert not images.enabled and images.images_for('okt_23', 'x') == []
+    assert 'DRIVE_PROGRAMS_FOLDER_ID' in issues()[-1]['message']

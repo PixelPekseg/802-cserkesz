@@ -25,7 +25,7 @@ def clean_env(monkeypatch):
     for name in list(os.environ):
         if name.startswith(('TEST_', 'ADMIN_', 'GOOGLE_', 'SMTP_', 'GITHUB_')) or name in (
                 'ONLY_TESTS', 'SYNC_ISSUES_FILE', 'SHEETS_CACHE_DIR', 'TEAM_SHEET_URL', 'LEADERS_SHEET_URL',
-                'FEES_SHEET_URL', 'DRIVE_IMAGES_FOLDER_ID', 'DRIVE_LOCAL_DIR', 'PROGRAM_CALENDAR_ID',
+                'FEES_SHEET_URL', 'DRIVE_IMAGES_FOLDER_ID', 'DRIVE_LEADERS_FOLDER_ID', 'DRIVE_PROGRAMS_FOLDER_ID', 'DRIVE_LOCAL_DIR', 'PROGRAM_CALENDAR_ID',
                 'VEZETOK_WEBOLDAL_ADATOK_LINK', 'CSPK_WEBOLDAL_ADATOK_LINK', 'PROGRAM_KEPEK_MAPPA_LINK',
                 'ALLOW_EMPTY'):
             monkeypatch.delenv(name, raising=False)

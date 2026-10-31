@@ -103,7 +103,7 @@ def compose(person, problems):
             'az időpont, a helyszín, legalább két főszervező és legalább egy elérhetőség (e-mail cím vagy '
             'telefonszám).\n\n'
             'Ezek hiányoznak:\n' + '\n'.join(lines) + '\n\n'
-            'Kérünk, töltsd ki őket a „weboldal-adatok” táblázat „Táborok” lapján; pár órán belül megjelennek '
+            'Kérünk, töltsd ki őket a „weboldal_adatok” táblázat „Táborok” lapján; pár órán belül megjelennek '
             'a weboldalon. Amíg valami hiányzik, augusztus 1-ig minden hónap elején emlékeztetünk.'
             f'{link}\n\nJó munkát!\n{SIGNATURE}\n')
     return subject, body

@@ -7,7 +7,7 @@ Megjelenjen?
 
 Usage:
     python tools/sync_leaders.py
-        # from TEAM_SHEET_URL, GOOGLE_API_KEY, DRIVE_IMAGES_FOLDER_ID
+        # from TEAM_SHEET_URL, GOOGLE_API_KEY, DRIVE_LEADERS_FOLDER_ID
     python tools/sync_leaders.py --xlsx t.xlsx      # from a local copy of the shared workbook
     python tools/sync_leaders.py --file v.csv       # from a local CSV file
     DRIVE_LOCAL_DIR=./kepek python tools/sync_leaders.py --file v.csv   # local folder instead of Drive

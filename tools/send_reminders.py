@@ -20,8 +20,8 @@ Sends through SMTP (Gmail / Google Workspace: an app password):
                                   them nothing is sent, the would-be e-mails are only listed
                                   (and not recorded)
     SMTP_HOST, SMTP_PORT          optional, default smtp.gmail.com:465 (SSL)
-    VEZETOK_WEBOLDAL_ADATOK_LINK  the edit link of the leaders' sheet, put into the media person's
-                                  e-mails (GitHub Secret)
+    CSPK_WEBOLDAL_ADATOK_LINK     the edit link of the workbook, put into the media person's e-mails
+                                  (GitHub Secret; VEZETOK_WEBOLDAL_ADATOK_LINK, if set, is used instead)
     PROGRAM_KEPEK_MAPPA_LINK      the link of the Drive image folder (GitHub Secret)
     TEST_ORGANISER, TEST_MEDIA    test ("true", from the test-emails.yml form): sends the organisers' (2)
     TEST_ORGANISER_TO, …_TO       or the media person's (3) e-mails of the next program, marked
@@ -48,7 +48,8 @@ from mailing import SIGNATURE, Mailer, greeting, join_and, test_mail, test_targe
 STATE = os.path.join(common.ROOT, 'data', 'reminders.json')
 # The edit link of the sheet and the link of the image folder are GitHub Secrets as well: the
 # repository is public, and they may give edit access to whoever has them.
-SHEET_LINK = os.environ.get('VEZETOK_WEBOLDAL_ADATOK_LINK', '').strip()
+# one workbook since 2026-10-31: the team's link is enough
+SHEET_LINK = (os.environ.get('VEZETOK_WEBOLDAL_ADATOK_LINK', '') or os.environ.get('CSPK_WEBOLDAL_ADATOK_LINK', '')).strip()
 IMAGES_LINK = os.environ.get('PROGRAM_KEPEK_MAPPA_LINK', '').strip()
 
 PHOTOS_AHEAD = dt.timedelta(hours=24)
@@ -270,7 +271,7 @@ def main():
                  'sem küldök; a következő futáskor újrapróbálom.')
             return
         if mailer.enabled and not SHEET_LINK:
-            warn('Nincs beállítva a VEZETOK_WEBOLDAL_ADATOK_LINK titok, a médiás leveleiből kimarad a táblázat linkje.')
+            warn('Nincs beállítva a CSPK_WEBOLDAL_ADATOK_LINK titok, a médiás leveleiből kimarad a táblázat linkje.')
         run(rows, now, mailer, media)
 
 

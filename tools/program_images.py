@@ -1,4 +1,4 @@
-"""Program images and videos from the Google Drive "Képek és videók/Program képek/<folder>" folders
+"""Program images and videos from the subfolders of the Google Drive "Program képek" folder
 (used by sync_programs.py).
 
 The "Képek" column of the programs sheet holds the NAME of the program's folder (e.g. "csm"; the
@@ -90,6 +90,7 @@ def on_disk(state, slug):
 class ProgramImages:
     def __init__(self):
         self.drive = Drive()
+        self.enabled = self.drive.enabled and bool(self.drive.programs_id or self.drive.root_id)
         self.state = common.load_json(STATE, {})
         self.used = set()
         self.synced = set()
@@ -112,10 +113,10 @@ class ProgramImages:
         self.used.add(slug)
         if slug not in self.synced:
             self.synced.add(slug)
-            if self.drive.enabled:
+            if self.enabled:
                 self._sync(parts, slug, where)
             elif not self.warned_disabled:
-                common.warn('Nincs GOOGLE_API_KEY / DRIVE_IMAGES_FOLDER_ID, a programképeket most nem frissítem.')
+                common.warn('Nincs GOOGLE_API_KEY / DRIVE_PROGRAMS_FOLDER_ID, a programképeket most nem frissítem.')
                 self.warned_disabled = True
         return self._on_disk(slug)
 
@@ -123,7 +124,12 @@ class ProgramImages:
         return on_disk(self.state, slug)
 
     def _find_folder(self, parts):
-        program_root = next((i for i in self.drive.children(self.drive.root_id) if is_program_folder(i)), None)
+        if self.drive.programs_id:
+            program_root = {'id': self.drive.programs_id}
+        elif self.drive.root_id:
+            program_root = next((i for i in self.drive.children(self.drive.root_id) if is_program_folder(i)), None)
+        else:
+            program_root = None
         if not program_root:
             return None
         folder = program_root
@@ -230,7 +236,7 @@ class ProgramImages:
         """Deletes the files of folders no program uses any more, and saves the state.
         allow_delete=False keeps every stored folder (used when the sheet's "Képek" column is
         missing: then every program would look image-less, and all images would be deleted)."""
-        if self.drive.enabled and allow_delete:
+        if self.enabled and allow_delete:
             for slug in list(self.state):
                 if slug not in self.used:
                     self._drop(slug)

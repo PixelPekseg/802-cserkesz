@@ -1,15 +1,20 @@
 """Images from the Google Drive "Képek" folder – shared by sync_leaders.py, sync_equipment.py and
 sync_programs.py.
 
-Reads the public "Képek és videók" folder with the Drive API (GOOGLE_API_KEY + DRIVE_IMAGES_FOLDER_ID;
-the id does not change when the folder is renamed). Structure:
+Reads two public Drive folders with the Drive API (GOOGLE_API_KEY; a folder's id does not change when
+it is renamed or moved):
+    DRIVE_LEADERS_FOLDER_ID    the portraits ("Csapatvezetés"; the folder and its subfolders)
+    DRIVE_PROGRAMS_FOLDER_ID   the programs' images: one subfolder per program (e.g. "csm")
+Without these two, the older single folder (DRIVE_IMAGES_FOLDER_ID) is read, structured like this
+(DRIVE_LOCAL_DIR, the local folder for testing, too):
     Képek és videók/
         Csapatvezetés/      portraits (and any other subfolder, or the root itself)
         Program képek/      one subfolder per program (e.g. "csm") with its images and videos
                             (any name starting with "Program…" works)
 
 Portraits (PhotoSync): the sheet only gives the file NAME (with extension). The module looks it up
-by name in the Képek root and its subfolders (except "Program képek"; case-insensitive; with
+by name in the portraits folder and its subfolders (in the single folder: its root and subfolders
+except "Program képek"; case-insensitive; with
 duplicate names the most recently modified wins), downloads it, rotates it by EXIF, scales it down
 and saves it as WebP to images/webp/kozos/team/<name-slug>.webp. Only changed files are downloaded
 (data/photos.json). Empty file name, file not found or not an image → monogram (the old photo is deleted).
@@ -90,7 +95,9 @@ class Drive:
         self.local_dir = os.environ.get('DRIVE_LOCAL_DIR', '')
         self.api_key = os.environ.get('GOOGLE_API_KEY', '')
         self.root_id = self.local_dir or os.environ.get('DRIVE_IMAGES_FOLDER_ID', '')
-        self.enabled = bool(self.local_dir or (self.api_key and self.root_id))
+        self.leaders_id = '' if self.local_dir else os.environ.get('DRIVE_LEADERS_FOLDER_ID', '').strip()
+        self.programs_id = '' if self.local_dir else os.environ.get('DRIVE_PROGRAMS_FOLDER_ID', '').strip()
+        self.enabled = bool(self.local_dir or (self.api_key and (self.root_id or self.leaders_id or self.programs_id)))
         self._cache = {}
 
     def children(self, folder_id):
@@ -118,7 +125,7 @@ class Drive:
                 try:
                     data = json.loads(common.download(f'{API}?{urllib.parse.urlencode(params)}').decode('utf-8'))
                 except (common.DownloadError, ValueError) as error:
-                    common.fail('A Drive "Képek" mappa olvasása nem sikerült (jó a mappa azonosítója, nyilvános a '
+                    common.fail('A Drive képes mappa olvasása nem sikerült (jó a mappa azonosítója, nyilvános a '
                                 f'mappa, be van kapcsolva a Drive API, és érvényes az API-kulcs?): {error}')
                 items += data.get('files', [])
                 token = data.get('nextPageToken')
@@ -151,20 +158,22 @@ class PhotoSync:
 
     def __init__(self):
         self.drive = Drive()
-        self.enabled = self.drive.enabled
+        self.enabled = self.drive.enabled and bool(self.drive.leaders_id or self.drive.root_id)
         self.files = None          # {lowercase name: [file, ...]}, loaded on first use
         self.state = common.load_json(STATE, {})
         self.updated = []
         self.warned_disabled = False
 
     def _files(self):
-        """Files of the Képek root and its subfolders (except Program képek), by name."""
+        """Files of the portraits folder and its subfolders (in the single folder: the root and its
+        subfolders except Program képek), by name."""
         if self.files is not None:
             return self.files
         self.files = {}
-        folders = [self.drive.root_id]
-        for item in self.drive.children(self.drive.root_id):
-            if item.get('mimeType') == FOLDER_MIME and not is_program_folder(item):
+        root = self.drive.leaders_id or self.drive.root_id
+        folders = [root]
+        for item in self.drive.children(root):
+            if item.get('mimeType') == FOLDER_MIME and (self.drive.leaders_id or not is_program_folder(item)):
                 folders.append(item['id'])
         for folder in folders:
             for item in self.drive.children(folder):
@@ -182,7 +191,7 @@ class PhotoSync:
         target_path = os.path.join(TEAM_DIR, target_name)
         if not self.enabled:
             if filename and not self.warned_disabled:
-                common.warn('Nincs GOOGLE_API_KEY / DRIVE_IMAGES_FOLDER_ID, a fotókat most nem frissítem (a meglévők maradnak).')
+                common.warn('Nincs GOOGLE_API_KEY / DRIVE_LEADERS_FOLDER_ID, a fotókat most nem frissítem (a meglévők maradnak).')
                 self.warned_disabled = True
         elif not filename or not self._refresh(filename, target_name, target_path, where):
             self._remove(target_name, target_path)

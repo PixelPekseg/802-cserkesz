@@ -5,7 +5,7 @@ Every year a new troop (raj) starts in September (the 4th graders). On September
 (or on the first run in the 14 days after, as the hourly runs are irregular) it checks the snapshot
 of the Rajok sheet (data/troops.csv, saved by sync_troops.py just before): if there is no shown
 row with this school year as "Indulás éve", or it has no troop leader with a name and an e-mail
-address or phone number, an e-mail goes to TO with the link of the "weboldal-adatok" sheet (the team workbook). Each
+address or phone number, an e-mail goes to TO with the link of the "weboldal_adatok" workbook (the team workbook). Each
 occasion is sent once a year: recorded in data/troop_reminder.json (committed by the workflow).
 
 Environment:
@@ -73,7 +73,7 @@ def compose(today, problem, again):
     body = (f'Sziasztok!\n\n'
             f'A weboldal „Csatlakozom” fülén még nem szerepel a {year}/{str(year + 1)[-2:]}-es tanévben '
             f'induló új raj rajparancsnokainak elérhetősége: {problem}.\n\n'
-            'Kérünk, töltsétek ki a „weboldal-adatok” táblázat „Rajok” lapján az új raj sorát: a raj nevét, '
+            'Kérünk, töltsétek ki a „weboldal_adatok” táblázat „Rajok” lapján az új raj sorát: a raj nevét, '
             f'az indulás évét ({year}) és legalább egy rajparancsnok nevét és e-mail címét (a telefonszám '
             'opcionális), hogy megjelenjen a weboldalon. A változás pár órán belül kikerül a „Csatlakozom” '
             f'fülre és a „Pénzügyek” fül „Kcs tábordíj” részébe.{link}\n\n'

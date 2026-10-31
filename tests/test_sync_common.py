@@ -320,6 +320,14 @@ def test_workbook_is_downloaded_once_and_shared_between_steps(tmp_path, monkeypa
     assert calls == ['https://docs.google.com/x']
 
 
+def test_leaders_sheets_come_from_the_team_workbook_by_default(monkeypatch):
+    data = xlsx_bytes({'Programok': [['Név'], ['Toborzó']]})
+    monkeypatch.setattr(common, 'download', lambda url: data)
+    monkeypatch.setenv('TEAM_SHEET_URL', 'https://docs.google.com/egy')
+    args = argparse.Namespace(file=None, xlsx=None)
+    assert common.fetch(args, 'Programok', common.LEADERS_SHEET_ENV) == 'Név\nToborzó'
+
+
 def test_workbook_download_error(monkeypatch, issues):
     def broken(url):
         raise common.DownloadError('HTTP 404')

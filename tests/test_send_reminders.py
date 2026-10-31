@@ -230,7 +230,7 @@ def test_main_full_run(main_files, smtp, monkeypatch, issues):
     reminders.main()
     subjects = sorted(m['Subject'] for m in smtp.sent)
     assert len(subjects) == 2 and all('Holnapi' in s for s in subjects)
-    assert any('VEZETOK_WEBOLDAL_ADATOK_LINK' in i['message'] for i in issues())
+    assert any('CSPK_WEBOLDAL_ADATOK_LINK' in i['message'] for i in issues())
 
 
 def test_main_without_media_sends_nothing(main_files, smtp, monkeypatch, tmp_path, issues):

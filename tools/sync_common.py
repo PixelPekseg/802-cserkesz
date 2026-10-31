@@ -168,11 +168,12 @@ def write_bytes(path, data):
     _write_atomic(path, data, 'wb')
 
 
-# Two shared workbooks, each published as a whole in Excel (.xlsx) format. When the URL is set,
-# the scripts read their own sheet from it and ignore the old per-sheet CSV URLs.
-#   TEAM_SHEET_URL    – "Csapat adatai" (edited by a small group): Csapatvezetés, Rajok, Számlálók, Táborok
-#   LEADERS_SHEET_URL – "Vezetői táblázat" (edited by every leader): Programok, Értesítők, Eszközök,
+# The shared workbook, published as a whole in Excel (.xlsx) format; edited by the Ginzeng and the
+# media person. Every script reads its own sheet from it:
+#   TEAM_SHEET_URL    – Programok, Értesítők, Csapatvezetés, Rajok, Táborok, Számlálók, Eszközök,
 #                       Eszközök kapcsolattartója, Médiás kapcsolat (the latter only for the reminder e-mails)
+#   LEADERS_SHEET_URL – optional: the programs, notices, equipment and media sheets from a second workbook
+#                       (they were separate until 2026-10-31); without it they come from TEAM_SHEET_URL
 TEAM_SHEET_ENV = 'TEAM_SHEET_URL'
 LEADERS_SHEET_ENV = 'LEADERS_SHEET_URL'
 
@@ -253,7 +254,7 @@ def shared_sheet_csv(args, sheet, book_env):
     the steps of the workflow, see CACHE_DIR)."""
     if getattr(args, 'file', None):
         return None
-    path, url = getattr(args, 'xlsx', None), os.environ.get(book_env)
+    path, url = getattr(args, 'xlsx', None), os.environ.get(book_env) or os.environ.get(TEAM_SHEET_ENV)
     if not path and not url:
         return None
     key = path or url

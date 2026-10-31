@@ -51,8 +51,8 @@ jobs:
     timeout-minutes: 10
     env:
       TZ: Europe/Budapest
-      # the leaders' workbook, for the media person's sheet (same URL as in sync-sheets.yml)
-      LEADERS_SHEET_URL: https://docs.google.com/spreadsheets/d/e/2PACX-1vQqy5dHnLDdtxJCfwI1waOhfO-a1MHr933EVBTVl-jQiuuCHv94vU4f0UR3eCE48CXeYVfEN28QrZpo/pub?output=xlsx
+      # the shared workbook, for the media person's sheet (same URL as in sync-sheets.yml)
+      TEAM_SHEET_URL: https://docs.google.com/spreadsheets/d/e/2PACX-1vRmUbSRypUONm5iMrqiFU_ZqhMEEZAGu9cH-N5VEaYZOdePgTvD-3fjhac2w6qKi0yGXdN6Y8rLuaKa/pub?output=xlsx
       SHEETS_CACHE_DIR: /tmp/sheets
       # test mode even for a kind that is not ticked: no real reminder can go out from this workflow
       ONLY_TESTS: 'true'
@@ -89,7 +89,7 @@ jobs:
       - name: Programos tesztlevelek (szervező, médiás)
         if: ${{ !cancelled() && (inputs.test_organiser || inputs.test_media) }}
         env:
-          VEZETOK_WEBOLDAL_ADATOK_LINK: ${{ secrets.VEZETOK_WEBOLDAL_ADATOK_LINK }}
+          CSPK_WEBOLDAL_ADATOK_LINK: ${{ secrets.CSPK_WEBOLDAL_ADATOK_LINK }}
           PROGRAM_KEPEK_MAPPA_LINK: ${{ secrets.PROGRAM_KEPEK_MAPPA_LINK }}
         run: python tools/send_reminders.py
 
