@@ -34,6 +34,7 @@ programok.html      Programok (közelgő programok + Program Archívum, lépteth
 naptar.html         csak átirányítás a programok.html#naptar-ra (régi linkek, könyvjelzők miatt)
 tamogass.html       Támogass minket (SZJA 1%, palackvisszaváltás QR, egyesület adatai, számlaszám)
 penzugyek.html      Pénzügyek (Tagdíj / Nagytábordíj / Kcs tábordíj fülek időablakkal; egyelőre kézi példa, lásd 5. pont)
+egyesulet.html      Egyesület (Gödöllői Cserkészetért Egyesület: bemutatás, tevékenység, adatok, 1%, taglista, alapszabály PDF – kézzel szerkesztett)
 eszkozok.html       Eszközbérlés (eszközlista + kapcsolattartó a Táblázatból, bevezető szöveg kézzel)
 dokumentumok.html   Dokumentumok (pdf/ mappa; csak a láblécből linkelt)
 galeria.html        Galéria (az oldal összes fotója/videója; a láblécből linkelt; tools/sync_gallery.py)
@@ -49,7 +50,7 @@ tools/*.py          a Táblázat → HTML generátorok
 drafts/             kész, de nem publikált anyagok (.gitignore-ban): adatkezeles.html
 ```
 
-- **Menü:** Főoldal · **Események ▾** (lenyíló: Programjaink = `programok.html`, Táboraink = `tabor.html`; a tulajdonos kérésére a naptár a Programjaink oldalra került vissza) · Csapatotthonunk · Rólunk · **Pénzügyek ▾** (lenyíló: `penzugyek.html#tagdij`, `#nagytabor`, `#kcstabor`, valamint `eszkozok.html`; `ul#subFinance` – az Eszközbérlés a tulajdonos kérésére került ide, a menü rövidítése miatt) · [Csatlakozom] · [Támogass minket]. A lenyíló `li.has-sub` > `button.nav-sub-toggle` + `ul.sub-nav`; az aktuális aloldalnál a `li` `is-current` osztályt, a link `aria-current="page"`-et kap. Egérrel használt széles képernyőn (`@media (hover: hover) and (min-width: 1281px)`) csak rámutatásra (és Tab-fókuszra) nyílik, nyíl nélkül, a kattintás ott szándékosan nem csinál semmit (a tulajdonos kérése); telefonon/érintőképernyőn kattintásra, nyíllal, a hamburger menüben behúzva; a JS (`script.js` eleje) kezeli a nyitást, a kívül kattintást és az Esc-et; menüpontra kattintva a hamburger és a lenyíló is bezárul (az azonos oldali fül-linkeknél is).
+- **Menü:** Főoldal · **Események ▾** (lenyíló: Programjaink = `programok.html`, Táboraink = `tabor.html`; a tulajdonos kérésére a naptár a Programjaink oldalra került vissza) · Csapatotthonunk · Rólunk · **Pénzügyek ▾** (lenyíló: `penzugyek.html#tagdij`, `#nagytabor`, `#kcstabor`, `egyesulet.html`, valamint `eszkozok.html`; `ul#subFinance` – az Eszközbérlés a tulajdonos kérésére került ide, a menü rövidítése miatt) · [Csatlakozom] · [Támogass minket]. A lenyíló `li.has-sub` > `button.nav-sub-toggle` + `ul.sub-nav`; az aktuális aloldalnál a `li` `is-current` osztályt, a link `aria-current="page"`-et kap. Egérrel használt széles képernyőn (`@media (hover: hover) and (min-width: 1281px)`) csak rámutatásra (és Tab-fókuszra) nyílik, nyíl nélkül, a kattintás ott szándékosan nem csinál semmit (a tulajdonos kérése); telefonon/érintőképernyőn kattintásra, nyíllal, a hamburger menüben behúzva; a JS (`script.js` eleje) kezeli a nyitást, a kívül kattintást és az Esc-et; menüpontra kattintva a hamburger és a lenyíló is bezárul (az azonos oldali fül-linkeknél is).
 - **A fejléc és a lábléc minden HTML fájlban külön szerepel** (12 oldal + 404). Menü-/lábléc-módosítást mindenhol át kell vezetni; utána `diff`-eld az oldalakat.
 - **Jekyll-csapda:** a GitHub Pages figyelmen kívül hagyja az `_`-lal kezdődő mappákat. Ezért `images/webp`, `images/originals`, `drafts` (korábban `_webp` stb. volt, a képek emiatt nem látszottak). **Soha ne nevezz el mappát `_`-lal.** `.nojekyll` nincs és nem kell.
 - **Cache-bust:** a HTML-ek `style.css?v=129` és `script.js?v=77` formában hivatkoznak a fájlokra (az utolsó ismert állapot). Bármely CSS/JS módosítás után **minden HTML-ben emeld a számot** (`sed`-del vagy ciklussal), különben a böngésző/CDN a régit mutatja.
@@ -249,3 +250,7 @@ A tulajdonos aktuális teendőlistája a `TODO.md`-ben van (2026-10-27; csak hel
 5. Kis, célzott módosításokat végezz; a tulajdonos gyakran finomít (képek elrendezése, szövegek), és kifejezett, konkrét vizuális elvárásai vannak (3. pont).
 6. Soha ne kérj/írj be kulcsot, jelszót a repóba; a titkok a GitHub Secrets-ben vannak.
 7. Commitot/pusht csak kérésre.
+
+## Egyesület oldal (2026-10-31)
+
+`egyesulet.html` a Pénzügyek menüben, az Eszközbérlés előtt. Kézzel szerkesztett, nincs generált része. Az alapszabály (`pdf/alapszabaly.pdf`) a személyes adatoktól (lakcímek, aláírások, tanúk adatai, alapítói lista oldala) megtisztított, képként újrarenderelt változat; az eredetit nem szabad a repóba tenni. Tagváltozáskor az `ol.member-list` listát kell kézzel frissíteni.

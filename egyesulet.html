@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+  <meta charset="UTF-8">
+  <!-- Content Security Policy: scripts only from this site (plus the hashed inline script of
+       404.html), embeds only from Google Forms/Drive/Maps; a defence in depth against injected code.
+       Keep it identical on every page; a new external resource has to be allowed here. -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'sha256-ILmEoDmaDFn/JUVySfZHBvQvwyPFL4ER1KanXS+sU4k='; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-src https://docs.google.com https://drive.google.com https://www.google.com https://maps.google.com; object-src 'none'; base-uri 'self'; form-action 'none'; upgrade-insecure-requests">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Egyesület – 802. sz. Szent Korona Cserkészcsapat</title>
+  <meta name="description" content="A Gödöllői Cserkészetért Egyesület biztosítja a 802. sz. Szent Korona Cserkészcsapat működéséhez szükséges forrásokat. Adatai, tagjai, alapszabálya és az adó 1%-ának felajánlása.">
+
+  <link rel="canonical" href="https://www.802szentkorona.com/egyesulet">
+
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Gödöllői Cserkészetért Egyesület – 802. sz. Szent Korona Cserkészcsapat">
+  <meta property="og:description" content="A csapatunk mögött álló közhasznú egyesület: adatai, tagjai, alapszabálya és az adó 1%-ának felajánlása.">
+  <meta property="og:url" content="https://www.802szentkorona.com/egyesulet">
+  <meta property="og:image" content="https://www.802szentkorona.com/images/webp/kozos/share.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="A 802. sz. Szent Korona Cserkészcsapat tagjai közös csoportképen">
+  <meta property="og:site_name" content="802. sz. Szent Korona Cserkészcsapat">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta property="og:locale" content="hu_HU">
+
+  <link rel="icon" type="image/jpeg" href="images/webp/kozos/logo_green.jpg?v=1">
+  <link rel="apple-touch-icon" href="images/webp/kozos/logo_green.jpg?v=1">
+  <link rel="stylesheet" href="style.css?v=130">
+</head>
+<body>
+
+  <!-- Notice bar (red, top of the page) -->
+  <!-- NOTICES:START – written by tools/sync_notices.py from the Google Sheet, do not edit by hand -->
+  <div class="notice-bar" id="noticeBar"></div>
+
+  <!-- NOTICES:END -->
+
+  <!-- Header / navigation -->
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="./" class="logo">
+        <img class="logo-img" src="images/webp/kozos/logo_white.webp" alt="" data-optional>
+        <span class="logo-text">802. sz. Szent Korona Cserkészcsapat</span>
+      </a>
+
+      <!-- Hamburger button for the mobile view -->
+      <button class="nav-toggle" id="navToggle" type="button" aria-label="Menü megnyitása" aria-expanded="false" aria-controls="mainNav">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+
+      <nav class="main-nav" id="mainNav">
+        <ul>
+          <li><a href="./">Főoldal</a></li>
+          <li class="has-sub">
+            <button class="nav-sub-toggle" type="button" aria-expanded="false" aria-controls="subPrograms">Események</button>
+            <ul class="sub-nav" id="subPrograms">
+              <li><a href="programok">Programjaink</a></li>
+              <li><a href="tabor">Táboraink</a></li>
+            </ul>
+          </li>
+          <li><a href="csapatotthon">Csapatotthonunk</a></li>
+          <li><a href="rolunk">Rólunk</a></li>
+          <li class="has-sub is-current">
+            <button class="nav-sub-toggle" type="button" aria-expanded="false" aria-controls="subFinance">Pénzügyek</button>
+            <ul class="sub-nav" id="subFinance">
+              <li><a href="penzugyek#tagdij">Tagdíj</a></li>
+              <li><a href="penzugyek#nagytabor">Nagytábordíj</a></li>
+              <li><a href="penzugyek#kcstabor">Kcs tábordíj</a></li>
+              <li><a href="egyesulet" aria-current="page">Egyesület</a></li>
+              <li><a href="eszkozok">Eszközbérlés</a></li>
+            </ul>
+          </li>
+          <li><a class="nav-cta nav-cta-join" href="csatlakozom">Csatlakozom</a></li>
+          <li><a class="nav-cta" href="tamogass">Támogass minket</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Title banner -->
+  <section class="page-banner">
+    <h1>Egyesület</h1>
+    <p>Gödöllői Cserkészetért Egyesület</p>
+  </section>
+
+  <!--
+    The association behind the troop (static page; the bank details are the same as on tamogass.html:
+    keep the two identical, the monitor checks both). Member list: from the owner (2026-10-31).
+    The bylaws PDF is a public copy: personal data (addresses, ID numbers, signatures, the founders'
+    list) removed, the pages kept as images only.
+  -->
+  <section class="section assoc-page">
+    <div class="container">
+      <div class="support-text">
+        <h2>Gödöllői Cserkészetért Egyesület</h2>
+        <p>Csapatunk működéséhez szükséges forrást a Gödöllői Cserkészetért Egyesület biztosítja számunkra. Ezen keresztül intézzük a tagdíj- és tábordíjbefizetéseket, és itt tudnak minket támogatni is.</p>
+        <p>Az egyesület elnöke: <strong>dr. Vass Kristóf András</strong></p>
+      </div>
+
+      <div class="support-text assoc-activity">
+        <h3>Tevékenység leírása</h3>
+        <p>Az egyesület célja a gödöllői cserkészhagyományok ápolása, és a 802. sz. Szent Korona Cserkészcsapat támogatása, működése anyagi hátterének megteremtése. A cserkészet a kortárscsoportok erejével nevel: a 4–15 fős őrsök azonos korú fiatalokból álló, hosszú távon együtt maradó közösségek, amelyeket vezetőjük irányít.</p>
+        <p>Eszményképünket a cserkésztörvény írja le, ehhez kötelezzük el magunkat fogadalmunkkal. Nem iskolai oktatást végzünk: játékosan, tapasztalati úton adjuk át a cserkészismereteket, így a gyerekek szinte észre sem veszik, mennyi mindent tanulnak egy-egy őrsgyűlésen vagy programon. Programjaink egymásra épülnek, vonzók és hasznosak, hogy a fiatalok belső indíttatásból vegyenek részt rajtuk, és cselekedve tanuljanak. A természetben megtanulnak helytállni, jól bánni erőforrásaikkal, megtapasztalják az alkotás örömét, és a teremtett világon keresztül közelebb kerülhetnek Istenhez.</p>
+      </div>
+
+      <!-- The association's and the bank details side by side (stacked on mobile), as on tamogass.html -->
+      <div class="support-cards">
+        <div class="bank-card">
+          <h3>Az egyesület adatai</h3>
+          <p class="bank-label">Név</p>
+          <p class="bank-value">Gödöllői Cserkészetért Egyesület</p>
+          <p class="bank-label">Székhely</p>
+          <p class="bank-value">2100 Gödöllő, Jászóvár utca 64.</p>
+          <p class="bank-label">Adószám</p>
+          <div class="bank-copy">
+            <p class="bank-value bank-number">18949584-1-13</p>
+            <button class="copy-btn" type="button" data-copy="18949584-1-13" data-copy-label="Adószám" aria-label="Adószám másolása" title="Másolás"><svg class="icon-copy" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/></svg><svg class="icon-check" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 13l4 4L19 7"/></svg></button>
+          </div>
+          <p class="bank-label">Elnök</p>
+          <p class="bank-value">dr. Vass Kristóf András</p>
+          <p class="bank-label">E-mail</p>
+          <p class="bank-value"><a class="inline-link" href="mailto:godolloicserkeszetertegyesulet@gmail.com">godolloicserkeszetertegyesulet@gmail.com</a></p>
+        </div>
+
+        <div class="bank-card">
+          <h3>Banki átutalás</h3>
+          <p class="bank-label">Számlatulajdonos</p>
+          <div class="bank-copy">
+            <p class="bank-value">Gödöllői Cserkészetért Egyesület</p>
+            <button class="copy-btn" type="button" data-copy="Gödöllői Cserkészetért Egyesület" data-copy-label="Számlatulajdonos" aria-label="Számlatulajdonos másolása" title="Másolás"><svg class="icon-copy" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/></svg><svg class="icon-check" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 13l4 4L19 7"/></svg></button>
+          </div>
+          <p class="bank-label">Számlaszám</p>
+          <div class="bank-copy">
+            <p class="bank-value bank-number">1620 0223 1007 7922 0000 0000</p>
+            <button class="copy-btn" type="button" data-copy="162002231007792200000000" data-copy-label="Számlaszám" aria-label="Számlaszám másolása" title="Másolás"><svg class="icon-copy" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/></svg><svg class="icon-check" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 13l4 4L19 7"/></svg></button>
+          </div>
+          <p class="bank-label">Másodlagos banki azonosító</p>
+          <div class="bank-copy">
+            <p class="bank-value bank-number">+36204924970</p>
+            <button class="copy-btn" type="button" data-copy="+36204924970" data-copy-label="Másodlagos azonosító" aria-label="Másodlagos banki azonosító másolása" title="Másolás"><svg class="icon-copy" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/></svg><svg class="icon-check" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 13l4 4L19 7"/></svg></button>
+          </div>
+          <p class="bank-note">Tagdíj és tábordíj befizetésénél a közleményt a <a class="inline-link" href="penzugyek#tagdij">Pénzügyek</a> oldal szerint töltse ki; adománynál a közlemény: <strong>Adomány</strong></p>
+        </div>
+      </div>
+
+      <!-- 1% tax offering (the tax number is on the image too) -->
+      <div class="support-text assoc-tax">
+        <h3>Adója 1%-ával is támogathat minket</h3>
+        <p>A Gödöllői Cserkészetért Egyesület <strong>közhasznú szervezet</strong>, ezért személyi jövedelemadója 1%-át felajánlhatja nekünk. Ehhez az szja-bevallásban (vagy az eSZJA felületén) a civil szervezetnek szóló rendelkező nyilatkozatban csak az egyesület adószámát kell megadni: <strong>18949584-1-13</strong>. A felajánlás Önnek nem kerül semmibe, nekünk sokat segít. Köszönjük!</p>
+      </div>
+      <div class="support-banner">
+        <img
+          src="images/webp/tamogass/ado1.webp"
+          width="1702"
+          height="630"
+          loading="lazy"
+          alt="1%-kal egy jobb világért! Kérjük, támogassa a cserkészeket adója 1%-ával! Gödöllői Cserkészetért Egyesület, adószámunk: 18949584-1-13">
+      </div>
+
+      <div class="support-text assoc-members">
+        <h3>Az egyesület tagjai</h3>
+        <ol class="member-list">
+          <li>dr. Vass Kristóf András</li>
+          <li>Vass András</li>
+          <li>Balogh Péter Botond</li>
+          <li>Oláh Gergő</li>
+          <li>Csiki Ádám Barnabás</li>
+          <li>Szmodits Tibor</li>
+          <li>dr. Révészné dr. Szlovenszky Andrea</li>
+          <li>Rólik György</li>
+          <li>Bedő Gergely</li>
+          <li>Pálinkás Péter</li>
+          <li>Cseri-Holzmann Lili</li>
+        </ol>
+      </div>
+
+      <div class="doc-grid assoc-docs">
+        <div class="doc-card">
+          <h3>Az egyesület alapszabálya</h3>
+          <p>Egységes szerkezetben, a 2022. december 18-i módosításokkal. A nyilvános változatból a személyes adatokat (lakcímek, aláírások, a tanúk adatai) eltávolítottuk.</p>
+          <p class="doc-meta">PDF, 3,3 MB</p>
+          <a class="btn btn-primary" href="pdf/alapszabaly.pdf" download="Gödöllői Cserkészetért Egyesület – alapszabály.pdf">Letöltés</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-links">
+        <a href="mailto:802@cserkesz.hu">802@cserkesz.hu</a>
+        <a href="dokumentumok">Dokumentumok</a>
+        <a href="galeria">Galéria</a>
+        <a href="https://www.facebook.com/802szentkorona" target="_blank" rel="noopener noreferrer">Facebook</a>
+        <a href="https://www.instagram.com/802szentkorona/" target="_blank" rel="noopener noreferrer">Instagram</a>
+        <a href="programok#naptar">Naptár</a>
+      </div>
+      <!-- ADMIN_CONTACT:START – written by tools/sync_footer.py from the ADMIN_EMAIL secret, do not edit by hand -->
+      <p class="footer-report">Ha problémát tapasztal, kérjük, jelezze a <a href="mailto:kiss.gergely@cserkesz.hu">kiss.gergely@cserkesz.hu</a> e-mail címen.</p>
+
+      <!-- ADMIN_CONTACT:END -->
+      <p>&copy; <span id="year"></span> 802. sz. Szent Korona Cserkészcsapat. Minden jog fenntartva.</p>
+    </div>
+  </footer>
+
+  <script src="script.js?v=78"></script>
+</body>
+</html>

@@ -1464,6 +1464,52 @@ section[id] {
 }
 
 /* ==========================================================
+   Egyesület (egyesulet.html): the association behind the troop;
+   the data cards and the 1% image reuse the Támogass minket styles
+   ========================================================== */
+.assoc-page h3 {
+  font-size: 1.4rem;
+  margin-bottom: 10px;
+}
+
+.assoc-page .support-text {
+  margin-bottom: 36px;
+}
+
+.assoc-activity {
+  text-align: left;
+}
+
+.assoc-page .support-cards {
+  margin-bottom: 48px;
+}
+
+.assoc-tax {
+  margin-bottom: 20px;
+}
+
+/* Members in two columns (one on mobile), numbered */
+.member-list {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px 32px;
+  margin: 0;
+  padding-left: 1.6em;
+  text-align: left;
+}
+
+@media (max-width: 600px) {
+  .member-list {
+    grid-template-columns: 1fr;
+  }
+}
+
+.assoc-docs {
+  grid-template-columns: minmax(0, 480px);
+  justify-content: center;
+}
+
+/* ==========================================================
    Footer
    ========================================================== */
 .site-footer {
