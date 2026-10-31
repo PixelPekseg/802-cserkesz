@@ -39,7 +39,7 @@ def test_description_upcoming_and_past():
     assert text.split('\n\n') == ['Gyertek', 'Időpont: 17:45 (gyülekező)',
                                   'Kérdés esetén keresd: Kiss Anna (anna@cserkesz.hu, +36 30 123 4567)',
                                   'Facebook-esemény: https://fb.me/x',
-                                  f'Részletek a weboldalon: {cal.SITE_URL}programok.html#portya-1']
+                                  f'Részletek a weboldalon: {cal.SITE_URL}programok#portya-1']
     past = rows_of(program(Leírás='Gyertek', Beszámoló='Jó volt', **{'Kezdő dátum': '2020.01.01.'}))[0]
     assert cal.description(past, 'x').startswith('Jó volt')
 

@@ -89,7 +89,7 @@ def description(row, card_id):
         parts.append('Kérdés esetén keresd: ' + '; '.join(contacts))
     if row['facebook']:
         parts.append(f'Facebook-esemény: {row["facebook"]}')
-    parts.append(f'Részletek a weboldalon: {SITE_URL}programok.html#{card_id}')
+    parts.append(f'Részletek a weboldalon: {SITE_URL}programok#{card_id}')
     return '\n\n'.join(parts)
 
 

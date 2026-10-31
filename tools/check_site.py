@@ -78,7 +78,8 @@ def check_page(path):
             continue
         target, _, anchor = link.partition('#')
         target = urllib.parse.unquote(target.split('?')[0])
-        if target and not os.path.exists(os.path.join(ROOT, target)):
+        # pages are linked without ".html" (GitHub Pages serves "programok" from programok.html)
+        if target and not any(os.path.exists(os.path.join(ROOT, target + ext)) for ext in ('', '.html')):
             problems.append(f'hiányzó fájlra mutató hivatkozás: {link}')
         elif not target and anchor and anchor not in parser.ids:
             problems.append(f'a(z) #{anchor} hivatkozásnak nincs célpontja az oldalon')

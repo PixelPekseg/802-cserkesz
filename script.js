@@ -308,7 +308,7 @@ async function initUpcomingTab(now = new Date()) {
   events.forEach(event => {
     const item = document.createElement('li');
     const link = document.createElement('a');
-    link.href = event.id ? `programok.html#${event.id}` : 'programok.html';
+    link.href = event.id ? `programok#${event.id}` : 'programok';
     const name = document.createElement('span');
     name.className = 'upcoming-name';
     name.textContent = event.name;
@@ -1178,7 +1178,7 @@ function buildCalendarLink(card) {
   return `https://calendar.google.com/calendar/render?${params}`;
 }
 
-const programsUrl = id => `${location.origin}${location.pathname.replace(/[^/]*$/, '')}programok.html#${id}`;
+const programsUrl = id => `${location.origin}${location.pathname.replace(/[^/]*$/, '')}programok#${id}`;
 
 document.querySelectorAll('#newsGrid .news-card[id]').forEach(card => {
   const actions = document.createElement('div');

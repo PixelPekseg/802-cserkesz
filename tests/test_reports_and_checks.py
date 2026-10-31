@@ -147,6 +147,11 @@ def test_check_query_and_encoded_links(tmp_path, monkeypatch):
     assert check(tmp_path, monkeypatch, html, files=('Belépési.pdf',)) == []
 
 
+def test_check_page_links_without_extension(tmp_path, monkeypatch):
+    html = GOOD.replace('kep.webp', 'kep.webp"><a href="programok#a"><a href="./"><a href="penzugyek#tagdij')
+    assert check(tmp_path, monkeypatch, html) == ['programok.html: hiányzó fájlra mutató hivatkozás: penzugyek#tagdij']
+
+
 def test_check_main_reports_warnings(tmp_path, monkeypatch, issues):
     check(tmp_path, monkeypatch, GOOD.replace('kep.webp', 'nincs.webp'))
     check_site.main()
@@ -178,3 +183,16 @@ def test_footer_invalid_address_keeps_pages(site, monkeypatch, issues, value):
     footer.main()
     assert (site / 'index.html').read_text(encoding='utf-8') == before
     assert 'ADMIN_EMAIL' in issues()[0]['message']
+
+
+# ---------- serve (local preview) ----------
+
+def test_serve_maps_addresses_without_extension(tmp_path):
+    import serve
+    (tmp_path / 'programok.html').write_text('x', encoding='utf-8')
+    (tmp_path / 'kep.webp').write_bytes(b'x')
+    handler = serve.Handler.__new__(serve.Handler)
+    handler.directory = str(tmp_path)
+    assert handler.translate_path('/programok') == str(tmp_path / 'programok.html')
+    assert handler.translate_path('/kep.webp') == str(tmp_path / 'kep.webp')
+    assert handler.translate_path('/nincs') == str(tmp_path / 'nincs')
