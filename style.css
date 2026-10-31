@@ -1467,6 +1467,15 @@ section[id] {
    Egyesület (egyesulet.html): the association behind the troop;
    the data cards and the 1% image reuse the Támogass minket styles
    ========================================================== */
+/* The intro sits in the banner, so its text gets a wider line */
+.assoc-banner p {
+  max-width: 820px;
+}
+
+.assoc-banner strong {
+  color: #fff;
+}
+
 .assoc-page h3 {
   font-size: 1.4rem;
   margin-bottom: 10px;
@@ -1491,8 +1500,9 @@ section[id] {
 /* Members in two columns (one on mobile), numbered */
 .member-list {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 6px 32px;
+  grid-template-columns: auto auto;
+  justify-content: center;
+  gap: 6px 48px;
   margin: 0;
   padding-left: 1.6em;
   text-align: left;
@@ -1500,7 +1510,7 @@ section[id] {
 
 @media (max-width: 600px) {
   .member-list {
-    grid-template-columns: 1fr;
+    grid-template-columns: auto;
   }
 }
 
