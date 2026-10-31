@@ -22,7 +22,8 @@ Sends through SMTP (Gmail / Google Workspace: an app password):
     SMTP_HOST, SMTP_PORT          optional, default smtp.gmail.com:465 (SSL)
     WEBOLDAL_ADATOK_LINK          the edit link of the workbook, put into the media person's e-mails
                                   (GitHub Secret)
-    PROGRAM_KEPEK_MAPPA_LINK      the link of the Drive image folder (GitHub Secret)
+    DRIVE_PROGRAMS_FOLDER_ID      the id of the "Program képek" Drive folder (public, set in the
+                                  workflow), its link goes into the media person's e-mails
     TEST_ORGANISER, TEST_MEDIA    test ("true", from the test-emails.yml form): sends the organisers' (2)
     TEST_ORGANISER_TO, …_TO       or the media person's (3) e-mails of the next program, marked
                                   [TESZT], to the given address, or without one to the real
@@ -46,10 +47,11 @@ import sync_programs as programs  # noqa: E402
 from mailing import SIGNATURE, Mailer, greeting, join_and, test_mail, test_target, testing  # noqa: E402
 
 STATE = os.path.join(common.ROOT, 'data', 'reminders.json')
-# The edit link of the sheet and the link of the image folder are GitHub Secrets as well: the
-# repository is public, and they may give edit access to whoever has them.
+# The edit link of the sheet is a GitHub Secret as well: the repository is public, and it gives
+# edit access to whoever has it. The image folder is public (view only), its link is built from its id.
 SHEET_LINK = os.environ.get('WEBOLDAL_ADATOK_LINK', '').strip()
-IMAGES_LINK = os.environ.get('PROGRAM_KEPEK_MAPPA_LINK', '').strip()
+IMAGES_FOLDER_ID = os.environ.get('DRIVE_PROGRAMS_FOLDER_ID', '').strip()
+IMAGES_LINK = f'https://drive.google.com/drive/folders/{IMAGES_FOLDER_ID}' if IMAGES_FOLDER_ID else ''
 
 PHOTOS_AHEAD = dt.timedelta(hours=24)
 REPORT_AFTER = dt.timedelta(days=1)

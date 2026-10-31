@@ -26,7 +26,7 @@ def clean_env(monkeypatch):
         if name.startswith(('TEST_', 'ADMIN_', 'GOOGLE_', 'SMTP_', 'GITHUB_')) or name in (
                 'ONLY_TESTS', 'SYNC_ISSUES_FILE', 'SHEETS_CACHE_DIR', 'TEAM_SHEET_URL', 'LEADERS_SHEET_URL',
                 'FEES_SHEET_URL', 'DRIVE_IMAGES_FOLDER_ID', 'DRIVE_LEADERS_FOLDER_ID', 'DRIVE_PROGRAMS_FOLDER_ID', 'DRIVE_LOCAL_DIR', 'PROGRAM_CALENDAR_ID',
-                'WEBOLDAL_ADATOK_LINK', 'PROGRAM_KEPEK_MAPPA_LINK',
+                'WEBOLDAL_ADATOK_LINK', 'DRIVE_PROGRAMS_FOLDER_ID',
                 'ALLOW_EMPTY'):
             monkeypatch.delenv(name, raising=False)
     monkeypatch.setattr(common, 'ISSUES_FILE', '')

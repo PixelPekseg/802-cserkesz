@@ -128,7 +128,6 @@ jobs:
           ADMIN_EMAIL: ${{ secrets.ADMIN_EMAIL }}
           ADMIN_JELSZO: ${{ secrets.ADMIN_JELSZO }}
           WEBOLDAL_ADATOK_LINK: ${{ secrets.WEBOLDAL_ADATOK_LINK }}
-          PROGRAM_KEPEK_MAPPA_LINK: ${{ secrets.PROGRAM_KEPEK_MAPPA_LINK }}
         run: python tools/send_reminders.py
 
       # The public "802. Programok" Google Calendar follows the Programok sheet (people subscribe to it);

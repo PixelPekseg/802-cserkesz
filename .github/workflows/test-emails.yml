@@ -54,6 +54,8 @@ jobs:
       # the shared workbook, for the media person's sheet (same URL as in sync-sheets.yml)
       TEAM_SHEET_URL: https://docs.google.com/spreadsheets/d/e/2PACX-1vRmUbSRypUONm5iMrqiFU_ZqhMEEZAGu9cH-N5VEaYZOdePgTvD-3fjhac2w6qKi0yGXdN6Y8rLuaKa/pub?output=xlsx
       SHEETS_CACHE_DIR: /tmp/sheets
+      # the public "Program képek" folder, its link goes into the media person's e-mail
+      DRIVE_PROGRAMS_FOLDER_ID: 1A-ZlCVWMnECNaOmWOXhiDhBNkEvabRNA
       # test mode even for a kind that is not ticked: no real reminder can go out from this workflow
       ONLY_TESTS: 'true'
       # the form's choices, passed through the environment, never pasted into a script
@@ -90,7 +92,6 @@ jobs:
         if: ${{ !cancelled() && (inputs.test_organiser || inputs.test_media) }}
         env:
           WEBOLDAL_ADATOK_LINK: ${{ secrets.WEBOLDAL_ADATOK_LINK }}
-          PROGRAM_KEPEK_MAPPA_LINK: ${{ secrets.PROGRAM_KEPEK_MAPPA_LINK }}
         run: python tools/send_reminders.py
 
       - name: Rajparancsnoki tesztlevél
