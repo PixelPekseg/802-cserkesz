@@ -1,4 +1,11 @@
 {
-  "alerted": null,
-  "issues": []
+  "alerted": "2026-10-31T19:23",
+  "issues": [
+    "warning|Programok|4. sor (Október 23-i megemlékezés): a(z) \"okt_23\" mappa nem található a Program képek mappában, a kártyán nem lesz kép.",
+    "warning|Csapatvezetés|2. sor (Cseri-Holzman Lili): a(z) \"cseri-holzman_lili.jpg\" nem található a Képek mappában (pontosan egyezik a név, a kiterjesztéssel együtt?). Monogram jelenik meg.",
+    "warning|Csapatvezetés|3. sor (Csiki Ádám): a(z) \"csiki_adam.jpg\" nem található a Képek mappában (pontosan egyezik a név, a kiterjesztéssel együtt?). Monogram jelenik meg.",
+    "warning|Csapatvezetés|4. sor (Grébel Hanna): a(z) \"grebel_hanna.jpg\" nem található a Képek mappában (pontosan egyezik a név, a kiterjesztéssel együtt?). Monogram jelenik meg.",
+    "warning|Csapatvezetés|5. sor (Bedő Gergely): a(z) \"bedo_gergely.jpg\" nem található a Képek mappában (pontosan egyezik a név, a kiterjesztéssel együtt?). Monogram jelenik meg.",
+    "warning|Csapatvezetés|6. sor (Péter Anna): a(z) \"peter_anna.jpg\" nem található a Képek mappában (pontosan egyezik a név, a kiterjesztéssel együtt?). Monogram jelenik meg."
+  ]
 }
