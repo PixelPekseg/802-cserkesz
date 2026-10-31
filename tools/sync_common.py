@@ -299,6 +299,20 @@ def is_sheet_error(value):
     return value.strip().upper() in SHEET_ERRORS
 
 
+# A cell holding only a stand-in ("-", "?", "…", "x" …) instead of real data: never publish it.
+PLACEHOLDERS = {'-', '--', '---', '–', '—', '?', '??', '???', '.', '..', '...', '…', 'x', 'xx', 'xxx',
+                'tbd', 'tba', 'todo', 'nincs adat'}
+
+
+def is_placeholder(value):
+    return (value or '').strip().lower() in PLACEHOLDERS
+
+
+def placeholder_warning(where, value):
+    warn(f'{where}: helyőrző érték van a cellában ("{value}"), nem teszem ki az oldalra (üresnek veszem). '
+         'Írd be a valódi adatot, vagy hagyd üresen a cellát.')
+
+
 HEADER_SEARCH_ROWS = 5   # the header may sit a few rows down (an empty or title row inserted above it)
 
 
@@ -352,6 +366,9 @@ def read_table(csv_text, columns, required):
                 warn(f'{line_number}. sor, "{header[i].strip()}" oszlop: a cellában táblázathiba van ({value}), '
                      'üresnek veszem. (Telefonszámnál a "+" jel okozza: állítsd az oszlopot Egyszerű szövegre, '
                      'vagy írd így: \'+36 …)')
+                value = ''
+            elif key != 'visible' and is_placeholder(value):
+                placeholder_warning(f'{line_number}. sor, "{header[i].strip()}" oszlop', value)
                 value = ''
             record[key] = value
         result.append((line_number, record))

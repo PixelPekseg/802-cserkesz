@@ -254,6 +254,9 @@ def parse_rows(csv_text):
             warn(f'Egy cellában táblázathiba van ({value}), üresnek veszem. (Telefonszámnál a "+" jel okozza: '
                  'állítsd az oszlopot Egyszerű szövegre, vagy írd így: \'+36 …)')
             return ''
+        if key != 'visible' and common.is_placeholder(value):
+            common.placeholder_warning(f'Programok, "{reader[header_row][i].strip()}" oszlop', value)
+            return ''
         return value
 
     parsed = []

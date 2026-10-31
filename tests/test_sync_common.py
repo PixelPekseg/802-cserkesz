@@ -232,6 +232,25 @@ def test_read_table_basic_and_sheet_errors(capsys):
     assert 'táblázathiba' in capsys.readouterr().out
 
 
+def test_read_table_placeholders_are_left_out(issues):
+    text = csv_text([['Név', 'E-mail', 'Fájlnév', 'Megjelenjen?'],
+                     ['-', 'a@x.hu', '?', 'x'], ['Béla', ' … ', 'b.jpg', '']])
+    rows = common.read_table(text, COLUMNS, required=['name', 'visible'])
+    assert rows == [(2, {'name': '', 'email': 'a@x.hu', 'photo': '', 'visible': 'x'}),
+                    (3, {'name': 'Béla', 'email': '', 'photo': 'b.jpg', 'visible': ''})]
+    messages = [issue['message'] for issue in issues()]
+    assert len(messages) == 3 and all('helyőrző érték' in m for m in messages)
+    assert '2. sor, "Név" oszlop' in messages[0]
+
+
+@pytest.mark.parametrize('value, placeholder', [
+    ('-', True), (' – ', True), ('?', True), ('...', True), ('X', True), ('TBD', True),
+    ('', False), (None, False), ('-5', False), ('Sátor', False), ('x db', False),
+])
+def test_is_placeholder(value, placeholder):
+    assert common.is_placeholder(value) is placeholder
+
+
 def test_read_table_header_lower_down(capsys):
     text = csv_text([['Vezetők listája'], [], ['Név', 'Megjelenjen?'], ['Anna', 'igen']])
     rows = common.read_table(text, COLUMNS, required=['name', 'visible'])

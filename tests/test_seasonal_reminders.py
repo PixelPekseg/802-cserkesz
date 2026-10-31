@@ -36,11 +36,11 @@ def test_troop_due(today, state, expected):
 @pytest.mark.parametrize('rows, problem', [
     ([troop('Gomba', '2026', 'Kiss Anna', 'a@x.hu')], ''),
     ([troop('Gomba', '2026/27', 'Kiss Anna', '', '06301234567')], ''),          # phone only is enough
-    ([troop('Régi', '2025', 'X', 'x@x.hu')], 'nincs olyan megjelenő raj'),
+    ([troop('Régi', '2025', 'Anna', 'x@x.hu')], 'nincs olyan megjelenő raj'),
     ([troop('Gomba', '2026', 'Kiss Anna', 'a@x.hu', visible='nem')], 'nincs olyan megjelenő raj'),
     ([troop('Gomba', '2026', 'Kiss Anna')], 'a(z) Gomba sorában nincs rajparancsnok'),   # name only
     ([troop('', '2026', '', 'a@x.hu')], 'a(z) névtelen sorában'),
-    ([troop('Gomba', 'kettőezer', 'X', 'x@x.hu')], 'nincs olyan megjelenő raj'),
+    ([troop('Gomba', 'kettőezer', 'Anna', 'x@x.hu')], 'nincs olyan megjelenő raj'),
 ])
 def test_new_troop_problem(rows, problem):
     result = troops.new_troop_problem(csv_text([TROOP_HEADER, *rows]), dt.date(2026, 9, 15))
@@ -57,7 +57,7 @@ def test_troop_compose():
 
 def test_troop_main(tmp_path, monkeypatch, smtp):
     data = tmp_path / 'r.csv'
-    data.write_text(csv_text([TROOP_HEADER, troop('Régi', '2025', 'X', 'x@x.hu')]), encoding='utf-8')
+    data.write_text(csv_text([TROOP_HEADER, troop('Régi', '2025', 'Anna', 'x@x.hu')]), encoding='utf-8')
     monkeypatch.setattr(troops, 'STATE', str(tmp_path / 'state.json'))
     monkeypatch.setattr('sys.argv', ['troop_reminder.py', '--today', '2026-10-16', '--file', str(data)])
     troops.main()
@@ -69,7 +69,7 @@ def test_troop_main(tmp_path, monkeypatch, smtp):
 
 def test_troop_main_test_without_problem(tmp_path, monkeypatch, smtp):
     data = tmp_path / 'r.csv'
-    data.write_text(csv_text([TROOP_HEADER, troop('Gomba', '2026', 'X', 'x@x.hu')]), encoding='utf-8')
+    data.write_text(csv_text([TROOP_HEADER, troop('Gomba', '2026', 'Anna', 'x@x.hu')]), encoding='utf-8')
     monkeypatch.setattr(troops, 'STATE', str(tmp_path / 'state.json'))
     monkeypatch.setenv('TEST_TROOP', 'true')
     monkeypatch.setattr('sys.argv', ['troop_reminder.py', '--today', '2026-12-01', '--file', str(data)])

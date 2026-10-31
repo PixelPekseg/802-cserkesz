@@ -127,6 +127,12 @@ def test_sheet_error_cell_is_empty(issues):
     assert 'táblázathiba' in issues()[0]['message']
 
 
+def test_placeholder_cell_is_empty(issues):
+    rows, _ = parse(program(Helyszín='-'))
+    assert rows[0]['place'] == ''
+    assert 'Programok, "Helyszín" oszlop: helyőrző érték' in issues()[0]['message']
+
+
 def test_sorting_by_date_then_time():
     rows, _ = parse(program(Név='C', **{'Kezdő dátum': '2030.01.02.'}),
                     program(Név='B', **{'Kezdő dátum': '2030.01.01.', 'Kezdő idő': '10:00'}),
